@@ -22,6 +22,7 @@ function Login() {
         console.log(result.data);
         setAuthTokens({
           email: result.data.email,
+          id: result.data.id
         });
         setLoggedIn(true)
       } else {

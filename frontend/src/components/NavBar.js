@@ -2,16 +2,38 @@ import React, { useState } from 'react';
 import '../index.css';
 import { useAuth } from '../context/auth';
 import { Redirect } from 'react-router-dom';
+import axios from 'axios';
 
 function Navbar() {
     const { setAuthTokens } = useAuth();
 
     const [showModal, setShowModal] = useState(false);
+    const [foldername, setFoldername] = useState("");
+    const [ isError, setIsError ] = useState(false); 
 
     function logOut() {
         setAuthTokens(null);
         return <Redirect to="/login" />
       }
+
+    function postItem() {
+        if(showModal.add_folder){
+            const token = JSON.parse(localStorage.getItem('tokens'));
+            axios({method: "POST", url:`http://192.168.1.50:3030/addfolder/${token.id}`, data: {
+                name: foldername,
+            }}).then(result => {
+                if(result.status === 200) {
+                    setShowModal(false);
+                } else {
+                    setIsError(true)
+                }
+            }).catch(e => {
+                setIsError(true);
+            });
+        } else {
+            console.log('file upload');
+        }
+    }
 
     return (
 
@@ -76,7 +98,8 @@ function Navbar() {
                         <div class="mt-2">
                             {showModal.add_folder ? (
                             <div>
-                                <input type="text" placeholder="Name..." name="name" class="w-full h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-gray-200 rounded-md shadow-xl"/>
+                                { isError &&<p>Please fill foldername in!</p> }
+                                <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" class="w-full h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-gray-200 rounded-md shadow-xl"/>
                             </div>
                             ): (
                             <label class="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
@@ -92,7 +115,7 @@ function Navbar() {
                     </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onClick={() => setShowModal(false)} class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="submit" onClick={postItem} class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                         Add
                     </button>
                     <button type="button" onClick={() => setShowModal(false)} class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">

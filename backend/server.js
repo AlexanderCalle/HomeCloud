@@ -82,6 +82,32 @@ app.post('/register', (req, res) => {
     }
 });
 
+app.get('/folders/:id', (req, res)=> {
+    con.query('SELECT * FROM `folders` WHERE user_id = ?', req.params.id, (err, result)=> {
+        if (err) return res.status(500).send(err);
+        res.status(200).send(result);
+    })
+});
+
+app.post('/addfolder/:id', (req, res)=>{
+    if(req.body.name != ""){
+        const data = {
+            name: req.body.name,
+            main_path: process.env.UPLOAD_FOLDER + req.params.id + '/',
+            user_id: req.params.id
+        }
+        con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
+            if (err) return res.status(500).send(err);
+            fs.mkdirSync(process.env.UPLOAD_FOLDER + req.params.id + '/' + req.body.name + '/')
+            res.status(200).send({
+                name: req.body.name,
+            });
+        })
+    } else {
+        res.sendStatus(400);
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })
