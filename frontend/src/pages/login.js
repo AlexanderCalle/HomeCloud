@@ -25,10 +25,10 @@ function Login() {
         });
         setLoggedIn(true)
       } else {
-        setIsError(result.data)
+        setIsError(true)
       }
     }).catch(e => {
-      setIsError(e);
+      setIsError(true);
     });
   }
 
