@@ -6,6 +6,7 @@ const con = require('./connect');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs')
 const fs = require('fs');
+const multer = require('multer');
 
 const app = express();
 
@@ -116,17 +117,31 @@ app.get('/folders/folder/:folder_id', (req, res) => {
     });
 });
 
-app.get('/addfiles/:folder_id/:user_id', (req, res) => {
-    const data = {
-        name: 'testFile',
-        path: process.env.UPLOAD_FOLDER + 'c31d27a41b4ae575316bcc/TEst/tesFile',
-        user_id: 'c31d27a41b4ae575316bcc',
-        folder_id: 10,
+const storage = multer.diskStorage({
+    destination: (req, file, callBack) => {
+        callBack(null, process.env.UPLOAD_FOLDER + req.params.user_id + '/' + req.params.foldername + '/')
+    },
+    filename: (req, file, callBack) => {
+        callBack(null, `${file.originalname}`)
     }
-    con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-        if (err) return res.status(500).send(err);
-        res.send(data);
-    }); 
+  })
+
+let upload = multer({ storage: storage})
+
+app.post('/addfiles/:user_id/:foldername', upload.single('file'), (req, res) => {
+    con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], (err, result)=>{
+        if(err) return res.status(500).send(err);
+        const data = {
+            name: req.file.originalname,
+            path: process.env.UPLOAD_FOLDER + req.params.user_id + '/' + req.params.foldername + '/' + req.file.originalname,
+            user_id: req.params.user_id,
+            folder_id: result[0].folder_id,
+        }
+        con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
+            if (err) return res.status(500).send(err);
+            res.status(200).send(data);
+        }); 
+    });
 })
 
 app.listen(port, () => {

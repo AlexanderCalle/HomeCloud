@@ -9,7 +9,7 @@ function Navbar() {
 
     const [showModal, setShowModal] = useState(false);
     const [foldername, setFoldername] = useState("");
-    const [ isError, setIsError ] = useState(false); 
+    const [isError, setIsError ] = useState(false); 
 
     function logOut() {
         setAuthTokens(null);
@@ -30,8 +30,6 @@ function Navbar() {
             }).catch(e => {
                 setIsError(true);
             });
-        } else {
-            console.log('file upload');
         }
     }
 
@@ -49,22 +47,12 @@ function Navbar() {
                 </a>
                 <a className='tooltip' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
                     showModal: true,
-                    name: "Add file(s)"
-                })}>
-                    <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </a>
-                <a className='tooltip' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
-                    showModal: true,
                     name: 'Add Folder',
                     add_folder: true
                 })}>
                     <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
                 </a>
-            </div>
-
-            <div className='flex flex-col space-y-6'>
                 <a className='tooltip'>
                     <span className='tooltiptext shadow-lg font-semibold'>Friends</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -73,6 +61,9 @@ function Navbar() {
                     <span className='tooltiptext shadow-lg font-semibold'>My Profile</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </a>
+            </div>
+
+            <div className='flex flex-col space-y-6'>
                 <button className='tooltip' onClick={logOut}>
                     <span className='tooltiptext shadow-lg font-semibold'>Logout</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -96,20 +87,10 @@ function Navbar() {
                             {showModal.name}
                         </h3>
                         <div className="mt-2">
-                            {showModal.add_folder ? (
                             <div>
                                 { isError &&<p>Please fill foldername in!</p> }
                                 <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className="w-full h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-gray-200 rounded-md shadow-xl"/>
                             </div>
-                            ): (
-                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
-                                <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                                </svg>
-                                <span className="text-base leading-normal">Select a file</span>
-                                <input type='file' className="hidden" />
-                            </label>
-                            )}
                         </div>
                         </div>
                     </div>
@@ -128,7 +109,6 @@ function Navbar() {
             </div>
         ): null}
         </>
-
       </>
     )
 }
