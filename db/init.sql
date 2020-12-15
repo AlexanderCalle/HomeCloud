@@ -16,3 +16,15 @@ CREATE TABLE IF NOT EXISTS `folders` (
     primary key (folder_id),
     FOREIGN KEY (user_id) REFERENCES `users`(id)
 );
+
+CREATE TABLE IF NOT EXISTS `files` (
+    file_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    path VARCHAR(255),
+    user_id VARCHAR(255) NOT NULL,
+    folder_id INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (file_id),
+    FOREIGN KEY (user_id) REFERENCES `users`(id),
+    FOREIGN KEY (folder_id) REFERENCES `folders`(folder_id)
+)

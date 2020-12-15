@@ -4,8 +4,10 @@ import PrivateRoute from './PrivateRoute';
 import { AuthContext } from "./context/auth";
 
 import Home from './pages/home';
+import Collection from './pages/collection';
 import Login from './pages/login';
 import Register from './pages/register';
+
 
 function App() {
 
@@ -24,6 +26,7 @@ function App() {
           <Switch>
             <Route exact path='/login' component={Login} />
             <PrivateRoute exact path='/' component={Home} />
+            <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
             <Route exact path='/register' component={Register} />
           </Switch>
         </div>

@@ -108,6 +108,27 @@ app.post('/addfolder/:id', (req, res)=>{
     }
 });
 
+app.get('/folders/folder/:folder_id', (req, res) => {
+    con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folder_id, (err, files) => {
+        if (err) return res.status(500).send(err);
+        if(files[0] === undefined) return res.send("no data");
+        res.send(files);
+    });
+});
+
+app.get('/addfiles/:folder_id/:user_id', (req, res) => {
+    const data = {
+        name: 'testFile',
+        path: process.env.UPLOAD_FOLDER + 'c31d27a41b4ae575316bcc/TEst/tesFile',
+        user_id: 'c31d27a41b4ae575316bcc',
+        folder_id: 10,
+    }
+    con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
+        if (err) return res.status(500).send(err);
+        res.send(data);
+    }); 
+})
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })
