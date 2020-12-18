@@ -12,6 +12,7 @@ const app = express();
 
 const port = process.env.PORT || 3030;
 
+app.use(express.static('./upload'))
 dotenv.config();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -56,14 +57,14 @@ app.post('/register', (req, res) => {
             } else {
                 const generated_id = crypto.randomBytes(11).toString('hex');
                 const password_hash = bcrypt.hashSync(req.body.password, 11);
-                fs.mkdirSync(process.env.UPLOAD_FOLDER + generated_id + '/');
+                fs.mkdirSync('/' + generated_id + '/');
                 const data = {
                     id: generated_id,
                     email: req.body.email,
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
                     password_hash: password_hash,
-                    folder_path: process.env.UPLOAD_FOLDER + generated_id + '/'
+                    folder_path: '/' + generated_id + '/'
                 }
                 con.query('INSERT INTO `users` SET ?', data, (err, result) => {
                     if(err) {
@@ -94,12 +95,12 @@ app.post('/addfolder/:id', (req, res)=>{
     if(req.body.name != ""){
         const data = {
             name: req.body.name,
-            main_path: process.env.UPLOAD_FOLDER + req.params.id + '/',
+            main_path: '/' + req.params.id + '/',
             user_id: req.params.id
         }
         con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
             if (err) return res.status(500).send(err);
-            fs.mkdirSync(process.env.UPLOAD_FOLDER + req.params.id + '/' + req.body.name + '/')
+            fs.mkdirSync('/' + req.params.id + '/' + req.body.name + '/')
             res.status(200).send({
                 name: req.body.name,
             });
@@ -119,7 +120,7 @@ app.get('/folders/folder/:folder_id', (req, res) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, process.env.UPLOAD_FOLDER + req.params.user_id + '/' + req.params.foldername + '/')
+        callBack(null, './upload/' + req.params.user_id + '/' + req.params.foldername + '/')
     },
     filename: (req, file, callBack) => {
         callBack(null, `${file.originalname}`)
@@ -133,7 +134,7 @@ app.post('/addfiles/:user_id/:foldername', upload.single('file'), (req, res) => 
         if(err) return res.status(500).send(err);
         const data = {
             name: req.file.originalname,
-            path: process.env.UPLOAD_FOLDER + req.params.user_id + '/' + req.params.foldername + '/' + req.file.originalname,
+            path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.file.originalname,
             user_id: req.params.user_id,
             folder_id: result[0].folder_id,
         }
@@ -142,7 +143,14 @@ app.post('/addfiles/:user_id/:foldername', upload.single('file'), (req, res) => 
             res.status(200).send(data);
         }); 
     });
-})
+});
+
+app.get('/myprofile/:userid', (req, res)=>{
+    con.query('SELECT email, firstname, lastname, id FROM `users` WHERE id = ?', req.params.userid, (err, user)=> {
+        if (err) return res.status(500).send(err);
+        res.status(200).send(user[0]);
+    });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

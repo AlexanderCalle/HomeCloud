@@ -7,6 +7,7 @@ import Home from './pages/home';
 import Collection from './pages/collection';
 import Login from './pages/login';
 import Register from './pages/register';
+import MyProfile from './pages/myProfile';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route exact path='/login' component={Login} />
             <PrivateRoute exact path='/' component={Home} />
             <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
+            <PrivateRoute exact path='/myprofile' component={MyProfile} />
             <Route exact path='/register' component={Register} />
           </Switch>
         </div>
