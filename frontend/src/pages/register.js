@@ -16,7 +16,7 @@ function Register() {
 
   function postRegister() {
     console.log('logging in');
-    axios({method: "POST", url:'http://192.168.1.50:3030/register', data: {
+    axios({method: "POST", url:'http://localhost:3030/register', data: {
       email: emailUser,
       password: password,
       firstname: firstname,

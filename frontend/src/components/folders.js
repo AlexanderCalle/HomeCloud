@@ -13,7 +13,7 @@ class FolderList extends React.Component {
     
     componentDidMount() {
         const token = JSON.parse(localStorage.getItem('tokens'));
-        axios({method: 'GET', url:`http://192.168.1.50:3030/folders/${token.id}`})
+        axios({method: 'GET', url:`http://localhost:3030/folders/${token.id}`})
             .then(res => {
             const folders = res.data;
             this.setState({ folders });

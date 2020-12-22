@@ -114,18 +114,31 @@ function Collection() {
           </div>
         </div>
         <>
-        { fileshow ? 
-        <div className="w-1/3 border-l border-r border-blue-500 bg-blue-100 flex flex-col shadow-2xl ">
-          <button className="absolute p-2 right-0" onClick={() => setFileshow(false)}>
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
-          <div className="flex-none h-16 bg-white flex flex-row justify-center items-center p-5 border-blue-500 border-b">
-            <h1 className="text-blue-500 font-semibold">Filename</h1>
+        <Transition 
+          show={fileshow}
+          enter="transition-all duration-500"
+          enterFrom="-mr-96"
+          enterTo="mr-0"
+          leave="transition-all duration-500"
+          leaveTo="-mr-96"
+        >
+          <div className="w-1/3 border-l border-r border-blue-500 bg-blue-100 flex flex-col shadow-2xl ">
+            <button className="absolute p-2 right-0" onClick={() => setFileshow(false)}>
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div className="flex-none h-16 bg-white flex flex-row justify-center items-center p-5 border-blue-500 border-b">
+              <h1 className="text-blue-500 font-semibold">Filename</h1>
+            </div>
+            <div className="flex flex-col p-2 space-y-8 justify-center items-center">
+              <img src={'http://localhost:3030' + filePath} />
+              <br></br>
+              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+                <span>Download</span>
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col p-2 space-y-8 justify-center items-center">
-            <img src={'http://localhost:3030' + filePath} />
-          </div>
-        </div> : null }
+        </Transition> 
         </>
       </div>
       <>
