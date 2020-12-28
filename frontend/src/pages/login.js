@@ -40,7 +40,6 @@ function Login() {
     return (
         <div class="fixed z-10 inset-0 overflow-y-auto shadow-2xl bg-gray-100">
           <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <form>
               <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
               <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                 <div class="w-full bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -50,10 +49,11 @@ function Login() {
                         Login
                       </h3>
                       { isError &&<p>The username or password provided were incorrect!</p> }
-                      <div class="w-full mt-4 flex flex-col space-y-4">
-                        <input type="text" value={emailUser} onChange={ (e) => setEmail(e.target.value) } placeholder="Email..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                        <input type="password" value={password} onChange={ (e) => setPassword(e.target.value) } placeholder="Password..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                      </div>
+                      <form class="w-full mt-4 flex flex-col space-y-4" onSubmit={(e)=> { e.preventDefault(); postLogin()}}>
+                          <input type="text" value={emailUser} onChange={ (e) => setEmail(e.target.value) } placeholder="Email..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
+                          <input type="password" value={password} onChange={ (e) => setPassword(e.target.value) } placeholder="Password..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
+                          <input type="submit" class="hidden" />
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -70,7 +70,6 @@ function Login() {
                   </a>
                 </div>
               </div>
-            </form>
           </div>
         </div>
     )

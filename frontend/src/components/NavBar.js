@@ -89,7 +89,7 @@ function Navbar() {
                         <div className="mt-2">
                             <div>
                                 { isError &&<p>Please fill foldername in!</p> }
-                                <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className="w-full h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-gray-200 rounded-md shadow-xl"/>
+                                <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
                             </div>
                         </div>
                         </div>

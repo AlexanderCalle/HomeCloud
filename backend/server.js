@@ -132,11 +132,19 @@ let upload = multer({ storage: storage})
 app.post('/addfiles/:user_id/:foldername', upload.single('file'), (req, res) => {
     con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], (err, result)=>{
         if(err) return res.status(500).send(err);
+
+        let is_image = 0;
+
+        if(req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') {
+            is_image = 1;
+        }
+
         const data = {
             name: req.file.originalname,
             path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.file.originalname,
             user_id: req.params.user_id,
             folder_id: result[0].folder_id,
+            is_image: is_image
         }
         con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
             if (err) return res.status(500).send(err);
@@ -150,6 +158,36 @@ app.get('/myprofile/:userid', (req, res)=>{
         if (err) return res.status(500).send(err);
         res.status(200).send(user[0]);
     });
+});
+
+app.post('/renamefolder/:folderId', (req, res)=>{
+    
+    con.query('SELECT * FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, folder)=> {
+        if (err) return res.status(500).send(err);
+
+        const oldPath = folder[0].main_path + folder[0].name;
+        const newPath = folder[0].main_path + req.body.name;
+
+        fs.renameSync(oldPath, newPath);
+        con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, (err, files)=> {
+            if (err) return res.status(500).send(err);
+            files.forEach(file => {
+                const newFileDest = '/' + folder[0].user_id + '/' + req.body.name + '/' + file.name;
+                con.query('UPDATE `files` SET path = ? WHERE file_id = ?', [newFileDest, file.file_id], (err, result)=> {
+                    if (err) return res.status(500).send(err);
+                });
+            })
+        });
+
+        con.query('UPDATE `folders` SET name = ? WHERE folder_id = ?', [req.body.name, req.params.folderId], (err, result)=> {
+            if (err) return res.status(500).send(err);
+            res.status(200).send({
+                name: req.body.name
+            });
+        }); 
+
+    });
+
 });
 
 app.listen(port, () => {

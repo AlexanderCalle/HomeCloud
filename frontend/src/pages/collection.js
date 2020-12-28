@@ -6,21 +6,23 @@ import FolderList from '../components/folders';
 import File from '../components/files';
 import Axios from 'axios';
 import { useParams } from 'react-router-dom';
-// import { useAuth } from '../context/auth';
-// import useBreakpoint from '../context/useBreakpoint';
 
 function Collection() {
-  // const isStatic = useBreakpoint('md');
-
   const [showFolders, setShowFolders] = React.useState(true);
-  const [foldername, setFoldername] = React.useState(useParams().foldername)
-  const [folderId, setFolderId] = React.useState(useParams().folderId);
+  const [foldername, setFoldername] = React.useState(useParams().foldername);
+  const folderId = useParams().folderId;
   const [showAddFilesDialog, setShowAddFilesDialog] = React.useState(false);
   const [fileUploading, setFileUploading] = React.useState(null);
   const [files, setFiles] = React.useState(null);
   const [progress, setProgess] = React.useState(null);
   const [fileshow, setFileshow] = React.useState(false);
+  const [showSettings, setShowSettings] = React.useState(false);
   const [filePath, setFilePath] = React.useState(null);
+  const [fileName, setFileName] = React.useState(null);
+  const [rename, setRename] = React.useState(false);
+  const [is_image, setIsImage] = React.useState(false);
+  const [newFoldername, setNewFoldername] = React.useState(foldername);
+  const [fileId, setFileId] = React.useState(null);
 
   function handleChange(event) {
     if(event.target.files.length > 1) {
@@ -59,10 +61,27 @@ function Collection() {
       })
   }
 
-  function fileShowing(filePath) {
+  function fileShowing(filePath, fileName, is_image, fileId) {
     setFileshow(!fileshow);
     setFilePath(filePath);
+    setFileName(fileName);
+    setIsImage(is_image);
+    setFileId(fileId);
     console.log(filePath);
+  }
+
+  function renameFolder(e) {
+    Axios({method: 'POST', url: `http://localhost:3030/renamefolder/${folderId}`, data: {
+      name: newFoldername,
+    }}).then(result => {
+      if (result.status === 200) {
+        setRename(false);
+        setFoldername(result.data.name);
+      } else {
+        console.error(result.data)
+      }
+    }).catch(err => console.log(err));
+
   }
 
   return (
@@ -99,12 +118,24 @@ function Collection() {
             <button onClick={() => setShowFolders(!showFolders)}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
             </button>
-            <h1 className="font-bold">{foldername}</h1>
+            <>
+             {rename ? (
+               <form className="flex flex-row">
+                 <input type="text" value={newFoldername} onChange={ (e) => setNewFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-sm"/>
+                 <button onClick={(e) => {renameFolder(e)}} className="h-8 rounded-md border border-transparent shadow-sm px-4 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                   Rename
+                  </button>
+               </form>
+             ) : <h1 className="font-bold">{foldername}</h1>}
+            </>
             </div>
-            <div className="flex flex-row space-x-4">
+            <div className="flex flex-row space-x-2">
               <botton className="cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowAddFilesDialog(true)}>
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               </botton>
+              <button onClick={() => setShowSettings(!showSettings)}>
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+              </button>
             </div>
           </div>
           <div className="flex-auto overflow-y-auto">
@@ -114,14 +145,7 @@ function Collection() {
           </div>
         </div>
         <>
-        <Transition 
-          show={fileshow}
-          enter="transition-all duration-500"
-          enterFrom="-mr-96"
-          enterTo="mr-0"
-          leave="transition-all duration-500"
-          leaveTo="-mr-96"
-        >
+        {fileshow ? (     
           <div className="w-1/3 border-l border-r border-blue-500 bg-blue-100 flex flex-col shadow-2xl ">
             <button className="absolute p-2 right-0" onClick={() => setFileshow(false)}>
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -130,17 +154,45 @@ function Collection() {
               <h1 className="text-blue-500 font-semibold">Filename</h1>
             </div>
             <div className="flex flex-col p-2 space-y-8 justify-center items-center">
-              <img src={'http://localhost:3030' + filePath} />
+              <>
+                {is_image ? <img src={'http://localhost:3030' + filePath} /> : <h1>{fileName}</h1>}
+              </>
               <br></br>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+              <button className="space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 <span>Download</span>
+              </button>
+              <button className="space-x-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                <span>Delete</span>
               </button>
             </div>
           </div>
-        </Transition> 
+        ) : null}
         </>
       </div>
+
+      <>
+        {showSettings ? (
+          <div className="absolute flex flex-col justify-center w-52 h-32 bg-gray-100 rounded-md right-2 top-20">
+          <button className="block border-b border-t cursor-pointer" onClick={()=> { setRename(true); setShowSettings(false) }}>
+            <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4">
+              <div className="flex flex-row items-center space-x-2">
+                  <strong className="flex-grow font-normal">Rename</strong>
+              </div>
+            </div>
+          </button>
+          <button className="block border-b cursor-pointer">
+            <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4">
+                <div className="flex flex-row items-center space-x-2">
+                    <strong className="flex-grow font-normal">Delete</strong>
+                </div>
+            </div>
+          </button>
+        </div>
+        ) : null}
+      </>
+
       <>
         {showAddFilesDialog ? (
             <div className="fixed z-10 inset-0 overflow-y-auto">
