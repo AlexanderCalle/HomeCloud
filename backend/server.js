@@ -7,14 +7,15 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs')
 const fs = require('fs');
 const multer = require('multer');
+const AdmZip = require('adm-zip');
 
 const app = express();
+app.use(cors());
 
 const port = process.env.PORT || 3030;
 
 app.use(express.static('./upload'))
 dotenv.config();
-app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -99,8 +100,11 @@ app.post('/addfolder/:id', (req, res)=>{
             user_id: req.params.id
         }
         con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
-            if (err) return res.status(500).send(err);
-            fs.mkdirSync('/' + req.params.id + '/' + req.body.name + '/')
+            if (err) {
+                res.status(500).send(err);
+                console.log(err)
+            } 
+            fs.mkdirSync('./upload/' + req.params.id + '/' + req.body.name + '/')
             res.status(200).send({
                 name: req.body.name,
             });
@@ -165,14 +169,14 @@ app.post('/renamefolder/:folderId', (req, res)=>{
     con.query('SELECT * FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, folder)=> {
         if (err) return res.status(500).send(err);
 
-        const oldPath = folder[0].main_path + folder[0].name;
-        const newPath = folder[0].main_path + req.body.name;
+        const oldPath = './upload' + folder[0].main_path + folder[0].name;
+        const newPath = './upload' + folder[0].main_path + req.body.name;
 
         fs.renameSync(oldPath, newPath);
         con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, (err, files)=> {
             if (err) return res.status(500).send(err);
             files.forEach(file => {
-                const newFileDest = '/' + folder[0].user_id + '/' + req.body.name + '/' + file.name;
+                const newFileDest = './upload/' + folder[0].user_id + '/' + req.body.name + '/' + file.name;
                 con.query('UPDATE `files` SET path = ? WHERE file_id = ?', [newFileDest, file.file_id], (err, result)=> {
                     if (err) return res.status(500).send(err);
                 });
@@ -187,6 +191,62 @@ app.post('/renamefolder/:folderId', (req, res)=>{
         }); 
 
     });
+
+});
+
+app.get('/deletefile/:fileId', (req, res) => {
+
+    con.query('SELECT * FROM `files` WHERE file_id = ?', req.params.fileId, (err, files) => {
+        if (err) return res.status(500).send(err);
+
+        fs.unlinkSync('./upload' + files[0].path);
+        con.query('DELETE FROM `files` WHERE file_id = ?', req.params.fileId, (err, result)=> {
+            if (err) return res.status(500).send(err);
+            res.status(200).send('ok')
+        });
+
+    });
+
+});
+
+app.get('/deletefolder/:folderId', (req, res)=> {
+
+    con.query('SELECT * FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, folder)=> {
+        if (err) return res.status(500).send(err);
+
+        con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, (err, files)=> {
+            if (err) return res.status(500).send(err);
+
+            files.forEach(file => {
+                fs.unlinkSync('./upload' + file.path);
+
+                con.query('DELETE FROM `files` WHERE file_id = ?', file.file_id, (err, result)=> {
+                    if (err) return res.status(500).send(err);
+                });
+            });
+
+            fs.rmdirSync('./upload' + folder[0].main_path + folder[0].name);
+            con.query('DELETE FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, result) => {
+                if (err) return res.status(500).send(err);
+    
+                res.status(200).send('Deleted successfully');
+            });
+        });
+
+
+    });
+
+});
+
+app.get('/getfolder/:userId/:foldername', (req, res)=> {
+
+    const file = new AdmZip();
+
+    file.addLocalFolder('./upload/' +req.params.userId + '/' + req.params.foldername);
+
+    file.writeZip('./upload/zipFiles/' + req.params.foldername + '.zip');
+
+    res.download(`./upload/zipFiles/${req.params.foldername}.zip`);
 
 });
 

@@ -16,7 +16,7 @@ class File extends Component {
         Axios({method: 'GET', url:'http://localhost:3030/folders/folder/' + this.folderId})
           .then(res => {
             if(res.status === 200) {
-              if(res.data != "no data") {
+              if(res.data !== "no data") {
                 const files = res.data;
                 this.setState({ files });
               } 

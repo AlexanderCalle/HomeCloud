@@ -5,68 +5,49 @@ import Navbar from '../components/NavBar'
 import FolderList from '../components/folders';
 import File from '../components/files';
 import Axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
+import useFileDownloader from '../hooks/useFileDownloader'
 
 function Collection() {
+  const token = JSON.parse(localStorage.getItem('tokens'));
+
   const [showFolders, setShowFolders] = React.useState(true);
   const [foldername, setFoldername] = React.useState(useParams().foldername);
   const folderId = useParams().folderId;
-  const [showAddFilesDialog, setShowAddFilesDialog] = React.useState(false);
-  const [fileUploading, setFileUploading] = React.useState(null);
-  const [files, setFiles] = React.useState(null);
-  const [progress, setProgess] = React.useState(null);
   const [fileshow, setFileshow] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
-  const [filePath, setFilePath] = React.useState(null);
-  const [fileName, setFileName] = React.useState(null);
   const [rename, setRename] = React.useState(false);
-  const [is_image, setIsImage] = React.useState(false);
   const [newFoldername, setNewFoldername] = React.useState(foldername);
   const [fileId, setFileId] = React.useState(null);
+  const [isfolderWarning, setFoldernameWarning] = React.useState(false);
 
-  function handleChange(event) {
-    if(event.target.files.length > 1) {
-        setFileUploading(`${event.target.files.length} selected`);
-        setFiles(event.target.files[0]);
-    } else {
-        setFileUploading(event.target.files[0].name);
-        setFiles(event.target.files);
-    }
-  }
+  const [file, setFile] = React.useState({
+    name: null,
+    file: null,
+    filename: null,
+    is_image: false,
+  });
 
-  function fileUpload(e) {
-    const data  = new FormData();
-    data.append('file', files[0]);
-
-    const token = JSON.parse(localStorage.getItem('tokens'));
-
-    Axios.post(`http://localhost:3030/addfiles/${token.id}/${foldername}`, data, {
-      onUploadProgress: (ProgressEvent) => {
-        console.log(ProgressEvent.loaded);
-        let progress = Math.round(
-        ProgressEvent.loaded / ProgressEvent.total * 100) + '%';
-        setProgess(progress);
-      }
+  const [folder, setFolder] = React.useState({
+    name: foldername,
+    folder: token.id + "/" + foldername,
   })
-      .then((res) => {
-        if(res.status === 200) {
-          console.log(res.data)
-          setProgess(null);
-          setFileUploading(null);
-          setFiles(null);
-          setShowAddFilesDialog(false);
-        } else {
-          console.log(res.data);
-        }
-      })
-  }
+
+  const [downloadFile, donwloadfolder, downloaderComponent] = useFileDownloader();
+
+  const download = (file) => downloadFile(file);
+
+  const downloadfolder = (file) => downloadfolder(file);
 
   function fileShowing(filePath, fileName, is_image, fileId) {
     setFileshow(!fileshow);
-    setFilePath(filePath);
-    setFileName(fileName);
-    setIsImage(is_image);
     setFileId(fileId);
+    setFile({
+      name: fileName,
+      file: filePath,
+      filename: fileName,
+      is_image: is_image,
+    })
     console.log(filePath);
   }
 
@@ -82,6 +63,27 @@ function Collection() {
       }
     }).catch(err => console.log(err));
 
+  }
+
+  function deletefile() {
+    Axios.get(`http://localhost:3030/deletefile/${fileId}`)
+      .then(res => {
+        if (res.status === 200) {
+          console.log(res.data);
+          window.location.reload();
+        } else {
+          console.error(res.data)
+        }
+      })
+  }
+
+  function deleteFolder() {
+    Axios.get(`http://localhost:3030/deletefolder/${folderId}`)
+      .then(res => {
+        if(res.status === 200) {
+           <Redirect to="/" />
+        }
+      })
   }
 
   return (
@@ -130,9 +132,9 @@ function Collection() {
             </>
             </div>
             <div className="flex flex-row space-x-2">
-              <botton className="cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowAddFilesDialog(true)}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              </botton>
+              <button onClick={() => donwloadfolder(folder)}>
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              </button>
               <button onClick={() => setShowSettings(!showSettings)}>
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
               </button>
@@ -155,20 +157,23 @@ function Collection() {
             </div>
             <div className="flex flex-col p-2 space-y-8 justify-center items-center">
               <>
-                {is_image ? <img src={'http://localhost:3030' + filePath} /> : <h1>{fileName}</h1>}
+                {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>{file.filename}</h1>}
               </>
               <br></br>
-              <button className="space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+              <button onClick={()=> download(file)} className="space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 <span>Download</span>
               </button>
-              <button className="space-x-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+              <button onClick={deletefile} className="space-x-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 <span>Delete</span>
               </button>
             </div>
           </div>
         ) : null}
+        </>
+        <>
+          {downloaderComponent}
         </>
       </div>
 
@@ -182,10 +187,10 @@ function Collection() {
               </div>
             </div>
           </button>
-          <button className="block border-b cursor-pointer">
+          <button className="block border-b cursor-pointer" onClick={()=> { setFoldernameWarning(true)}}>
             <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4">
                 <div className="flex flex-row items-center space-x-2">
-                    <strong className="flex-grow font-normal">Delete</strong>
+                    <strong className="flex-grow font-normal text-red-500">Delete</strong>
                 </div>
             </div>
           </button>
@@ -193,8 +198,8 @@ function Collection() {
         ) : null}
       </>
 
-      <>
-        {showAddFilesDialog ? (
+        <>
+          {isfolderWarning ? (
             <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <form>
@@ -206,36 +211,20 @@ function Collection() {
                     <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
                     <div className="min-w-0 sm:flex sm:items-start">
                         <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
-                          <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
-                              Add File
+                          <h3 className="text-lg leading-6 font-medium text-red-500" id="modal-headline">
+                              Warning!
                           </h3>
                           <div className="mt-2">
-                              <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
-                                  <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                      <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                                  </svg>
-                                  <span className="text-base leading-normal">{ 
-                                      fileUploading != null ? fileUploading : 'Select File(s)'
-                                  }</span>
-                                  <input type='file' className="hidden" onChange={handleChange}/>
-                              </label>
+                              <p>Are you sure you want to delete this folder?</p>
                           </div>
                         </div>
                     </div>
                     </div>
                     <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" onClick={(e)=> {fileUpload(e)}} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        {progress == null ? 'Add': (
-                          <>
-                          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Processing
-                          </>
-                        ) }
+                    <button type="submit" onClick={deleteFolder} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Delete
                     </button>
-                    <button type="button" onClick={() => setShowAddFilesDialog(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onClick={() => setFoldernameWarning(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         Cancel
                     </button>
                     </div>
@@ -243,8 +232,9 @@ function Collection() {
                 </form>
             </div>
             </div>
-        ): null}
+          ) : null}
         </>
+
     </div>
   );
 }
