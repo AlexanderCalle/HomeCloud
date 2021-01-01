@@ -133,27 +133,31 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage})
 
-app.post('/addfiles/:user_id/:foldername', upload.single('file'), (req, res) => {
-    con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], (err, result)=>{
+app.post('/addfiles/:user_id/:foldername', upload.array('file'), (req, res) => {
+    con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], async (err, result)=>{
         if(err) return res.status(500).send(err);
 
-        let is_image = 0;
+        await req.files.forEach(function(file) {
 
-        if(req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') {
-            is_image = 1;
-        }
+            let is_image = 0;
+    
+            if(file.mimetype == 'image/png' || file.mimetype == 'image/jpeg') {
+                is_image = 1;
+            }
+    
+            const data = {
+                name: file.originalname,
+                path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + file.originalname,
+                user_id: req.params.user_id,
+                folder_id: result[0].folder_id,
+                is_image: is_image
+            }
+            con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
+                if (err) return res.status(500).send(err);
+            }); 
+        });
 
-        const data = {
-            name: req.file.originalname,
-            path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.file.originalname,
-            user_id: req.params.user_id,
-            folder_id: result[0].folder_id,
-            is_image: is_image
-        }
-        con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-            if (err) return res.status(500).send(err);
-            res.status(200).send(data);
-        }); 
+        res.status(200).send('ok');
     });
 });
 

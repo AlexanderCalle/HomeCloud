@@ -10,7 +10,7 @@ function Navbar() {
     const [showModal, setShowModal] = useState(false);
     const [foldername, setFoldername] = useState("");
     const [isError, setIsError ] = useState(false); 
-    const [files, setFiles] = React.useState(null);
+    const [files, setFiles] = React.useState([]);
     const [fileUploading, setFileUploading] = React.useState(null);
     const [folderName, setFolderName] = useState(useParams().foldername);
 
@@ -37,7 +37,7 @@ function Navbar() {
     function handleChange(event) {
         if(event.target.files.length > 1) {
             setFileUploading(`${event.target.files.length} selected`);
-            setFiles(event.target.files[0]);
+            setFiles(event.target.files);
         } else {
             setFileUploading(event.target.files[0].name);
             setFiles(event.target.files);
@@ -45,17 +45,22 @@ function Navbar() {
       }
 
     function FileUpload(e) {
+        
         const data  = new FormData();
-        data.append('file', files[0]);
-    
+
+        for(let i = 0; i < files.length; i++) {
+            data.append('file', files[i]);
+        }
+
         const token = JSON.parse(localStorage.getItem('tokens'));
 
         console.log(foldername);
     
-        axios.post(`http://localhost:3030/addfiles/${token.id}/${folderName}`, data)
+        axios.post(`http://localhost:3030/addfiles/${token.id}/${folderName}`, data, {
+            "Content-Type": "multipart/form-data"
+        })
           .then((res) => {
             if(res.status === 200) {
-              console.log(res.data)
               setFileUploading(null);
               setFiles(null);
               setShowModal(false);
@@ -85,11 +90,12 @@ function Navbar() {
                     <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
                 </a>
-                <botton className="cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
+                <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
                     showModal: true,
-                    name: 'Add Folder',
+                    name: 'Add file(s)',
                     add_folder: false
                 })}>
+                     <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </botton>
                 <a className='tooltip'>
@@ -139,7 +145,7 @@ function Navbar() {
                                         <span className="text-base leading-normal">{ 
                                             fileUploading != null ? fileUploading : 'Select File(s)'
                                         }</span>
-                                        <input type='file' className="hidden" onChange={handleChange}/>
+                                        <input type='file' className="hidden" onChange={handleChange} multiple/>
                                     </label>
                                 )}
                             </div>

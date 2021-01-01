@@ -18,7 +18,6 @@ function Collection() {
   const [showSettings, setShowSettings] = React.useState(false);
   const [rename, setRename] = React.useState(false);
   const [newFoldername, setNewFoldername] = React.useState(foldername);
-  const [fileId, setFileId] = React.useState(null);
   const [isfolderWarning, setFoldernameWarning] = React.useState(false);
 
   const [file, setFile] = React.useState({
@@ -39,16 +38,19 @@ function Collection() {
 
   const downloadfolder = (file) => downloadfolder(file);
 
+  async function  downloadFunction(name, path, filename, is_image) {
+    await setFile({
+      name: name,
+      file: path,
+      filename: filename,
+      is_image: is_image
+    });
+
+    download(file)
+  }
+
   function fileShowing(filePath, fileName, is_image, fileId) {
     setFileshow(!fileshow);
-    setFileId(fileId);
-    setFile({
-      name: fileName,
-      file: filePath,
-      filename: fileName,
-      is_image: is_image,
-    })
-    console.log(filePath);
   }
 
   function renameFolder(e) {
@@ -65,7 +67,7 @@ function Collection() {
 
   }
 
-  function deletefile() {
+  function deletefile(fileId) {
     Axios.get(`http://localhost:3030/deletefile/${fileId}`)
       .then(res => {
         if (res.status === 200) {
@@ -142,7 +144,7 @@ function Collection() {
           </div>
           <div className="flex-auto overflow-y-auto">
             <div>
-               <File fileShowing={fileShowing} fileshow={fileshow} folderId={folderId} />
+               <File downloadFunction={downloadFunction} deletefile={deletefile} fileShowing={fileShowing} fileshow={fileshow} folderId={folderId} />
             </div>
           </div>
         </div>
@@ -159,15 +161,6 @@ function Collection() {
               <>
                 {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>{file.filename}</h1>}
               </>
-              <br></br>
-              <button onClick={()=> download(file)} className="space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span>Download</span>
-              </button>
-              <button onClick={deletefile} className="space-x-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                <span>Delete</span>
-              </button>
             </div>
           </div>
         ) : null}
