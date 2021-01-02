@@ -7,6 +7,7 @@ import File from '../components/files';
 import Axios from 'axios';
 import { useParams, Redirect } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
+import FileShow from '../components/FileShow';
 
 function Collection() {
   const token = JSON.parse(localStorage.getItem('tokens'));
@@ -51,6 +52,12 @@ function Collection() {
 
   function fileShowing(filePath, fileName, is_image, fileId) {
     setFileshow(!fileshow);
+    setFile({
+      name: fileName,
+      file: filePath,
+      is_image: is_image,
+      fileId: fileId
+    })
   }
 
   function renameFolder(e) {
@@ -150,19 +157,7 @@ function Collection() {
         </div>
         <>
         {fileshow ? (     
-          <div className="w-1/3 border-l border-r border-blue-500 bg-blue-100 flex flex-col shadow-2xl ">
-            <button className="absolute p-2 right-0" onClick={() => setFileshow(false)}>
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div className="flex-none h-16 bg-white flex flex-row justify-center items-center p-5 border-blue-500 border-b">
-              <h1 className="text-blue-500 font-semibold">Filename</h1>
-            </div>
-            <div className="flex flex-col p-2 space-y-8 justify-center items-center">
-              <>
-                {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>{file.filename}</h1>}
-              </>
-            </div>
-          </div>
+          <FileShow setFileshow={setFileshow} file={file} />
         ) : null}
         </>
         <>
