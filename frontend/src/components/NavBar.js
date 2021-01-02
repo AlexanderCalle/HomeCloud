@@ -13,6 +13,12 @@ function Navbar() {
     const [files, setFiles] = React.useState([]);
     const [fileUploading, setFileUploading] = React.useState(null);
     const [folderName, setFolderName] = useState(useParams().foldername);
+    const [uploadInfo, setUploadInfo] = useState({
+        progress: 0,
+        loaded: 0,
+        total: 0,
+        completed: false,
+    })
 
     function logOut() {
         setAuthTokens(null);
@@ -45,6 +51,19 @@ function Navbar() {
       }
 
     function FileUpload(e) {
+
+        const options = {
+            onUploadProgress: (progressEvent) => {
+                const { loaded, total } = progressEvent;
+
+                setUploadInfo({
+                    progress: Math.floor((loaded * 100) / total),
+                    loaded,
+                    total,
+                    completed: false,
+                })
+            }
+        }
         
         const data  = new FormData();
 
@@ -57,7 +76,8 @@ function Navbar() {
         console.log(foldername);
     
         axios.post(`http://localhost:3030/addfiles/${token.id}/${folderName}`, data, {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
+            ...options
         })
           .then((res) => {
             if(res.status === 200) {
@@ -138,15 +158,20 @@ function Navbar() {
                                         <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
                                     </>
                                 ) : (
-                                    <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
-                                        <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                            <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                                        </svg>
-                                        <span className="text-base leading-normal">{ 
-                                            fileUploading != null ? fileUploading : 'Select File(s)'
-                                        }</span>
-                                        <input type='file' className="hidden" onChange={handleChange} multiple/>
-                                    </label>
+                                    <>
+                                    {uploadInfo.loaded > 0 && uploadInfo.progress + '%'}
+                                    {uploadInfo.loaded === 0 && (
+                                        <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                                            <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                            </svg>
+                                            <span className="text-base leading-normal">{ 
+                                                fileUploading != null ? fileUploading : 'Select File(s)'
+                                            }</span>
+                                            <input type='file' className="hidden" onChange={handleChange} multiple/>
+                                        </label>
+                                    )}
+                                    </>
                                 )}
                             </div>
                         </div>

@@ -16,7 +16,7 @@ function FileShow(props) {
             </div>
             <div className="flex flex-col p-2 space-y-8 justify-center items-center">
                 <>
-                {props.file.is_image ? <img src={'http://localhost:3030' + props.file.file} /> : <h1>{props.file.filename}</h1>}
+                {props.file.is_image ? <img src={'http://localhost:3030' + props.file.file} /> : <h1>No preview to see</h1>}
                 </>
             </div>
         </div>
