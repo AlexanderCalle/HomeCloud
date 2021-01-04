@@ -13,7 +13,6 @@ const useFileDownloader = () => {
   const downloadfolder = (file) =>
     {
         setFiles((fileList) => [...fileList, { ...file, downloadId: uuid(), is_folder: true }]);
-        console.log(files)
     };
 
   const remove = (removeId) =>
@@ -23,7 +22,9 @@ const useFileDownloader = () => {
 
   return [
     (e) => download(e),
+
     (e) => downloadfolder(e),
+
     files.length > 0 ? (
       <Downloader files={files} remove={(e) => remove(e)} />
     ) : null,

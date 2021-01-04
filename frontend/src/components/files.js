@@ -13,7 +13,7 @@ class File extends Component {
         }
     }
     componentDidMount() {
-        Axios({method: 'GET', url:'http://localhost:3030/folders/folder/' + this.folderId})
+        Axios({method: 'GET', url:`http://${process.env.REACT_APP_HOST_IP}:3030/folders/folder/` + this.folderId})
           .then(res => {
             if(res.status === 200) {
               if(res.data !== "no data") {
@@ -43,7 +43,10 @@ class File extends Component {
                             </div>
                         </a>
                         <div className="flex-none flex flex-row space-x-2 mr-2">
-                            <button onClick={() => this.props.downloadFunction(file.name, file.path, file.name, file.is_image)}>
+                            <button onClick={() => {
+                                this.props.downloadFunction(file.name, file.path, file.name, file.is_image)
+                                console.log(file.name);
+                            }}>
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             </button>
                             <button onClick={()=>this.props.deletefile(file.file_id)}>

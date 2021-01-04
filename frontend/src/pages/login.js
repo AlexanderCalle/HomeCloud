@@ -14,7 +14,7 @@ function Login() {
 
   function postLogin() {
     console.log('logging in');
-    axios({method: "POST", url:'http://localhost:3030/login', data: {
+    axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/login`, data: {
       email: emailUser,
       password: password
     }}).then(result => {

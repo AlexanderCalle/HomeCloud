@@ -11,7 +11,7 @@ class Profile extends Component {
     componentDidMount() {
         const token = JSON.parse(localStorage.getItem('tokens'));
 
-        Axios({method: 'GET', url: `http://localhost:3030/myprofile/${token.id}`})
+        Axios({method: 'GET', url: `http://${process.env.REACT_APP_HOST_IP}:3030/myprofile/${token.id}`})
             .then(res => {
                 if(res.status === 200) {
                     this.setState(res.data);

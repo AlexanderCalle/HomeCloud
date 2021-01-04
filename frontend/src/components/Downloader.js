@@ -51,7 +51,7 @@ const DownloadItem = ({ name, file, filename, removeFile }) => {
             }
         }
 
-        Axios.get('http://localhost:3030' + file, {
+        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030` + file, {
                 responseType: "blob",
                 ...options,
                 headers: {
@@ -59,7 +59,6 @@ const DownloadItem = ({ name, file, filename, removeFile }) => {
                     'Access-Control-Allow-Origin': '*'
                 }
             }).then(function (response) {
-            console.log(response);
         
             const url = window.URL.createObjectURL(
                 new Blob([response.data], {
@@ -136,7 +135,7 @@ const DonwloadFolder = ({name, folder, removeFile}) => {
             }
         }
 
-        Axios.get('http://localhost:3030/getfolder/' + folder, {
+        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/getfolder/` + folder, {
                 responseType: "blob",
                 ...options,
                 headers: {

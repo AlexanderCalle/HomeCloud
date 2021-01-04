@@ -16,14 +16,17 @@ const port = process.env.PORT || 3030;
 
 app.use(express.static('./upload'))
 dotenv.config();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: 128*1024*1024}));
+app.use(bodyParser.urlencoded({limit: 128*1024*1024, extended: true}));
+
+let chunks = [];
 
 app.get('/', (req, res) => {
     res.send('hello')
 });
 
 app.post('/login', (req, res) => {
+    console.log('logging in');
     const email = req.body.email;
     if(req.body.email != "" && req.body.password != "") {
         con.query('SELECT * FROM users WHERE email = ?', req.body.email, (err, result)=> {
@@ -37,6 +40,7 @@ app.post('/login', (req, res) => {
                     id: result[0].id
                 })
             } else {
+                console.log('password');
                 return res.sendStatus(403);
             }
         });
@@ -133,21 +137,29 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage})
 
-app.post('/addfiles/:user_id/:foldername', upload.array('file'), (req, res) => {
+let ws = null;
+
+function writeStream(path) {
+    ws = fs.createWriteStream(path)
+}
+
+app.post('/addfiles/:user_id/:foldername/:filename', async (req, res) => {
     con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], async (err, result)=>{
         if(err) return res.status(500).send(err);
 
-        await req.files.forEach(function(file) {
+            await ws.end();
 
             let is_image = 0;
-    
-            if(file.mimetype == 'image/png' || file.mimetype == 'image/jpeg') {
+
+            let dataType = req.params.filename.split('.')[1].toLowerCase();
+
+            if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
                 is_image = 1;
             }
     
             const data = {
-                name: file.originalname,
-                path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + file.originalname,
+                name: req.params.filename,
+                path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
                 user_id: req.params.user_id,
                 folder_id: result[0].folder_id,
                 is_image: is_image
@@ -155,7 +167,6 @@ app.post('/addfiles/:user_id/:foldername', upload.array('file'), (req, res) => {
             con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
                 if (err) return res.status(500).send(err);
             }); 
-        });
 
         res.status(200).send('ok');
     });
@@ -253,6 +264,34 @@ app.get('/getfolder/:userId/:foldername', (req, res)=> {
     res.download(`./upload/zipFiles/${req.params.foldername}.zip`);
 
 });
+
+app.post('/UploadChunks/:userId/:foldername/:filename', (req, res) => {
+
+    // var ws = fs.createWriteStream(`./upload/${req.params.userId}/${req.params.foldername}/${req.params.filename}`);
+
+    var size = 0;
+
+    req.on('data', function (data) {
+        size += data.length;
+        console.log('Got chunk: ' + data.length + ' total: ' + size);
+        ws.write(data);
+    });
+
+    req.on('end', function () {
+        console.log("total size = " + size);
+        res.status(200).send("response");
+    }); 
+      
+    
+});
+
+app.get('/openStream/:userId/:foldername/:filename', (req, res) => {
+
+    let path = `./upload/${req.params.userId}/${req.params.foldername}/${req.params.filename}`;
+
+    writeStream(path)
+
+})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

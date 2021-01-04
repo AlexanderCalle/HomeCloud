@@ -39,15 +39,15 @@ function Collection() {
 
   const downloadfolder = (file) => downloadfolder(file);
 
-  async function  downloadFunction(name, path, filename, is_image) {
-    await setFile({
+  function  downloadFunction(name, path, filename, is_image) {
+    const fileDown = {
       name: name,
       file: path,
       filename: filename,
       is_image: is_image
-    });
+    };
 
-    download(file)
+    download(fileDown)
   }
 
   function fileShowing(filePath, fileName, is_image, fileId) {
@@ -61,7 +61,7 @@ function Collection() {
   }
 
   function renameFolder(e) {
-    Axios({method: 'POST', url: `http://localhost:3030/renamefolder/${folderId}`, data: {
+    Axios({method: 'POST', url: `http://${process.env.HOST_IP}:3030/renamefolder/${folderId}`, data: {
       name: newFoldername,
     }}).then(result => {
       if (result.status === 200) {
@@ -75,7 +75,7 @@ function Collection() {
   }
 
   function deletefile(fileId) {
-    Axios.get(`http://localhost:3030/deletefile/${fileId}`)
+    Axios.get(`http://${process.env.HOST_IP}:3030/deletefile/${fileId}`)
       .then(res => {
         if (res.status === 200) {
           console.log(res.data);
@@ -87,7 +87,7 @@ function Collection() {
   }
 
   function deleteFolder() {
-    Axios.get(`http://localhost:3030/deletefolder/${folderId}`)
+    Axios.get(`http://${process.env.HOST_IP}:3030/deletefolder/${folderId}`)
       .then(res => {
         if(res.status === 200) {
            <Redirect to="/" />
