@@ -22,18 +22,13 @@ function Navbar() {
     const [progress, setProgress] = useState(0)
     const [fileSize, setFileSize] = useState(0)
     const [chunkCount, setChunkCount] = useState(0);
-    const [filename, setFilename] = useState("")
+    const [filename, setFilename] = useState("");
+    const [fileOnSelected, setFileOnSelected] = useState(0);
 
     function logOut() {
         setAuthTokens(null);
         return <Redirect to="/login" />
       }
-
-    useEffect(() => {
-        if (fileSize > 0) {
-            fileUpload(counter);
-        }
-    }, [fileToBeUpload, progress])
 
     function postItem() {
         const token = JSON.parse(localStorage.getItem('tokens'));
@@ -53,38 +48,77 @@ function Navbar() {
     function handleChange(event) {
         if(event.target.files.length > 1) {
             setFileUploading(`${event.target.files.length} selected`);
+            setFiles(event.target.files);
         } else {
             setFileUploading(event.target.files[0].name);
-            setFiles(event.target.files[0]);
+            setFiles(event.target.files);
         }
       }
 
-      const getFileContext = (e) => {
+      const firstGetFileContext = () => {
+        resetChunkProperties();
+        setCounter(1);
 
-            e.preventDefault();
+        let numb = fileOnSelected;
 
-            resetChunkProperties();
+        const token = JSON.parse(localStorage.getItem('tokens'));
+        
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`)
+        .then(async response => {
+            if(response.status === 200) {
+                    setFileSize(files[numb].size);
+            
+                    const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
+                    setChunkCount(_totalCount);
 
-            const _file = files;
-            setFileSize(_file.size);
+                    setFileToBeUpload(files[numb]);
+                    setFilename(files[numb].name);
+                    setFileOnSelected(fileOnSelected + 1);
+                }
+            });
+      }
 
-            const _totalCount = _file.size % chunkSize == 0 ? _file.size / chunkSize : Math.floor(_file.size / chunkSize) + 1; // Total count of chunks will have been upload to finish the file
-            setChunkCount(_totalCount);
+    const getFileContext = () => {
+        resetChunkProperties();
+        setCounter(1);
 
-            setFileToBeUpload(_file);
-            setFilename(_file.name);
+        let numb = fileOnSelected + 1;
+    
+        const token = JSON.parse(localStorage.getItem('tokens'));
+        
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`)
+        .then(async response => {
+            if(response.status === 200) {
+                    setFileSize(files[numb].size);
+            
+                    const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
+                    setChunkCount(_totalCount);
 
-            const token = JSON.parse(localStorage.getItem('tokens'));
+                    setFileToBeUpload(files[numb]);
+                    setFilename(files[numb].name);
 
-            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${_file.name}`)
-        }
+                    setFileOnSelected(fileOnSelected + 1);
+                }
+            });
+    }
 
     const resetChunkProperties = () => {
-        setProgress(0)
-        setCounter(1)
-        setBeginingOfTheChunk(0)
-        setEndOfTheChunk(chunkSize)
+        setProgress(0);
+        setCounter(1);
+        setBeginingOfTheChunk(0);
+        setEndOfTheChunk(chunkSize);
+        setFileSize(0);
+        setChunkCount(0);
+        setFileToBeUpload({});
     }
+
+    useEffect(() => {
+        console.log(foldername);
+        if (fileSize > 0) {
+            fileUpload(counter);
+        }
+    }, [fileToBeUpload, progress]);
+
 
     const fileUpload = () => {
         setCounter(counter + 1);
@@ -96,9 +130,7 @@ function Navbar() {
 
       const uploadChunk = async (chunk) => {
         try {
-            const token = JSON.parse(localStorage.getItem('tokens'));
-
-            const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/UploadChunks/${token.id}/${folderName}/${filename}`, chunk, {
+            const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/UploadChunks`, chunk, {
                 headers: {
                     'Content-Type': 'application/octet-stream',
                 },
@@ -113,6 +145,7 @@ function Navbar() {
                 if(counter == chunkCount) {
                     console.log('Process is complete, counter', counter)
                     await uploadCompleted();
+
                 } else {
                     var percentage = Math.floor((counter / chunkCount) * 100);
                     setProgress(percentage);
@@ -127,56 +160,45 @@ function Navbar() {
 
       const uploadCompleted = async () => {
 
+        if(files.length > 1) {
+            setFileOnSelected(fileOnSelected + 1);
+        }
+
         const token = JSON.parse(localStorage.getItem('tokens'));
 
-        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/addfiles/${token.id}/${folderName}/${filename}`);
+        let numb = 0;
+
+        if(files.length > 1) {
+            numb = fileOnSelected;
+        }
+
+        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/addfiles/${token.id}/${folderName}/${files[numb].name}`);
         if (response.status === 200) {
           setProgress(100);
-          setTimeout(() => {
-            resetChunkProperties();
-            setShowModal(false);
-            setFileUploading(null);
-            window.location.reload();
-        }, 1000);
+          if(files.length == 1) {
+              setTimeout(() => {
+                  resetChunkProperties();
+                  setShowModal(false);
+                  setFileUploading(null);
+                  window.location.reload();
+              }, 1000);
+          } else {
+            if(files.length - 1 === fileOnSelected) {
+                setTimeout(() => {
+                    resetChunkProperties();
+                    setShowModal(false);
+                    setFileUploading(null);
+                    window.location.reload();
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    getFileContext();
+                }, 1000);
+            }
+          }
         }
       }
     
-
-    // function FileUpload(e) {
-
-    //     e.preventDefault();
-
-    //     const options = {
-    //         onUploadProgress: (progressEvent) => {
-    //             const { loaded, total } = progressEvent;
-
-    //             setProgress(Math.floor((loaded * 100) / total))
-    //         }
-    //     }
-        
-    //     const data  = new FormData();
-
-    //     for(let i = 0; i < files.length; i++) {
-    //         data.append('file', files[i]);
-    //     }
-
-    //     const token = JSON.parse(localStorage.getItem('tokens'));
-    
-    //     axios.post(`http://localhost:3030/addfiles/${token.id}/${folderName}`, data, {
-    //         "Content-Type": "multipart/form-data",
-    //         ...options
-    //     })
-    //       .then((res) => {
-    //         if(res.status === 200) {
-    //           setFileUploading(null);
-    //           setFiles(null);
-    //           setShowModal(false);
-    //         } else {
-    //           console.log(res.data);
-    //         }
-    //       })
-    //   }
-
     return (
 
       <>
@@ -251,6 +273,11 @@ function Navbar() {
                                             <div>
                                                 <div className="relative pt-2">
                                                     <div className="flex mb-2 items-center justify-between">
+                                                        <div>
+                                                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                                                {filename}
+                                                            </span>
+                                                        </div>
                                                         <div className="flex flex-row items-center space-x-2 text-right">
                                                             <span className="text-xs font-semibold inline-block text-blue-600">
                                                                 { progress > 0 && progress + '%'}
@@ -268,15 +295,21 @@ function Navbar() {
                                         </div>
                                     )}
                                     {progress === 0 && (
-                                        <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
-                                            <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                                            </svg>
-                                            <span className="text-base leading-normal">{ 
-                                                fileUploading != null ? fileUploading : 'Select File(s)'
-                                            }</span>
-                                            <input type='file' className="hidden" onChange={handleChange} />
-                                        </label>
+                                        <>
+                                        {folderName == undefined ? (
+                                            <p>No Folder Selected</p>
+                                        ) : (
+                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                                                <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                                </svg>
+                                                <span className="text-base leading-normal">{ 
+                                                    fileUploading != null ? fileUploading : 'Select File(s)'
+                                                }</span>
+                                                <input type='file' className="hidden" onChange={handleChange} multiple />
+                                            </label>
+                                        )}
+                                        </>
                                     )}
                                     </>
                                 )}
@@ -286,19 +319,25 @@ function Navbar() {
                     </div>
                     <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <>
-                        {showModal.add_folder ? (
-                            <button type="submit" onClick={postItem} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                Add
-                            </button>
-                        ) : (
-                            <button type="submit" onClick={(e) => getFileContext(e)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                Add
-                            </button>
-                        )}
+                    {folderName == undefined ? null : (
+                        <>
+                        <>
+                            {showModal.add_folder ? (
+                                <button type="submit" onClick={postItem} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Add
+                                </button>
+                            ) : (
+                                <button type="button" onClick={() => firstGetFileContext()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Add
+                                </button>
+                            )}
+                        </>
+                        </>
+                    )}
+                        <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
                     </>
-                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
                     </div>
                 </div>
                 </form>

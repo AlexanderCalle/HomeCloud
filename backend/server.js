@@ -140,14 +140,15 @@ let upload = multer({ storage: storage})
 let ws = null;
 
 function writeStream(path) {
+    console.log(path);
     ws = fs.createWriteStream(path)
 }
 
-app.post('/addfiles/:user_id/:foldername/:filename', async (req, res) => {
+app.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
+    ws.end();
     con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], async (err, result)=>{
         if(err) return res.status(500).send(err);
 
-            await ws.end();
 
             let is_image = 0;
 
@@ -191,7 +192,7 @@ app.post('/renamefolder/:folderId', (req, res)=>{
         con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, (err, files)=> {
             if (err) return res.status(500).send(err);
             files.forEach(file => {
-                const newFileDest = './upload/' + folder[0].user_id + '/' + req.body.name + '/' + file.name;
+                const newFileDest = '/' + folder[0].user_id + '/' + req.body.name + '/' + file.name;
                 con.query('UPDATE `files` SET path = ? WHERE file_id = ?', [newFileDest, file.file_id], (err, result)=> {
                     if (err) return res.status(500).send(err);
                 });
@@ -243,7 +244,6 @@ app.get('/deletefolder/:folderId', (req, res)=> {
             fs.rmdirSync('./upload' + folder[0].main_path + folder[0].name);
             con.query('DELETE FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, result) => {
                 if (err) return res.status(500).send(err);
-    
                 res.status(200).send('Deleted successfully');
             });
         });
@@ -265,9 +265,7 @@ app.get('/getfolder/:userId/:foldername', (req, res)=> {
 
 });
 
-app.post('/UploadChunks/:userId/:foldername/:filename', (req, res) => {
-
-    // var ws = fs.createWriteStream(`./upload/${req.params.userId}/${req.params.foldername}/${req.params.filename}`);
+app.post('/UploadChunks', (req, res) => {
 
     var size = 0;
 
@@ -285,11 +283,13 @@ app.post('/UploadChunks/:userId/:foldername/:filename', (req, res) => {
     
 });
 
-app.get('/openStream/:userId/:foldername/:filename', (req, res) => {
+app.get('/openStream/:userId/:foldername/:filename', async (req, res) => {
 
     let path = `./upload/${req.params.userId}/${req.params.foldername}/${req.params.filename}`;
 
-    writeStream(path)
+    await writeStream(path);
+
+    res.status(200).send('ok');
 
 })
 
