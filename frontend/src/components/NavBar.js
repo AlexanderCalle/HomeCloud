@@ -3,12 +3,13 @@ import '../index.css';
 import { useAuth } from '../context/auth';
 import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
+import ProgressBar from './ProgressBar';
 
-const chunkSize = 1024*1024;
+const chunkSize = 1024*1024; // 1MB
 
 function Navbar() {
-    const { setAuthTokens } = useAuth();
 
+    const { setAuthTokens } = useAuth();
     const [showModal, setShowModal] = useState(false);
     const [foldername, setFoldername] = useState("");
     const [isError, setIsError ] = useState(false); 
@@ -25,13 +26,17 @@ function Navbar() {
     const [filename, setFilename] = useState("");
     const [fileOnSelected, setFileOnSelected] = useState(0);
 
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+
     function logOut() {
         setAuthTokens(null);
         return <Redirect to="/login" />
-      }
+    }
 
     function postItem() {
         const token = JSON.parse(localStorage.getItem('tokens'));
+
         axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/addfolder/${token.id}`, data: {
             name: foldername,
         }}).then(result => {
@@ -53,9 +58,9 @@ function Navbar() {
             setFileUploading(event.target.files[0].name);
             setFiles(event.target.files);
         }
-      }
+    }
 
-      const firstGetFileContext = () => {
+    const firstGetFileContext = () => {
         resetChunkProperties();
         setCounter(1);
 
@@ -63,9 +68,11 @@ function Navbar() {
 
         const token = JSON.parse(localStorage.getItem('tokens'));
         
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`)
-        .then(async response => {
-            if(response.status === 200) {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+            cancelToken: source.token
+        })
+            .then(async response => {
+                if(response.status === 200) {
                     setFileSize(files[numb].size);
             
                     const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
@@ -76,7 +83,7 @@ function Navbar() {
                     setFileOnSelected(fileOnSelected + 1);
                 }
             });
-      }
+    }
 
     const getFileContext = () => {
         resetChunkProperties();
@@ -86,9 +93,11 @@ function Navbar() {
     
         const token = JSON.parse(localStorage.getItem('tokens'));
         
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`)
-        .then(async response => {
-            if(response.status === 200) {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+            cancelToken: source.token
+        })
+            .then(async response => {
+                if(response.status === 200) {
                     setFileSize(files[numb].size);
             
                     const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
@@ -134,6 +143,7 @@ function Navbar() {
                 headers: {
                     'Content-Type': 'application/octet-stream',
                 },
+                cancelToken: source.token
             });
 
             const data = response.data;
@@ -172,7 +182,9 @@ function Navbar() {
             numb = fileOnSelected;
         }
 
-        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/addfiles/${token.id}/${folderName}/${files[numb].name}`);
+        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/addfiles/${token.id}/${folderName}/${files[numb].name}`, {
+            cancelToken: source.token
+        });
         if (response.status === 200) {
           setProgress(100);
           if(files.length == 1) {
@@ -198,6 +210,15 @@ function Navbar() {
           }
         }
       }
+
+    function cancelHandler() {
+        resetChunkProperties();
+        setFiles({});
+        setFileOnSelected(0);
+
+        source.cancel();
+        window.location.reload();
+    }
     
     return (
 
@@ -214,7 +235,9 @@ function Navbar() {
                 <a className='tooltip cursor-pointer' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
                     showModal: true,
                     name: 'Add Folder',
-                    add_folder: true
+                    add_folder: true,
+                    upload_folder: false,
+                    add_files: false
                 })}>
                     <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
@@ -222,10 +245,22 @@ function Navbar() {
                 <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
                     showModal: true,
                     name: 'Add file(s)',
-                    add_folder: false
+                    add_folder: false,
+                    upload_folder: false,
+                    add_files: true
                 })}>
                      <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </botton>
+                <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
+                    showModal: true,
+                    name: 'Upload Folder',
+                    add_folder: false,
+                    upload_folder: true,
+                    add_files: false
+                })}>
+                     <span className='tooltiptext shadow-lg font-semibold'>Upload Folder</span>
+                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 </botton>
                 <a className='tooltip'>
                     <span className='tooltiptext shadow-lg font-semibold'>Friends</span>
@@ -261,36 +296,22 @@ function Navbar() {
                                 {showModal.name}
                             </h3>
                             <div className="mt-2">
-                                {showModal.add_folder ? (
+                                {showModal.add_folder && (
                                     <>
                                         { isError && <p>Please fill foldername in!</p> }
                                         <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
                                     </>
-                                ) : (
+                                )}
+                                {showModal.add_files && (
                                     <>
                                     {progress > 0 && (
-                                        <div className="w-full h-16 border-b ">
-                                            <div>
-                                                <div className="relative pt-2">
-                                                    <div className="flex mb-2 items-center justify-between">
-                                                        <div>
-                                                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                                                                {filename}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex flex-row items-center space-x-2 text-right">
-                                                            <span className="text-xs font-semibold inline-block text-blue-600">
-                                                                { progress > 0 && progress + '%'}
-                                                            </span>
-                                                            <button>
-                                                                <svg class="w-6 h-6" fill="none" stroke="rgba(37, 99, 235)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="overflow-hidden h-2 text-xs flex rounded bg-blue-200">
-                                                        <div style={{ width: progress + '%' }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-                                                    </div>
-                                                </div>
+                                        <div>
+                                            <ProgressBar 
+                                                filename={filename}
+                                                progress={progress}
+                                            />
+                                            <div className="mt-2">
+                                                <p>Completed: {fileOnSelected}/{files == null ? "0" : files.length}</p>
                                             </div>
                                         </div>
                                     )}
@@ -307,6 +328,38 @@ function Navbar() {
                                                     fileUploading != null ? fileUploading : 'Select File(s)'
                                                 }</span>
                                                 <input type='file' className="hidden" onChange={handleChange} multiple />
+                                            </label>
+                                        )}
+                                        </>
+                                    )}
+                                    </>
+                                )}
+                                {showModal.upload_folder && (
+                                    <>
+                                    {progress > 0 && (
+                                        <div>
+                                            <ProgressBar 
+                                                filename={filename}
+                                                progress={progress}
+                                            />
+                                            <div className="mt-2">
+                                                <p>Completed: {fileOnSelected}/{files == null ? "0" : files.length}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {progress === 0 && (
+                                        <>
+                                        {folderName == undefined ? (
+                                            <p>No Folder Selected</p>
+                                        ) : (
+                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                                                <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                                </svg>
+                                                <span className="text-base leading-normal">{ 
+                                                    fileUploading != null ? fileUploading : 'Select File(s)'
+                                                }</span>
+                                                <input type='file' className="hidden" onChange={handleChange} multiple webkitdirectory="" directory="" />
                                             </label>
                                         )}
                                         </>

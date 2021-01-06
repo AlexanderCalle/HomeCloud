@@ -30,6 +30,9 @@ const Downloader = ({ files = [], remove }) => {
 }
 
 const DownloadItem = ({ name, file, filename, removeFile }) => {
+    const CancelToken = Axios.CancelToken;
+    const source = CancelToken.source();
+
     const [downloadInfo, setDownloadInfo] = useState({
         progress: 0,
         completed: false,
@@ -57,7 +60,8 @@ const DownloadItem = ({ name, file, filename, removeFile }) => {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Access-Control-Allow-Origin': '*'
-                }
+                },
+                cancelToken: source.token
             }).then(function (response) {
         
             const url = window.URL.createObjectURL(
@@ -98,7 +102,10 @@ const DownloadItem = ({ name, file, filename, removeFile }) => {
                             { downloadInfo.loaded > 0 && downloadInfo.progress + '%'}
                             { downloadInfo.loaded === 0 && 'Initializing...'}
                         </span>
-                        <button onClick={removeFile}>
+                        <button onClick={async ()=> {
+                            await removeFile()
+                            source.cancel();
+                        }}>
                             <svg class="w-6 h-6" fill="none" stroke="rgba(37, 99, 235)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </button>
                     </div>
@@ -113,6 +120,8 @@ const DownloadItem = ({ name, file, filename, removeFile }) => {
 }
 
 const DonwloadFolder = ({name, folder, removeFile}) => {
+    const CancelToken = Axios.CancelToken;
+    const source = CancelToken.source();
 
     const [downloadInfo, setDownloadInfo] = useState({
         progress: 0,
@@ -141,7 +150,8 @@ const DonwloadFolder = ({name, folder, removeFile}) => {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Access-Control-Allow-Origin': '*'
-                }
+                },
+                cancelToken: source.token
             }).then(function (response) {
             console.log(response);
         
@@ -183,7 +193,10 @@ const DonwloadFolder = ({name, folder, removeFile}) => {
                             { downloadInfo.loaded > 0 && downloadInfo.progress + '%'}
                             { downloadInfo.loaded === 0 && 'Initializing...'}
                         </span>
-                        <button onClick={removeFile}>
+                        <button onClick={async ()=> {
+                            await removeFile()
+                            source.cancel();
+                        }}>
                             <svg class="w-6 h-6" fill="none" stroke="rgba(37, 99, 235)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </button>
                     </div>

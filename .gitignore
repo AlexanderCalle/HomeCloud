@@ -18,6 +18,7 @@ frontend/build
 
 # misc
 frontend/.DS_Store
+/frontend/.eslintcache
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.test.local

@@ -63,12 +63,13 @@ function Collection() {
   }
 
   function renameFolder(e) {
+    e.preventDefault();
     Axios({method: 'POST', url: `http://${process.env.REACT_APP_HOST_IP}:3030/renamefolder/${folderId}`, data: {
       name: newFoldername,
-    }}).then(result => {
+    }}).then(async result => {
       if (result.status === 200) {
         setRename(false);
-        setFoldername(result.data.name);
+        await history.push(`/collection/folder/${result.data.name}/${folderId}`);
         window.location.reload();
       } else {
         console.error(result.data)
