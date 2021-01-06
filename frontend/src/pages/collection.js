@@ -8,6 +8,7 @@ import Axios from 'axios';
 import { useParams, useHistory } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
 import FileShow from '../components/FileShow';
+import SelecingFiles from '../components/SelectingFiles';
 
 function Collection() {
   let history = useHistory();
@@ -22,6 +23,8 @@ function Collection() {
   const [rename, setRename] = React.useState(false);
   const [newFoldername, setNewFoldername] = React.useState(foldername);
   const [isfolderWarning, setFoldernameWarning] = React.useState(false);
+  const [isSelecting, setIsSelecting] = React.useState(false);
+  const [selected, setSelected] = React.useState([])
 
   const [file, setFile] = React.useState({
     name: null,
@@ -90,12 +93,13 @@ function Collection() {
       })
   }
 
-  async function deleteFolder(e) {
+  function deleteFolder(e) {
     e.preventDefault();
     Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/deletefolder/${folderId}`)
-      .then(res => {
+      .then(async res => {
         if(res.status === 200) {
-          history.push('/');
+          await history.push('/');
+          window.location.reload();
         }
       })
   }
@@ -106,25 +110,24 @@ function Collection() {
       <Navbar />
 
       <Transition
-          show={showFolders}
-          enter="transition-all duration-500"
-          enterFrom="-ml-64"
-          enterTo="ml-0"
-          leave="transition-all duration-500"
-          leaveTo="-ml-64"
-        >
-            <div className='w-64 flex-none bg-gray-100 p-4 flex flex-col space-y-4'>
+        show={showFolders}
+        enter="transition-all duration-500"
+        enterFrom="-ml-64"
+        enterTo="ml-0"
+        leave="transition-all duration-500"
+        leaveTo="-ml-64">
+        <div className='w-64 flex-none bg-gray-100 p-4 flex flex-col space-y-4'>
 
-                <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
-                  <h1 className="font-semibold text-2xl">Folders</h1>
-                  <svg className="flex-none w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-
-                <div className="flex-auto overflow-y-auto flex flex-col">
-                  <FolderList />
-                </div>
-
+            <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
+              <h1 className="font-semibold text-2xl">Folders</h1>
+              <svg className="flex-none w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
+
+            <div className="flex-auto overflow-y-auto flex flex-col">
+              <FolderList />
+            </div>
+
+        </div>
       </Transition>
       
       <div className='flex flex-row flex-auto bg-white rounded-tl-xl rounded-bl-xl border-l border-r border-gray-400 shadow-xl'>
@@ -145,18 +148,48 @@ function Collection() {
              ) : <h1 className="font-bold">{foldername}</h1>}
             </>
             </div>
-            <div className="flex flex-row space-x-2">
-              <button onClick={() => donwloadfolder(folder)}>
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-              </button>
-              <button onClick={() => setShowSettings(!showSettings)}>
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-              </button>
+            <div className="flex flex-row space-x-4">
+              <button className="px-2 py-1 rounded-md border-2 border-black font-semibold" onClick={() => setIsSelecting(!isSelecting)}>Select</button>
+              {isSelecting && (
+                <button>
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              )}
+              {isSelecting && (
+                <button>
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              )}
+              {!isSelecting && (
+                <button onClick={() => donwloadfolder(folder)}>
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              )}
+              {!isSelecting && (
+                <button onClick={() => setShowSettings(!showSettings)}>
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                </button>
+              )}
+              
             </div>
           </div>
           <div className="flex-auto overflow-y-auto">
             <div>
-               <File downloadFunction={downloadFunction} deletefile={deletefile} fileShowing={fileShowing} fileshow={fileshow} folderId={folderId} />
+              {isSelecting ? (
+                <SelecingFiles 
+                  folderId={folderId}
+                  setSelected={setSelected}
+                />
+              ) : (
+                <File 
+                  downloadFunction={downloadFunction} 
+                  deletefile={deletefile} 
+                  fileShowing={fileShowing} 
+                  fileshow={fileshow} 
+                  folderId={folderId}
+                  IsSelecting={isSelecting}
+                />
+              )}
             </div>
           </div>
         </div>
