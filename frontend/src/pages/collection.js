@@ -24,7 +24,10 @@ function Collection() {
   const [newFoldername, setNewFoldername] = React.useState(foldername);
   const [isfolderWarning, setFoldernameWarning] = React.useState(false);
   const [isSelecting, setIsSelecting] = React.useState(false);
-  const [selected, setSelected] = React.useState([])
+  const [selected, setSelected] = React.useState([]);
+  const [showModal, setShowModal] = React.useState(false);
+  const [isError, setIsError] = React.useState(null);
+  const [newName, setNewName] = React.useState(null);
 
   const [file, setFile] = React.useState({
     name: null,
@@ -104,6 +107,56 @@ function Collection() {
       })
   }
 
+  function deleteSelected() {
+    selected.forEach(async file => {
+      const fileId = file.fileId;
+
+      await deletefile(fileId);
+      console.log('deleted');
+    })
+  }
+
+  function downloadSelected() {
+    selected.forEach(async file => {
+      download(file)
+    })
+  }
+
+  function renameFile(file) {
+    console.log(file);
+    setNewName(file.name)
+    setShowModal({
+      showModal: true,
+      fileId: file.fileId,
+      ext: file.ext,
+    });
+  }
+
+  function submitRename(fileId) {
+
+    const token = JSON.parse(localStorage.getItem('tokens'));
+    
+    const data = {
+      name: newName + '.' + showModal.ext,
+      foldername: foldername,
+      userId: token.id,
+      fileId: showModal.fileId
+    }
+
+    Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/renamefile/${folderId}/${fileId}`, data)
+      .then(response => {
+        if(response.status === 200) {
+          setShowModal(false);
+          window.location.reload();
+        } else if(response.status === 201){
+          setIsError('There is a file with this name in the folder');
+        } else {
+          setIsError(response.data);
+        }
+      })
+
+  }
+
   return (
     <div className='flex flex-row h-screen bg-gray-100'>
       
@@ -117,16 +170,13 @@ function Collection() {
         leave="transition-all duration-500"
         leaveTo="-ml-64">
         <div className='w-64 flex-none bg-gray-100 p-4 flex flex-col space-y-4'>
-
             <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
               <h1 className="font-semibold text-2xl">Folders</h1>
-              <svg className="flex-none w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <svg class="w-8 h-8 hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-
             <div className="flex-auto overflow-y-auto flex flex-col">
-              <FolderList />
+              <FolderList selectedName={foldername} />
             </div>
-
         </div>
       </Transition>
       
@@ -149,14 +199,14 @@ function Collection() {
             </>
             </div>
             <div className="flex flex-row space-x-4">
-              <button className="px-2 py-1 rounded-md border-2 border-black font-semibold" onClick={() => setIsSelecting(!isSelecting)}>Select</button>
+              <button className={!isSelecting ? styles.default : styles.selecting} onClick={() => setIsSelecting(!isSelecting)}>Select</button>
               {isSelecting && (
-                <button>
+                <button onClick={downloadSelected}>
                   <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
               )}
               {isSelecting && (
-                <button>
+                <button onClick={deleteSelected}>
                   <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               )}
@@ -188,6 +238,7 @@ function Collection() {
                   fileshow={fileshow} 
                   folderId={folderId}
                   IsSelecting={isSelecting}
+                  renameFile={renameFile} 
                 />
               )}
             </div>
@@ -250,7 +301,7 @@ function Collection() {
                     <button type="submit" onClick={(e)=> deleteFolder(e)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                         Delete
                     </button>
-                    <button type="button" onClick={() => setFoldernameWarning(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         Cancel
                     </button>
                     </div>
@@ -261,8 +312,53 @@ function Collection() {
           ) : null}
         </>
 
+        <>
+        {showModal ? (
+            <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <form>
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                    <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                    <div className="min-w-0 sm:flex sm:items-start">
+                        <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
+                            <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
+                              Rename file
+                            </h3>
+                            <div className="mt-2">
+
+                              { isError && <p>Please fill foldername in!</p> }
+                              <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
+                            
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                      <button type="button" onClick={() => submitRename(showModal.fileId)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                          Add
+                      </button>
+                      <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                          Cancel
+                      </button>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
+        ): null}
+        </>
+
     </div>
   );
+}
+
+const styles = {
+  selecting: "px-2 py-1 rounded-md border-2 border-blue-500 bg-blue-500 text-white hover:bg-white hover:text-blue-500 font-semibold transition duration-300 outline-none focus:outline-none",
+  default: "px-2 py-1 rounded-md border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold transition duration-300 outline-none focus:outline-none",
 }
 
 export default Collection;

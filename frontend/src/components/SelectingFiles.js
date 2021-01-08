@@ -63,23 +63,21 @@ class SelecingFiles extends Component {
             <div>
             {this.state.files.map((file => {
                 return (
-                    <div className="border-b">
+                    <div className="border-b" onClick={() => {
+                        this.selectItem(file)
+                    }}>
                         <div className={ file.isSelect ? styles.selected : styles.normal }>
-                        <button className="outline-none focus:outline-none" onClick={() => {
-                            this.selectItem(file)
-                        }}>
-                                {file.isSelect ? (
-                                    <>
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    </>
-                                ) : (
-                                    <>
-                                    <svg width="1.5rem" height="1.5rem">
-                                        <circle cx="0.7rem" cy="0.7rem" r="0.50rem" stroke="currentColor" stroke-width="2" fill="none" />
-                                    </svg>
-                                    </>
-                                )}
-                            </button>
+                            {file.isSelect ? (
+                                <>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </>
+                            ) : (
+                                <>
+                                <svg width="1.5rem" height="1.5rem">
+                                    <circle cx="0.7rem" cy="0.7rem" r="0.50rem" stroke="currentColor" stroke-width="2" fill="none" />
+                                </svg>
+                                </>
+                            )}
                             <a className="flex-auto cursor-pointer ">
                                 <div className="p-3 space-y-4">
                                     <div className="flex flex-row items-center space-x-2">

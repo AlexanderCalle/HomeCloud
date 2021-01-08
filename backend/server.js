@@ -148,28 +148,49 @@ app.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
     ws.end();
     con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], async (err, result)=>{
         if(err) return res.status(500).send(err);
+            con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, result[0].folder_id], (err, file) => {
+                if(file[0] != undefined || file[0] != null) {
+                    let is_image = 0;
 
+                    let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-            let is_image = 0;
+                    if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                        is_image = 1;
+                    }
+            
+                    const data = {
+                        name: req.params.filename,
+                        path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                        user_id: req.params.user_id,
+                        folder_id: result[0].folder_id,
+                        is_image: is_image
+                    }
+                    con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result)=>{
+                        if (err) return res.status(500).send(err);
+                    }); 
+                    res.status(200).send('ok');
+                } else {
+                    let is_image = 0;
 
-            let dataType = req.params.filename.split('.')[1].toLowerCase();
+                    let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-            if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
-                is_image = 1;
-            }
-    
-            const data = {
-                name: req.params.filename,
-                path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
-                user_id: req.params.user_id,
-                folder_id: result[0].folder_id,
-                is_image: is_image
-            }
-            con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-                if (err) return res.status(500).send(err);
-            }); 
-
-        res.status(200).send('ok');
+                    if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                        is_image = 1;
+                    }
+            
+                    const data = {
+                        name: req.params.filename,
+                        path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                        user_id: req.params.user_id,
+                        folder_id: result[0].folder_id,
+                        is_image: is_image
+                    }
+                    con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
+                        if (err) return res.status(500).send(err);
+                    }); 
+                    res.status(200).send('ok');
+                }
+            })
     });
 });
 
@@ -207,6 +228,39 @@ app.post('/renamefolder/:folderId', (req, res)=>{
         }); 
 
     });
+
+});
+
+app.post('/renamefile/:folderId/:fileId', (req, res) => {
+    const name = req.body.name;
+    con.query('SELECT * FROM `files` WHERE folder_id = ? AND name = ?', [req.params.folderId, name], (err, result) => {
+        if (err) return res.status(500).send(err);
+        if(result[0] == undefined) {
+            con.query('SELECT * FROM `files` WHERE file_id = ?', req.body.fileId, async (err, file) => {
+                if(err) return console.log(err);
+
+                const oldPath = './upload' + file[0].path;
+                const newPath = `./upload/${req.body.userId}/${req.body.foldername}/${name}`
+                const newPathDb = `/${req.body.userId}/${req.body.foldername}/${name}`
+    
+                await fs.renameSync(oldPath, newPath);
+
+                const data = {
+                    name: name,
+                    path: newPathDb
+                }
+
+                con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, req.body.fileId], (err, result) => {
+                    if (err) return console.log(err);
+                    res.status(200).send('ok')
+                })
+            });
+        } else {
+            
+            res.status(201).send('There is already a file with this name');
+            
+        }
+    })
 
 });
 
@@ -291,6 +345,19 @@ app.get('/openStream/:userId/:foldername/:filename', async (req, res) => {
 
     res.status(200).send('ok');
 
+});
+
+app.post('/updateuser/:userId', async (req, res) => {
+    const data = {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email
+    }
+
+    con.query('UPDATE `users` SET ? WHERE id = ?', [data, req.params.userId], (err, result)=> {
+        if (err) return res.status(500).send(err);
+        res.status(200).send('ok')
+    })
 })
 
 app.listen(port, () => {

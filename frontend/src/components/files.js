@@ -44,6 +44,13 @@ class File extends Component {
                                 </div>
                             </a>
                             <div className="flex-none flex flex-row space-x-2 mr-2">
+                                <button onClick={() => this.props.renameFile({
+                                    name: file.name.split('.')[0],
+                                    ext: file.name.split('.')[1],
+                                    fileId: file.file_id
+                                })}>
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
                                 <button onClick={() => {
                                     this.props.downloadFunction(file.name, file.path, file.name, file.is_image)
                                 }}>
