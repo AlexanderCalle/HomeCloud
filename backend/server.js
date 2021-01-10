@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs')
 const fs = require('fs');
 const multer = require('multer');
 const AdmZip = require('adm-zip');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3030;
@@ -18,12 +19,73 @@ dotenv.config();
 app.use(bodyParser.json({limit: 128*1024*1024}));
 app.use(bodyParser.urlencoded({limit: 128*1024*1024, extended: true}));
 
+const getAllFiles = function(dirPath, arrayOfFiles) {
+    files = fs.readdirSync(dirPath)
+  
+    arrayOfFiles = arrayOfFiles || []
+  
+    files.forEach(function(file) {
+      if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+        arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+      } else {
+        arrayOfFiles.push(path.join(__dirname, dirPath, file))
+      }
+    })
+  
+    return arrayOfFiles
+  }
+
+const convertBytes = function(bytes) {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
+
+    if (bytes == 0) {
+        return "n/a"
+    }
+
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
+
+    if (i == 0) {
+        return bytes + " " + sizes[i]
+    }
+
+    return (Math.floor(bytes / Math.pow(1024, i))) + " " + sizes[i]
+}
+
+const getTotalSize = function(directoryPath) {
+    const arrayOfFiles = getAllFiles(directoryPath)
+
+    let totalSize = 0
+  
+    arrayOfFiles.forEach(function(filePath) {
+      totalSize += fs.statSync(filePath).size
+    })
+  
+    return convertBytes(totalSize)
+  }
+const getTotalSizeBytes = function(directoryPath) {
+    const arrayOfFiles = getAllFiles(directoryPath)
+
+    let totalSize = 0
+  
+    arrayOfFiles.forEach(function(filePath) {
+      totalSize += fs.statSync(filePath).size
+    })
+  
+    return totalSize
+  }
 
 let chunks = [];
 
 app.get('/', (req, res) => {
     res.send('hello')
 });
+
+app.get('/directorySize/:userId', (req, res) => {
+    res.status(200).send({
+        totalSize: getTotalSize('./upload/' + req.params.userId),
+        totalSizeBytes: Math.ceil((getTotalSizeBytes('./upload/' + req.params.userId) / 5368709120) * 100)
+    })
+})
 
 app.post('/login', (req, res) => {
     console.log('logging in');
@@ -35,11 +97,11 @@ app.post('/login', (req, res) => {
                 return res.sendStatus(500);
             }
             if(bcrypt.compareSync(req.body.password, result[0].password_hash)) {
-                return res.status(200).send({
+                res.status(200).send({
                     email: email,
                     id: result[0].id,
                     profile_pic: result[0].profile_pic
-                })
+                });
             } else {
                 console.log('password');
                 return res.sendStatus(403);

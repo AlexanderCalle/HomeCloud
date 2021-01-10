@@ -1,5 +1,5 @@
 import '../index.css';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Transition from '../components/transition';
 import Navbar from '../components/NavBar'
 import FolderList from '../components/folders';
@@ -9,6 +9,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
 import FileShow from '../components/FileShow';
 import SelecingFiles from '../components/SelectingFiles';
+import ProgressBar from '../components/ProgressBar';
 
 function Collection() {
   let history = useHistory();
@@ -28,6 +29,8 @@ function Collection() {
   const [showModal, setShowModal] = React.useState(false);
   const [isError, setIsError] = React.useState(null);
   const [newName, setNewName] = React.useState(null);
+  const [progress, setProgress] = React.useState(0);
+  const [usedSpace, setUsedSpace] = React.useState(0);
 
   const [file, setFile] = React.useState({
     name: null,
@@ -39,6 +42,17 @@ function Collection() {
   const [folder, setFolder] = React.useState({
     name: foldername,
     folder: token.id + "/" + foldername,
+  });
+
+  useEffect(() => {
+    Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/directorySize/${token.id}`)
+      .then(res => {
+        if(res.status === 200) {
+          var percentage = res.data.totalSizeBytes
+          setProgress(percentage)
+          setUsedSpace(res.data.totalSize)
+        }
+      })
   })
 
   const [downloadFile, donwloadfolder, downloaderComponent] = useFileDownloader();
@@ -169,13 +183,38 @@ function Collection() {
         enterTo="ml-0"
         leave="transition-all duration-500"
         leaveTo="-ml-64">
-        <div className='w-64 flex-none bg-gray-100 p-4 flex flex-col space-y-4'>
-            <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
-              <h1 className="font-semibold text-2xl">Folders</h1>
-              <svg class="w-8 h-8 hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div className='w-64 flex-none bg-gray-100 p-4 flex flex-col justify-between'>
+            <div className="flex flex-col space-y-4">
+              <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
+                <h1 className="font-semibold text-2xl">Folders</h1>
+                <svg class="w-8 h-8 hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div className="flex-auto overflow-y-auto flex flex-col">
+                <FolderList selectedName={foldername} />
+              </div>
             </div>
-            <div className="flex-auto overflow-y-auto flex flex-col">
-              <FolderList selectedName={foldername} />
+            <div className="flex flex-col space-y-2 items-center">
+              <div className="w-full h-16 border-b ">
+                <div>
+                    <div className="relative pt-2">
+                        <div className="flex mb-2 items-center justify-between">
+                            <div>
+                                <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                    Available Space
+                                </span>
+                            </div>
+                            <div className="flex flex-row items-center space-x-2 text-right">
+                                <span className="text-xs font-semibold inline-block text-blue-600">
+                                    { progress > 0 && usedSpace + '/5 GB' }
+                                </span>
+                            </div>
+                        </div>
+                        <div className="overflow-hidden h-2 text-xs flex rounded bg-blue-200">
+                            <div style={{ width: progress + '%' }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                        </div>
+                    </div>
+                </div>
+              </div>
             </div>
         </div>
       </Transition>
