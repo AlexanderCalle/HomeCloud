@@ -9,6 +9,7 @@ class Profile extends Component {
         this.state = {
             user: {},
             updatedUser: {},
+            avatar: {},
         }
     }
 
@@ -20,8 +21,10 @@ class Profile extends Component {
                 if(res.status === 200) {
                     this.setState({
                         user: res.data,
-                        updatedUser: res.data
+                        updatedUser: res.data,
+                        hovered: false
                     });
+                    console.log(res.data);
                 }
             }).catch(e => console.log(e));
     }
@@ -43,12 +46,47 @@ class Profile extends Component {
 
     }
 
+    UpdatingUserPic = (user) => {
+        console.log('pok');
+    }
+
+    handleEvent = () => {
+        var input = document.getElementById('upload');
+        input.click();
+    }
+
+    handleChange = async (e) => {
+        const data  = new FormData();
+        data.append('file', e.target.files[0]);
+
+        const token = JSON.parse(localStorage.getItem('tokens'));
+
+        Axios.post(`http://localhost:3030/uploadPic/${token.id}`, data, {
+        onUploadProgress: (ProgressEvent) => {
+            console.log(ProgressEvent.loaded);
+        }
+    })
+        .then((res) => {
+            if(res.status === 200) {
+                console.log(res.data);
+                window.location.reload();
+            } else {
+                console.log(res.data);
+            }
+        })
+    }
+
     render() {
         return (
             <>
                 <div className='flex flex-col space-y-16 items-center p-6'>
-                    <div className='flex rounded-full h-32 w-32 justify-center items-center'>
-                    <svg class="w-32 h-32 text-gray-900 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div onClick={this.handleEvent} id="div" onMouseEnter={()=> this.setState({hovered: true})} onMouseLeave={()=> this.setState({hovered: false})} className='flex cursor-pointer rounded-full h-32 w-32 hover:bg-gray-200 justify-center items-center focus:outline-none'>
+                        {this.state.hovered && (
+                            <svg class="w-10 h-10 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        )}
+                        <input type="file" id="upload" onChange={(e) => this.handleChange(e)} accept="image/*" hidden="true" />
+                        {this.state.user.profile_pic != null && <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + this.state.user.profile_pic} className="absolute object-cover w-32 h-32 rounded-full hover:opacity-10" />}
+                        {this.state.user.profile_pic == null && <svg id="svgProfile" class="w-32 h-32 text-gray-900 stroke-1 hover:opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
                     </div>
                     <div className="flex flex-col items-center space-y-8">
                         <div className="flex flex-col items-center space-y-2">
