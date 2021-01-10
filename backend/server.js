@@ -10,14 +10,14 @@ const multer = require('multer');
 const AdmZip = require('adm-zip');
 
 const app = express();
-app.use(cors());
-
 const port = process.env.PORT || 3030;
 
+app.use(cors());
 app.use(express.static('./upload'))
 dotenv.config();
 app.use(bodyParser.json({limit: 128*1024*1024}));
 app.use(bodyParser.urlencoded({limit: 128*1024*1024, extended: true}));
+
 
 let chunks = [];
 
@@ -37,7 +37,8 @@ app.post('/login', (req, res) => {
             if(bcrypt.compareSync(req.body.password, result[0].password_hash)) {
                 return res.status(200).send({
                     email: email,
-                    id: result[0].id
+                    id: result[0].id,
+                    profile_pic: result[0].profile_pic
                 })
             } else {
                 console.log('password');
@@ -79,6 +80,7 @@ app.post('/register', (req, res) => {
                     return res.status(200).send({
                         email: data.email,
                         id: data.id,
+                        profile_pic: null
                     })
                 });
             }
@@ -128,10 +130,10 @@ app.get('/folders/folder/:folder_id', (req, res) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, './upload/' + req.params.user_id + '/' + req.params.foldername + '/')
+        callBack(null, './upload/profilePic/')
     },
     filename: (req, file, callBack) => {
-        callBack(null, `${file.originalname}`)
+        callBack(null, `${req.params.userId + '.' + file.originalname.split('.')[1]}`)
     }
   })
 
@@ -195,7 +197,7 @@ app.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
 });
 
 app.get('/myprofile/:userid', (req, res)=>{
-    con.query('SELECT email, firstname, lastname, id FROM `users` WHERE id = ?', req.params.userid, (err, user)=> {
+    con.query('SELECT email, firstname, lastname, id, profile_pic FROM `users` WHERE id = ?', req.params.userid, (err, user)=> {
         if (err) return res.status(500).send(err);
         res.status(200).send(user[0]);
     });
@@ -357,6 +359,18 @@ app.post('/updateuser/:userId', async (req, res) => {
     con.query('UPDATE `users` SET ? WHERE id = ?', [data, req.params.userId], (err, result)=> {
         if (err) return res.status(500).send(err);
         res.status(200).send('ok')
+    })
+});
+
+app.post('/uploadPic/:userId', upload.single('file'), (req, res) => {
+
+    const path = `/profilePic/${req.params.userId + '.' + req.file.originalname.split('.')[1]}`
+
+    con.query('UPDATE `users` SET profile_pic = ? WHERE id = ?', [path, req.params.userId], (err, result)=> {
+        if (err) return res.status(500).send(err);
+        res.status(200).send({
+            profile_pic: path
+        })
     })
 })
 

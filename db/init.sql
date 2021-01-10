@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     email VARCHAR(255) not null,
     password_hash VARCHAR(255) NOT NULL,
     folder_path VARCHAR(255),
+    profile_picture VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY(id)
 );
 
