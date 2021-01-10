@@ -69,6 +69,11 @@ class Profile extends Component {
         .then((res) => {
             if(res.status === 200) {
                 console.log(res.data);
+                const data = {
+                    ...token,
+                    profile_pic: res.data.profile_pic
+                }
+                localStorage.setItem('tokens', JSON.stringify(data))
                 window.location.reload();
             } else {
                 console.log(res.data);

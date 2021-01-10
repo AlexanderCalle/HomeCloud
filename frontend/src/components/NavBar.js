@@ -25,6 +25,7 @@ function Navbar() {
     const [chunkCount, setChunkCount] = useState(0);
     const [filename, setFilename] = useState("");
     const [fileOnSelected, setFileOnSelected] = useState(0);
+    const token = JSON.parse(localStorage.getItem('tokens'));
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -35,7 +36,6 @@ function Navbar() {
     }
 
     function postItem() {
-        const token = JSON.parse(localStorage.getItem('tokens'));
 
         axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/addfolder/${token.id}`, data: {
             name: foldername,
@@ -268,7 +268,8 @@ function Navbar() {
                 </a >
                 <a className='tooltip' href="/myprofile" >
                     <span className='tooltiptext shadow-lg font-semibold'>My Profile</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {token.profile_pic != null && <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + token.profile_pic} className="object-cover w-11 h-11 rounded-full hover:opacity-70" />}
+                    {token.profile_pic == null && <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
                 </a>
             </div>
 

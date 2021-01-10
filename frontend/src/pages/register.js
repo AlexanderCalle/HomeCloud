@@ -26,7 +26,8 @@ function Register() {
         console.log(result.data);
         setAuthTokens({
           email: result.data.email,
-          id: result.data.id
+          id: result.data.id,
+          profile_pic: result.data.profile_pic,
         });
         setLoggedIn(true)
       } else {
