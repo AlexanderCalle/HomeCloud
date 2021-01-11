@@ -55,3 +55,18 @@ body.modal-active {
   overflow-x: hidden;
   overflow-y: visible !important;
 }
+
+.circle-background,
+.circle-progress {
+  fill: none;
+}
+
+.circle-background {
+  stroke: #ddd;
+}
+
+.circle-progress {
+  stroke: #4299e1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

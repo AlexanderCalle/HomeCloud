@@ -5,6 +5,7 @@ import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
 import WarningDialog from './warningDialog';
+import ProgressRing from './CircleProgress';
 
 let chunkSize = 1024*1024; // 1MB
 
@@ -345,8 +346,13 @@ function Navbar() {
                                                 filename={filename}
                                                 progress={progress}
                                             />
-                                            <div className="mt-2">
+                                            <div className="mt-2 flex flex-row justify-between">
                                                 <p>Completed: {fileOnSelected}/{files == null ? "0" : files.length}</p>
+                                                <ProgressRing
+                                                     strokeWidth="3"
+                                                     sqSize="25"
+                                                     percentage={files == null ? 0 : (fileOnSelected/files.length) * 100}
+                                                />
                                             </div>
                                         </div>
                                     )}
@@ -377,8 +383,13 @@ function Navbar() {
                                                 filename={filename}
                                                 progress={progress}
                                             />
-                                            <div className="mt-2">
+                                            <div className="mt-2 flex flex-row justify-between">
                                                 <p>Completed: {fileOnSelected}/{files == null ? "0" : files.length}</p>
+                                                <ProgressRing
+                                                     strokeWidth="3"
+                                                     sqSize="25"
+                                                     percentage={files == null ? "0" : (fileOnSelected / files.length) * 100}
+                                                />
                                             </div>
                                         </div>
                                     )}
