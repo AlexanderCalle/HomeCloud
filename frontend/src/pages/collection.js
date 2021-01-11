@@ -31,6 +31,7 @@ function Collection() {
   const [newName, setNewName] = React.useState(null);
   const [progress, setProgress] = React.useState(0);
   const [usedSpace, setUsedSpace] = React.useState(0);
+  const [totalSize, setTotalSize] = React.useState(0);
 
   const [file, setFile] = React.useState({
     name: null,
@@ -205,7 +206,7 @@ function Collection() {
                             </div>
                             <div className="flex flex-row items-center space-x-2 text-right">
                                 <span className="text-xs font-semibold inline-block text-blue-600">
-                                    { progress > 0 && usedSpace + '/5 GB' }
+                                    { progress > 0 && usedSpace + '/5.0 GB' }
                                 </span>
                             </div>
                         </div>

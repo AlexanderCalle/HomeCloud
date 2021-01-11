@@ -48,7 +48,7 @@ const convertBytes = function(bytes) {
         return bytes + " " + sizes[i]
     }
 
-    return (Math.floor(bytes / Math.pow(1024, i))) + " " + sizes[i]
+    return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i]
 }
 
 const getTotalSize = function(directoryPath) {
@@ -80,10 +80,14 @@ app.get('/', (req, res) => {
     res.send('hello')
 });
 
+//5368709120 == 5 GB
+//52428800 == 50 MB
+
 app.get('/directorySize/:userId', (req, res) => {
     res.status(200).send({
         totalSize: getTotalSize('./upload/' + req.params.userId),
-        totalSizeBytes: Math.ceil((getTotalSizeBytes('./upload/' + req.params.userId) / 5368709120) * 100)
+        totalSizeBytes: Math.ceil((getTotalSizeBytes('./upload/' + req.params.userId) / 5368709120) * 100),
+        total: getTotalSizeBytes('./upload/' + req.params.userId)
     })
 })
 

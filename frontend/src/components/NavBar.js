@@ -4,8 +4,9 @@ import { useAuth } from '../context/auth';
 import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
+import WarningDialog from './warningDialog';
 
-const chunkSize = 1024*1024; // 1MB
+let chunkSize = 1024*1024; // 1MB
 
 function Navbar() {
 
@@ -25,6 +26,9 @@ function Navbar() {
     const [chunkCount, setChunkCount] = useState(0);
     const [filename, setFilename] = useState("");
     const [fileOnSelected, setFileOnSelected] = useState(0);
+    const [totalSize, setTotalSize] = React.useState(0);
+    const [WarningDialog, setWarningDialog] = useState(false)
+    const [msg, setMsg] = useState("")
     const token = JSON.parse(localStorage.getItem('tokens'));
 
     const CancelToken = axios.CancelToken;
@@ -66,23 +70,33 @@ function Navbar() {
 
         let numb = fileOnSelected;
 
-        const token = JSON.parse(localStorage.getItem('tokens'));
-        
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
-            cancelToken: source.token
-        })
-            .then(async response => {
-                if(response.status === 200) {
-                    setFileSize(files[numb].size);
-            
-                    const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
-                    setChunkCount(_totalCount);
+        if(files[numb].size > 104857600) {
+            chunkSize = 10 * 1024 * 1024;
+        }
 
-                    setFileToBeUpload(files[numb]);
-                    setFilename(files[numb].name);
-                    setFileOnSelected(fileOnSelected + 1);
-                }
-            });
+        const token = JSON.parse(localStorage.getItem('tokens'));
+        //5368709120 == 5 GB
+        //52428800 == 50 MB
+        if(totalSize + files[numb].size >= 5368709120 ) {
+            setMsg('You have not enough space for this file: ' + files[numb].name);
+            setWarningDialog(true)
+        } else {
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+                cancelToken: source.token
+            })
+                .then(async response => {
+                    if(response.status === 200) {
+                        setFileSize(files[numb].size);
+
+                        const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
+                        setChunkCount(_totalCount);
+
+                        setFileToBeUpload(files[numb]);
+                        setFilename(files[numb].name);
+                        //setFileOnSelected(fileOnSelected + 1);
+                    }
+                });
+        }
     }
 
     const getFileContext = () => {
@@ -90,25 +104,34 @@ function Navbar() {
         setCounter(1);
 
         let numb = fileOnSelected + 1;
+
+        if(files[numb].size > 104857600) {
+            chunkSize = 10 * 1024 * 1024;
+        }
     
         const token = JSON.parse(localStorage.getItem('tokens'));
         
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
-            cancelToken: source.token
-        })
-            .then(async response => {
-                if(response.status === 200) {
-                    setFileSize(files[numb].size);
-            
-                    const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
-                    setChunkCount(_totalCount);
+        if(totalSize + files[numb].size >= 5368709120) {
+            setMsg('You have not enough space for this file');
+            setWarningDialog(true)
+        } else {
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+                cancelToken: source.token
+            })
+                .then(async response => {
+                    if(response.status === 200) {
+                        setFileSize(files[numb].size);
 
-                    setFileToBeUpload(files[numb]);
-                    setFilename(files[numb].name);
+                        const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
+                        setChunkCount(_totalCount);
 
-                    setFileOnSelected(fileOnSelected + 1);
-                }
-            });
+                        setFileToBeUpload(files[numb]);
+                        setFilename(files[numb].name);
+
+                        setFileOnSelected(fileOnSelected + 1);
+                    }
+                });
+        }
     }
 
     const resetChunkProperties = () => {
@@ -122,14 +145,19 @@ function Navbar() {
     }
 
     useEffect(() => {
-        console.log(foldername);
         if (fileSize > 0) {
             fileUpload(counter);
         }
-
-
     }, [fileToBeUpload, progress]);
 
+    useEffect(() => {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/directorySize/${token.id}`)
+        .then(res => {
+            if(res.status === 200) {
+                setTotalSize(res.data.total)
+            }
+      } )
+    })
 
     const fileUpload = () => {
         setCounter(counter + 1);
@@ -140,6 +168,7 @@ function Navbar() {
       }
 
       const uploadChunk = async (chunk) => {
+          
         try {
             const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/UploadChunks`, chunk, {
                 headers: {
@@ -151,13 +180,17 @@ function Navbar() {
             const data = response.data;
 
             if (response.status === 200) {
+                let numb = fileOnSelected;
+                if(files[numb].size > 104857600) {
+                    chunkSize = 10 * 1024 * 1024;
+                }
+
                 setBeginingOfTheChunk(endOfTheChunk);
                 setEndOfTheChunk(endOfTheChunk + chunkSize);
 
                 if(counter == chunkCount) {
                     console.log('Process is complete, counter', counter)
                     await uploadCompleted();
-
                 } else {
                     var percentage = Math.floor((counter / chunkCount) * 100);
                     setProgress(percentage);
@@ -171,7 +204,6 @@ function Navbar() {
       }
 
       const uploadCompleted = async () => {
-
         if(files.length > 1) {
             setFileOnSelected(fileOnSelected + 1);
         }
@@ -213,14 +245,14 @@ function Navbar() {
         }
       }
 
-    function cancelHandler() {
-        resetChunkProperties();
-        setFiles({});
-        setFileOnSelected(0);
+    // function cancelHandler() {
+    //     resetChunkProperties();
+    //     setFiles({});
+    //     setFileOnSelected(0);
 
-        source.cancel();
-        window.location.reload();
-    }
+    //     source.cancel();
+    //     window.location.reload();
+    // }
     
     return (
 
@@ -399,6 +431,42 @@ function Navbar() {
             </div>
             </div>
         ): null}
+        <>
+        {WarningDialog ? (
+            <div className="fixed z-10 inset-0 overflow-y-auto">
+                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <form>
+                    <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                        <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                    </div>
+                    <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                        <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                        <div className="min-w-0 sm:flex sm:items-start">
+                            <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
+                            <h3 className="text-lg leading-6 font-medium text-red-500" id="modal-headline">
+                                Warning!
+                            </h3>
+                            <div className="mt-2">
+                                <p>{msg}</p>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" onClick={()=> {
+                            setWarningDialog(false)
+                            window.location.reload();
+                        }} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Close
+                        </button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        ) : null}
+        </>
         </>
       </>
     )
