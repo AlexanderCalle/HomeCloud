@@ -30,3 +30,11 @@ CREATE TABLE IF NOT EXISTS `files` (
     FOREIGN KEY (user_id) REFERENCES `users`(id),
     FOREIGN KEY (folder_id) REFERENCES `folders`(folder_id)
 )
+
+CREATE TABLE IF NOT EXISTS `friends` (
+    `FriendsId` INT(11) NOT NULL AUTO_INCREMENT,
+    `UserOne` VARCHAR(255) NOT NULL,
+    `UserTwo` VARCHAR(255) NOT NULL,
+    `Status` INT(3) NOT NULL,
+    PRIMARY KEY (`FriendsId`)
+)

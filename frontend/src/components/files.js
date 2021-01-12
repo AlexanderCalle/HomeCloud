@@ -24,7 +24,7 @@ class File extends Component {
             }
         });
     }
-       
+    
     render() {
 
         return (

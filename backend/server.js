@@ -129,7 +129,7 @@ app.post('/register', (req, res) => {
             } else {
                 const generated_id = crypto.randomBytes(11).toString('hex');
                 const password_hash = bcrypt.hashSync(req.body.password, 11);
-                fs.mkdirSync('/' + generated_id + '/');
+                fs.mkdirSync('./upload/' + generated_id + '/');
                 const data = {
                     id: generated_id,
                     email: req.body.email,
@@ -438,7 +438,48 @@ app.post('/uploadPic/:userId', upload.single('file'), (req, res) => {
             profile_pic: path
         })
     })
-})
+});
+
+app.get('/users/search/:query', (req, res) => {
+    con.query(`SELECT id, firstname, lastname, email FROM users WHERE CONCAT ( firstname, ' ', lastname ) LIKE ? `, req.params.query + '%', (err, result) => {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result);
+    })
+});
+
+app.get('/users/friends/:userId', (req, res)=> {
+
+    const userId = req.params.userId;
+
+    con.query(`SELECT * FROM friends AS F , users AS U WHERE CASE WHEN F.UserOne = ? THEN F.UserTwo = U.id WHEN
+    F.UserTwo = ? THEN F.UserOne = U.id END AND F.Status = 1`, [userId, userId], (err, result)=> {
+        if(err) return res.status(500).send(err);
+        if(result.length != 0) {
+            res.status(200).send(result);
+        }
+    })
+});
+
+app.post('/users/addFriend', (req, res) => {
+    const data = {
+        UserOne: req.body.userId,
+        UserTwo: req.body.friendId,
+        Status: 0
+    }
+
+    con.query('INSERT INTO friends SET ?', data, (err, result)=> {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result);
+    })
+});
+
+app.get('/users/friendrequests/:userId', (req, res)=> {
+    const userId = req.params.userId;
+    con.query(`SELECT * FROM friends AS F , users AS U WHERE CASE WHEN F.UserTwo = ? THEN F.UserOne = U.id END AND F.Status = 0`, [userId, userId], (err, result) => {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result);
+    })
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

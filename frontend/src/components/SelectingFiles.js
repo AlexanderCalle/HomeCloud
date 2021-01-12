@@ -22,7 +22,6 @@ class SelecingFiles extends Component {
             if(res.status === 200) {
               if(res.data !== "no data") {
                 const files = res.data;
-
                 if(files.length > 0) {
                     files.forEach(file => {
                         const obj = {...file, isSelect: false};
@@ -55,8 +54,25 @@ class SelecingFiles extends Component {
         }
         this.setState({selected: selected});
         this.props.setSelected(selected)
-        console.log(this.state.selected);
     };
+
+    // selectAll = () => {
+    //     this.state.files.forEach(item => {
+    //         item.isSelect = !item.isSelect;
+    //         if(item.isSelect){
+    //             const obj = {
+    //                 name: item.name,
+    //                 file: item.path,
+    //                 filename: item.name,
+    //                 is_image: item.is_image,
+    //                 fileId: item.file_id
+    //             };
+    //             selected.push(obj);
+    //         }
+    //     })
+    //     this.setState({selected: selected});
+    //     this.props.setSelected(selected)
+    // }
     
     render() {
         return (

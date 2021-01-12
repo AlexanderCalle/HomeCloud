@@ -61,14 +61,13 @@ class Profile extends Component {
 
         const token = JSON.parse(localStorage.getItem('tokens'));
 
-        Axios.post(`http://localhost:3030/uploadPic/${token.id}`, data, {
-        onUploadProgress: (ProgressEvent) => {
-            console.log(ProgressEvent.loaded);
-        }
-    })
+        Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/uploadPic/${token.id}`, data, {
+            onUploadProgress: (ProgressEvent) => {
+                console.log(ProgressEvent.loaded);
+            }
+        })
         .then((res) => {
             if(res.status === 200) {
-                console.log(res.data);
                 const data = {
                     ...token,
                     profile_pic: res.data.profile_pic

@@ -10,6 +10,7 @@ import useFileDownloader from '../hooks/useFileDownloader'
 import FileShow from '../components/FileShow';
 import SelecingFiles from '../components/SelectingFiles';
 import ProgressBar from '../components/ProgressBar';
+//import {selectAll} from '../components/SelectingFiles';
 
 function Collection() {
   let history = useHistory();
@@ -195,7 +196,7 @@ function Collection() {
               </div>
             </div>
             <div className="flex flex-col space-y-2 items-center">
-              <div className="w-full h-16 border-b ">
+              <div className="w-full h-16 border-t ">
                 <div>
                     <div className="relative pt-2">
                         <div className="flex mb-2 items-center justify-between">
@@ -224,21 +225,26 @@ function Collection() {
         <div className="w-full flex flex-col p-4">
           <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
             <div className="flex flex-row space-x-2">
-            <button onClick={() => setShowFolders(!showFolders)}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
-            </button>
-            <>
-             {rename ? (
-               <form className="flex flex-row">
-                 <input type="text" value={newFoldername} onChange={ (e) => setNewFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-sm"/>
-                 <button onClick={(e) => {renameFolder(e)}} className="h-8 rounded-md border border-transparent shadow-sm px-4 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                   Rename
-                  </button>
-               </form>
-             ) : <h1 className="font-bold">{foldername}</h1>}
-            </>
+              <button onClick={() => setShowFolders(!showFolders)}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
+              </button>
+              <>
+              {rename ? (
+                <form className="flex flex-row">
+                  <input type="text" value={newFoldername} onChange={ (e) => setNewFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-sm"/>
+                  <button onClick={(e) => {renameFolder(e)}} className="h-8 rounded-md border border-transparent shadow-sm px-4 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Rename
+                    </button>
+                </form>
+              ) : <h1 className="font-bold">{foldername}</h1>}
+              </>
             </div>
             <div className="flex flex-row space-x-4">
+              {/* {isSelecting && (
+                <button onClick={selectAll}>
+                  Select All
+                </button>
+              )} */}
               <button className={!isSelecting ? styles.default : styles.selecting} onClick={() => setIsSelecting(!isSelecting)}>Select</button>
               {isSelecting && (
                 <button onClick={downloadSelected}>
