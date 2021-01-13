@@ -28,17 +28,17 @@ function FriendsPage() {
 
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/friends/${token.id}`)
             .then(response => {
-                if(response.status == 200) {
+                if(response.status === 200) {
                     setFriends(response.data);
                 }
             })
-    }, [])
+    }, [token.id]);
 
 
     function handleChange(e) {
         setSearchValue(e.target.value);
 
-        if(e.target.value != "") {
+        if(e.target.value !== "") {
 
 
             axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/search/${token.id}/${e.target.value}`)
@@ -72,7 +72,7 @@ function FriendsPage() {
         e.preventDefault()
         let data;
 
-        if(status == "accept") {
+        if(status === "accept") {
             data = {
                 Status: 1
             }
@@ -131,7 +131,7 @@ function FriendsPage() {
                                         <button onClick={() => setShowModalRequest(true)}>
                                             <div className="relative w-8 h-8">
                                                 <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                                {usersRequestingTotal != 0 ? (
+                                                {usersRequestingTotal !== 0 ? (
                                                     <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-white rounded-full bg-red-400 items-center justify-center z-2">
                                                         <p className="text-white font-medium text-xs">{usersRequestingTotal}</p>
                                                     </div>
@@ -145,10 +145,10 @@ function FriendsPage() {
                         <div className="flex-auto overflow-y-auto flex flex-col">
                                 {!searhed ? (
                                     <>
-                                    {friends != null ? (
+                                    {friends !== null ? (
                                         friends.map(friend => (
                                             <>
-                                            {friend.id != token.id ? (
+                                            {friend.id !== token.id ? (
                                                 <a className="block border-b cursor-pointer" href="#">
                                                     <div className={styles.default}>
                                                         <div className="flex flex-row items-center justify-between">
@@ -168,10 +168,10 @@ function FriendsPage() {
                                     </> 
                                 ) : (
                                     <>
-                                    {searchedUsers.length != 0 ? (
+                                    {searchedUsers.length !== 0 ? (
                                         searchedUsers.map(user => (
                                             <>
-                                            {token.id != user.id ? (
+                                            {token.id !== user.id ? (
                                                 <div className="block border-b">
                                                 <div className={styles.default}>
                                                     <div className="flex flex-row items-center justify-between">
@@ -179,9 +179,13 @@ function FriendsPage() {
                                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                             <strong className="flex-grow font-normal">{user.firstname} {user.lastname}</strong>
                                                         </div>
-                                                        <button onClick={()=> sendFriendRequest(user.id)}>
-                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                                                        </button>
+                                                        {user.Status === null || user.Status === 2 ? (
+                                                            <button onClick={()=> sendFriendRequest(user.id)}>
+                                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                                            </button>
+                                                        ) : null}
+                                                        {user.Status === 0 && <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>}
+                                                        {user.Status === 1 && <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>}
                                                     </div>
                                                 </div>
                                             </div>

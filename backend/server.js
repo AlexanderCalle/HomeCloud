@@ -443,85 +443,15 @@ app.post('/uploadPic/:userId', upload.single('file'), (req, res) => {
 
 app.get('/users/search/:userId/:query', async (req, res) => {  
     const userId  = req.params.userId;
-    let users = [];
-    con.query(`SELECT id, firstname, lastname, email, profile_pic FROM users WHERE CONCAT ( firstname, ' ', lastname ) LIKE ? `, req.params.query + '%', async (err, result) => {
-        if(err) return res.status(500).send(err);  
-        
-        // findFriends(result, userId);
-        
-        // // await result.forEach( async user => {
-        // //     if(user.id != userId) {
-                
-        // //     }
-        // // })
+    const query = `SELECT u.id, u.firstname, u.lastname, u.email, u.profile_pic, b.Status FROM users u LEFT JOIN friends b ON u.id IN (b.UserOne, b.UserTwo) AND ? IN (b.UserOne, b.UserTwo) WHERE CONCAT ( u.firstname, ' ', u.lastname ) LIKE ? AND u.id <> ?`
 
-        //console.log(users);
+    con.query(query, [userId, req.params.query + '%', userId], async (err, result) => {
+        if(err) console.log(err);
+
+        console.log(result);
         res.status(200).send(result);
     })
 });
-
-// async function findFriends( result, userId ) {
-//     let users = [];
-
-//     Promise.all(result.map(user => {
-//         if(user.id != userId) {
-//             con.query('SELECT * FROM friends WHERE  (UserOne = ? AND UserTwo = ? ) OR (UserTwo = ? AND UserOne = ?) AND (Status = "1" OR Status = "0") ', [userId, user.id, userId, user.id], (err, result)=> {
-//                 if(err) console.log(err);
-//                 if(result[0] != undefined) {
-//                     console.log(user.id);
-//                     return {
-//                         id: user.id,
-//                         firstname: user.firstname,
-//                         lastname: user.lastname,
-//                         email: user.email,
-//                         path: user.profile_pic,
-//                         Status: result[0].Status
-//                     };
-//                 } else {
-//                     return {
-//                         id: user.id,
-//                         firstname: user.firstname,
-//                         lastname: user.lastname,
-//                         email: user.email,
-//                         path: user.profile_pic,
-//                         Status: null
-//                     };
-//                 }
-//             })
-//         }
-//     })).then(friends => {
-//         console.log(friends);
-//     })
-
-    // for(let user of result) {
-    //     if(user.id != userId) {
-    //         await con.query('SELECT * FROM friends WHERE  (UserOne = ? AND UserTwo = ? ) OR (UserTwo = ? AND UserOne = ?) AND (Status = "1" OR Status = "0") ', [userId, user.id, userId, user.id], (err, result)=> {
-    //             if(err) console.log(err);
-    //             if(result[0] != undefined) {
-    //                 users.push({
-    //                     id: user.id,
-    //                     firstname: user.firstname,
-    //                     lastname: user.lastname,
-    //                     email: user.email,
-    //                     path: user.profile_pic,
-    //                     Status: result[0].Status
-    //                 });
-    //             } else {
-    //                 users.push({
-    //                     id: user.id,
-    //                     firstname: user.firstname,
-    //                     lastname: user.lastname,
-    //                     email: user.email,
-    //                     path: user.profile_pic,
-    //                     Status: null
-    //                 });
-    //             }
-    //         })
-    //     }
-    // }
-
-    //return users;
-//}
 
 app.get('/users/friends/:userId', (req, res)=> {
 
