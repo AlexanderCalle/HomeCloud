@@ -5,7 +5,6 @@ import Transition from '../components/transition';
 import axios from 'axios';
 
 function FriendsPage() {
-
     const [showFriends, setShowFriends] = useState(true);
     const [friends, setFriends] = useState(null);
     const [showSearchBar, setShowSearchBar] = useState(false);
@@ -14,6 +13,7 @@ function FriendsPage() {
     const [searhed, setSearched] = useState(false);
     const [usersRequesting, setUsersRequesting] = useState(null);
     const [usersRequestingTotal, setUsersRequestingTotal] = useState(0);
+    const [showModalRequest, setShowModalRequest] = useState(false);
 
     const token = JSON.parse(localStorage.getItem('tokens'));
 
@@ -30,7 +30,6 @@ function FriendsPage() {
             .then(response => {
                 if(response.status == 200) {
                     setFriends(response.data);
-                    console.log(response.data);
                 }
             })
     }, [])
@@ -40,7 +39,9 @@ function FriendsPage() {
         setSearchValue(e.target.value);
 
         if(e.target.value != "") {
-            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/search/${e.target.value}`)
+
+
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/search/${token.id}/${e.target.value}`)
             .then((response) => {
                 if (response.status === 200) {
                     setSearchedUsers(response.data);
@@ -58,13 +59,36 @@ function FriendsPage() {
             friendId: friendId,
         }
 
-        axios({method: 'POST', url:`http://localhost:3030/users/addFriend`, data:data})
+        axios({method: 'POST', url:`http://${process.env.REACT_APP_HOST_IP}:3030/users/addFriend`, data:data})
         .then((res) => {
             if(res.status === 200) {
                 setShowSearchBar(false)
                 setSearched(false)
             }
         })
+    }
+
+    function handleUpdateRequest(e, status, FriendsId) {
+        e.preventDefault()
+        let data;
+
+        if(status == "accept") {
+            data = {
+                Status: 1
+            }
+        } else {
+            data = {
+                Status: 2
+            }
+        }
+
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/users/updateRequest/${FriendsId}`, data)
+            .then(response => {
+                if(response.status === 200) {
+                    setShowModalRequest(false);
+                    window.location.reload();
+                }
+            })
     }
 
     return (
@@ -104,9 +128,9 @@ function FriendsPage() {
                                         <button onClick={() => setShowSearchBar(true)}>
                                             <svg class="w-8 h-8 hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </button>
-                                        <button>
+                                        <button onClick={() => setShowModalRequest(true)}>
                                             <div className="relative w-8 h-8">
-                                            <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                                <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                                 {usersRequestingTotal != 0 ? (
                                                     <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-white rounded-full bg-red-400 items-center justify-center z-2">
                                                         <p className="text-white font-medium text-xs">{usersRequestingTotal}</p>
@@ -194,9 +218,68 @@ function FriendsPage() {
                     </div>
                 </div>
             </div>
+
+            <>
+            {showModalRequest ? (
+                <div className="fixed z-10 inset-0 overflow-y-auto">
+                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <form>
+                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                            <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                            <div className="min-w-0 sm:flex sm:items-start">
+                                <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
+                                <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
+                                    Friend Request(s)
+                                </h3>
+                                <div className="mt-2 overflow-y-auto">
+                                    {usersRequesting.map(user => (
+                                        <>
+                                        {token.id != user.id ? (
+                                            <div className="block border-b">
+                                            <div className={styles.default}>
+                                                <div className="flex flex-row items-center justify-between">
+                                                    <div className="flex flex-row space-x-2">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                        <strong className="flex-grow font-normal">{user.firstname} {user.lastname}</strong>
+                                                    </div>
+                                                    <div className="space-x-2">
+                                                        <button onClick={(e) =>  handleUpdateRequest(e, "accept", user.FriendsId)}>
+                                                            <svg class="w-6 h-6 hover:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                        </button>
+                                                        <button onClick={(e) =>  handleUpdateRequest(e, "decline", user.FriendsId)}>
+                                                            <svg class="w-6 h-6 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        ): null}
+                                        </>
+                                    ))}
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button onClick={()=> {
+                                setShowModalRequest(false)
+                            }} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                Close
+                            </button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            ) : null}
+            </>
+
         </div>
     )
-
 }
 
 const styles = {

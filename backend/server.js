@@ -440,12 +440,88 @@ app.post('/uploadPic/:userId', upload.single('file'), (req, res) => {
     })
 });
 
-app.get('/users/search/:query', (req, res) => {
-    con.query(`SELECT id, firstname, lastname, email FROM users WHERE CONCAT ( firstname, ' ', lastname ) LIKE ? `, req.params.query + '%', (err, result) => {
-        if(err) return res.status(500).send(err);
+
+app.get('/users/search/:userId/:query', async (req, res) => {  
+    const userId  = req.params.userId;
+    let users = [];
+    con.query(`SELECT id, firstname, lastname, email, profile_pic FROM users WHERE CONCAT ( firstname, ' ', lastname ) LIKE ? `, req.params.query + '%', async (err, result) => {
+        if(err) return res.status(500).send(err);  
+        
+        // findFriends(result, userId);
+        
+        // // await result.forEach( async user => {
+        // //     if(user.id != userId) {
+                
+        // //     }
+        // // })
+
+        //console.log(users);
         res.status(200).send(result);
     })
 });
+
+// async function findFriends( result, userId ) {
+//     let users = [];
+
+//     Promise.all(result.map(user => {
+//         if(user.id != userId) {
+//             con.query('SELECT * FROM friends WHERE  (UserOne = ? AND UserTwo = ? ) OR (UserTwo = ? AND UserOne = ?) AND (Status = "1" OR Status = "0") ', [userId, user.id, userId, user.id], (err, result)=> {
+//                 if(err) console.log(err);
+//                 if(result[0] != undefined) {
+//                     console.log(user.id);
+//                     return {
+//                         id: user.id,
+//                         firstname: user.firstname,
+//                         lastname: user.lastname,
+//                         email: user.email,
+//                         path: user.profile_pic,
+//                         Status: result[0].Status
+//                     };
+//                 } else {
+//                     return {
+//                         id: user.id,
+//                         firstname: user.firstname,
+//                         lastname: user.lastname,
+//                         email: user.email,
+//                         path: user.profile_pic,
+//                         Status: null
+//                     };
+//                 }
+//             })
+//         }
+//     })).then(friends => {
+//         console.log(friends);
+//     })
+
+    // for(let user of result) {
+    //     if(user.id != userId) {
+    //         await con.query('SELECT * FROM friends WHERE  (UserOne = ? AND UserTwo = ? ) OR (UserTwo = ? AND UserOne = ?) AND (Status = "1" OR Status = "0") ', [userId, user.id, userId, user.id], (err, result)=> {
+    //             if(err) console.log(err);
+    //             if(result[0] != undefined) {
+    //                 users.push({
+    //                     id: user.id,
+    //                     firstname: user.firstname,
+    //                     lastname: user.lastname,
+    //                     email: user.email,
+    //                     path: user.profile_pic,
+    //                     Status: result[0].Status
+    //                 });
+    //             } else {
+    //                 users.push({
+    //                     id: user.id,
+    //                     firstname: user.firstname,
+    //                     lastname: user.lastname,
+    //                     email: user.email,
+    //                     path: user.profile_pic,
+    //                     Status: null
+    //                 });
+    //             }
+    //         })
+    //     }
+    // }
+
+    //return users;
+//}
 
 app.get('/users/friends/:userId', (req, res)=> {
 
@@ -461,24 +537,55 @@ app.get('/users/friends/:userId', (req, res)=> {
 });
 
 app.post('/users/addFriend', (req, res) => {
-    const data = {
-        UserOne: req.body.userId,
-        UserTwo: req.body.friendId,
-        Status: 0
-    }
 
-    con.query('INSERT INTO friends SET ?', data, (err, result)=> {
-        if(err) return res.status(500).send(err);
-        res.status(200).send(result);
+    const userId = req.body.userId;
+    const friendId = req.body.friendId;
+
+    con.query('SELECT FriendsId, Status, UserOne, UserTwo from friends WHERE CASE WHEN UserOne = ? THEN UserTwo = ? WHEN UserTwo = ? THEN UserOne = ? END', [userId, friendId, userId, friendId], (err, result)=> {
+        if(err) console.log(err);
+        
+        if(result[0] === undefined) {
+            const data = {
+                UserOne: req.body.userId,
+                UserTwo: req.body.friendId,
+                Status: 0
+            }
+
+            con.query('INSERT INTO friends SET ?', data, (err, result)=> {
+                if(err) return res.status(500).send(err);
+                res.status(200).send(result);
+            })
+        } else if(result[0].Status == 2) {
+            console.log('kdq');
+            const data = {
+                UserOne: req.body.userId,
+                UserTwo: req.body.friendId,
+                Status: 0
+            }
+
+            con.query('UPDATE `friends` SET ? WHERE FriendsId = ?', [data, result[0].FriendsId], (err, result)=> {
+                if(err) console.log(err);
+                res.status(200).send(result);
+            })
+        }
+
     })
 });
 
 app.get('/users/friendrequests/:userId', (req, res)=> {
     const userId = req.params.userId;
+
     con.query(`SELECT * FROM friends AS F , users AS U WHERE CASE WHEN F.UserTwo = ? THEN F.UserOne = U.id END AND F.Status = 0`, [userId, userId], (err, result) => {
         if(err) return res.status(500).send(err);
         res.status(200).send(result);
     })
+});
+
+app.post('/users/updateRequest/:FriendsId', (req, res)=> {
+    con.query('UPDATE `friends` SET `Status` = ? WHERE FriendsId = ?', [req.body.Status, req.params.FriendsId], (err, result)=>{
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result);
+    });
 });
 
 app.listen(port, () => {

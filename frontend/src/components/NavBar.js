@@ -28,8 +28,9 @@ function Navbar() {
     const [filename, setFilename] = useState("");
     const [fileOnSelected, setFileOnSelected] = useState(0);
     const [totalSize, setTotalSize] = React.useState(0);
-    const [WarningDialog, setWarningDialog] = useState(false)
-    const [msg, setMsg] = useState("")
+    const [WarningDialog, setWarningDialog] = useState(false);
+    const [msg, setMsg] = useState("");
+    const [usersRequestingTotal, setUsersRequestingTotal] = useState(0);
     const token = JSON.parse(localStorage.getItem('tokens'));
 
     const CancelToken = axios.CancelToken;
@@ -39,6 +40,15 @@ function Navbar() {
         setAuthTokens(null);
         return <Redirect to="/login" />
     }
+
+    useEffect(() => {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/friendrequests/${token.id}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    setUsersRequestingTotal(response.data.length)
+                }
+            })
+    }, [])
 
     function postItem() {
 
@@ -299,7 +309,14 @@ function Navbar() {
                 </botton>
                 <a className='tooltip' href="/friendspage">
                     <span className='tooltiptext shadow-lg font-semibold'>Friends</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <div className="relative w-8 h-8">
+                        <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        {usersRequestingTotal != 0 ? (
+                            <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-white rounded-full bg-red-400 items-center justify-center z-2">
+                                <p className="text-white font-medium text-xs">{usersRequestingTotal}</p>
+                            </div>
+                        ) : null}
+                    </div>
                 </a >
                 <a className='tooltip' href="/myprofile" >
                     <span className='tooltiptext shadow-lg font-semibold'>My Profile</span>
