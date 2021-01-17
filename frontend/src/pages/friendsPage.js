@@ -3,6 +3,7 @@ import Navbar from '../components/NavBar';
 import '../index.css';
 import Transition from '../components/transition';
 import axios from 'axios';
+import { ChatPage } from '../components/ChatPage';
 
 function FriendsPage() {
     const [showFriends, setShowFriends] = useState(true);
@@ -14,6 +15,7 @@ function FriendsPage() {
     const [usersRequesting, setUsersRequesting] = useState(null);
     const [usersRequestingTotal, setUsersRequestingTotal] = useState(0);
     const [showModalRequest, setShowModalRequest] = useState(false);
+    const [selectedFriend, setSelectedFriend] = useState();
 
     const token = JSON.parse(localStorage.getItem('tokens'));
 
@@ -30,6 +32,7 @@ function FriendsPage() {
             .then(response => {
                 if(response.status === 200) {
                     setFriends(response.data);
+                    setSelectedFriend(response.data[0])
                 }
             })
     }, [token.id]);
@@ -64,6 +67,7 @@ function FriendsPage() {
             if(res.status === 200) {
                 setShowSearchBar(false)
                 setSearched(false)
+                setSearchValue('')
             }
         })
     }
@@ -91,6 +95,15 @@ function FriendsPage() {
             })
     }
 
+    function handleRemoveFriend(e, FriendsId) {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/deleteFriend/${FriendsId}`)
+            .then((response) => {
+                if(response.status === 200) {
+                    window.location.reload();
+                }
+            })
+    }
+
     return (
         <div className='flex flex-row h-screen bg-gray-100'>
             <Navbar />
@@ -106,20 +119,23 @@ function FriendsPage() {
                     <div className="flex flex-col space-y-4">
                         <div className="flex flex-row flex-none p-4 border-b justify-between items-center mb-6">
                             {showSearchBar ? (
-                                <div className="flex flex-row space-x-2">
-                                    <div class="pt-2 relative mx-auto text-gray-600">
-                                        <input class="border-2 text-gray-600 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
+                                <div className="flex flex-row items-center justify-between space-x-2">
+                                    <div class="pt-2 relative text-gray-600">
+                                        <input class="border-2 w-64 text-gray-600 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
                                             type="search" name="search" value={searchValue} placeholder="Search" onChange={(e)=> handleChange(e)} />
                                         <button type="submit" class="absolute right-0 top-0 mt-5 mr-4">
                                             <svg class="text-gray-600 h-4 w-4 fill-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         </button>
                                     </div>
-                                    <button onClick={() => {
-                                        setShowSearchBar(false)
-                                        setSearched(false)
-                                    }}>
-                                        <svg class="w-4 h-4 mt-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
+                                    <div className="mt-2">
+                                        <button onClick={() => {
+                                            setShowSearchBar(false)
+                                            setSearched(false)
+                                            setSearchValue("")
+                                        }}>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             ) : (
                                 <>
@@ -149,11 +165,15 @@ function FriendsPage() {
                                         friends.map(friend => (
                                             <>
                                             {friend.id !== token.id ? (
-                                                <a className="block border-b cursor-pointer" href="#">
-                                                    <div className={styles.default}>
+                                                <a className="block border-b cursor-pointer" onClick={()=> setSelectedFriend(friend)}>
+                                                    <div className={ selectedFriend !== undefined && selectedFriend.id == friend.id ? styles.selected : styles.default}>
                                                         <div className="flex flex-row items-center justify-between">
                                                             <div className="flex flex-row space-x-2">
-                                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                {friend.profile_pic !== null ? (
+                                                                    <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-7 h-7 rounded-full" />
+                                                                ) : ( 
+                                                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                )}
                                                                 <strong className="flex-grow font-normal">{friend.firstname} {friend.lastname}</strong>
                                                             </div>
                                                         </div>
@@ -176,7 +196,11 @@ function FriendsPage() {
                                                 <div className={styles.default}>
                                                     <div className="flex flex-row items-center justify-between">
                                                         <div className="flex flex-row space-x-2">
-                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            {user.profile_pic !== null ? (
+                                                                <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + user.profile_pic} className="object-cover w-7 h-7 rounded-full" />
+                                                            ) : ( 
+                                                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            )}
                                                             <strong className="flex-grow font-normal">{user.firstname} {user.lastname}</strong>
                                                         </div>
                                                         {user.Status === null || user.Status === 2 ? (
@@ -202,24 +226,31 @@ function FriendsPage() {
                 </div>
             </Transition>
 
-            <div className='flex flex-row flex-auto bg-white rounded-tl-xl rounded-bl-xl border-l border-r border-gray-400 shadow-xl'>
+            <div className='h-screen flex flex-row flex-auto bg-white rounded-tl-xl rounded-bl-xl border-l border-r border-gray-400 shadow-xl'>
                 <div className="w-full flex flex-col p-4">
-                    <div className="flex-none h-16 flex flex-row space-x-4 items-center border-b">
-                        <button onClick={() => setShowFriends(!showFriends)}>
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
-                        </button>
-                        <h1 className="font-bold">Firstname Lastname</h1>
-                    </div>
-                    <div className="flex-auto flex flex-col justify-center items-center space-y-16">
-                        {/* <div>
-                            <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {selectedFriend !== undefined && (
+                    <>
+                    <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
+                        <div className="flex flex-row space-x-4 items-center">
+                            <button onClick={() => setShowFriends(!showFriends)}>
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
+                            </button>
+                            <h1 className="font-bold">{selectedFriend.firstname} {selectedFriend.lastname}</h1>
                         </div>
-                        <div className="flex flex-col space-y-4 items-center">
-                            <p>name: Firstname Lastname</p>        
-                            <p>email: firstname@example.com</p>
-                        </div> */}
-                        <p>Comming Soon...</p>
+                        <div>
+                            <button>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </button>
+                            {/* <button onClick={(e) => handleRemoveFriend(e, selectedFriend.FriendsId)}>
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"></path></svg>
+                            </button> */}
+                        </div>
                     </div>
+                    <div className="flex-auto h-4/5 p-4">
+                       <ChatPage />
+                    </div>
+                    </>
+                    )}
                 </div>
             </div>
 

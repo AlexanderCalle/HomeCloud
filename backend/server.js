@@ -100,6 +100,9 @@ app.post('/login', (req, res) => {
                 console.log(err);
                 return res.sendStatus(500);
             }
+            if(result[0] === undefined) {
+                return res.status(201).send('Email does not exist');
+            }
             if(bcrypt.compareSync(req.body.password, result[0].password_hash)) {
                 res.status(200).send({
                     email: email,
@@ -448,7 +451,6 @@ app.get('/users/search/:userId/:query', async (req, res) => {
     con.query(query, [userId, req.params.query + '%', userId], async (err, result) => {
         if(err) console.log(err);
 
-        console.log(result);
         res.status(200).send(result);
     })
 });
@@ -516,6 +518,13 @@ app.post('/users/updateRequest/:FriendsId', (req, res)=> {
         if(err) return res.status(500).send(err);
         res.status(200).send(result);
     });
+});
+
+app.get('/users/deleteFriend/:FriendsId', (req, res)=> {
+    con.query('DELETE FROM `friends` WHERE `FriendsId` = ?', req.params.FriendsId, (err, result)=> {
+        if(err) return res.status(500).send(err);
+        res.status(200).send('Deleted')
+    })
 });
 
 app.listen(port, () => {
