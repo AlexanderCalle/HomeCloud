@@ -4,8 +4,10 @@ import '../index.css';
 import Transition from '../components/transition';
 import axios from 'axios';
 import { ChatPage } from '../components/ChatPage';
+import {socket} from '../App';
 
 function FriendsPage() {
+
     const [showFriends, setShowFriends] = useState(true);
     const [friends, setFriends] = useState(null);
     const [showSearchBar, setShowSearchBar] = useState(false);
@@ -15,7 +17,9 @@ function FriendsPage() {
     const [usersRequesting, setUsersRequesting] = useState(null);
     const [usersRequestingTotal, setUsersRequestingTotal] = useState(0);
     const [showModalRequest, setShowModalRequest] = useState(false);
-    const [selectedFriend, setSelectedFriend] = useState();
+    const [selectedFriend, setSelectedFriend] = useState(null);
+    const [chatId, setChatId] = useState(null);
+    const [latestMessages, setLatestMessages] = useState([]);
 
     const token = JSON.parse(localStorage.getItem('tokens'));
 
@@ -32,18 +36,36 @@ function FriendsPage() {
             .then(response => {
                 if(response.status === 200) {
                     setFriends(response.data);
-                    setSelectedFriend(response.data[0])
+                    setSelectedFriend(null)
                 }
             })
     }, [token.id]);
 
+    // friend Page
+    useEffect(() => {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getlatestmessages/${token.id}`)
+            .then(response => {
+                if(response.status === 200) {
+                    setLatestMessages(response.data);
+                }
+            })
+    }, [chatId]) // not sure yet
+
+    useEffect(() => {
+        socket.on('latest', () => {
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getlatestmessages/${token.id}`)
+            .then(response => {
+                if(response.status === 200) {
+                    setLatestMessages(response.data);
+                }
+            })
+        })
+    }, [])
 
     function handleChange(e) {
         setSearchValue(e.target.value);
 
         if(e.target.value !== "") {
-
-
             axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/search/${token.id}/${e.target.value}`)
             .then((response) => {
                 if (response.status === 200) {
@@ -75,17 +97,11 @@ function FriendsPage() {
     function handleUpdateRequest(e, status, FriendsId) {
         e.preventDefault()
         let data;
-
         if(status === "accept") {
-            data = {
-                Status: 1
-            }
+            data = {Status: 1}
         } else {
-            data = {
-                Status: 2
-            }
+            data = {Status: 2}
         }
-
         axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/users/updateRequest/${FriendsId}`, data)
             .then(response => {
                 if(response.status === 200) {
@@ -95,13 +111,42 @@ function FriendsPage() {
             })
     }
 
-    function handleRemoveFriend(e, FriendsId) {
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/deleteFriend/${FriendsId}`)
-            .then((response) => {
-                if(response.status === 200) {
-                    window.location.reload();
+    // function handleRemoveFriend(e, FriendsId) {
+    //     axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/deleteFriend/${FriendsId}`)
+    //         .then((response) => {
+    //             if(response.status === 200) {
+    //                 window.location.reload();
+    //             }
+    //         })
+    // }
+
+    function handleChat(friend) {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getchat/${token.id}/${friend.id}`)
+            .then(response => {
+
+            if(response.status === 200) {
+                setChatId(response.data.chatId)
+
+                let chatId = response.data.chatId
+                let userId = token.id
+
+                socket.emit('joinchat', {chatId, userId})
+            } else if(response.status === 201) {
+    
+                const data = {
+                    userOne: token.id,
+                    userTwo: friend.id
                 }
-            })
+    
+                axios.post('http://localhost:3030/chat/makechat', data)
+                    .then(response => {
+                        if(response.status === 200) {
+                            setChatId(response.data.insertId)
+                            socket.emit('joinchat', response.data.insertId)
+                        }
+                })
+            }
+        })
     }
 
     return (
@@ -165,16 +210,27 @@ function FriendsPage() {
                                         friends.map(friend => (
                                             <>
                                             {friend.id !== token.id ? (
-                                                <a className="block border-b cursor-pointer" onClick={()=> setSelectedFriend(friend)}>
-                                                    <div className={ selectedFriend !== undefined && selectedFriend.id == friend.id ? styles.selected : styles.default}>
+                                                <a className="block border-b cursor-pointer" onClick={()=> {
+                                                    setSelectedFriend(friend);
+                                                    handleChat(friend);
+                                                }}>
+                                                    <div className={ selectedFriend !== null ? ( selectedFriend.id == friend.id ? styles.selected : styles.default ) : styles.default}>
                                                         <div className="flex flex-row items-center justify-between">
-                                                            <div className="flex flex-row space-x-2">
-                                                                {friend.profile_pic !== null ? (
-                                                                    <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-7 h-7 rounded-full" />
-                                                                ) : ( 
-                                                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                                )}
-                                                                <strong className="flex-grow font-normal">{friend.firstname} {friend.lastname}</strong>
+                                                            <div className="flex flex-col space-x-2">
+                                                                <div className="flex flex-row space-x-2">
+                                                                    {friend.profile_pic !== null ? (
+                                                                        <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-7 h-7 rounded-full" />
+                                                                    ) : ( 
+                                                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                    )}
+                                                                    <strong className="flex-grow font-normal">{friend.firstname} {friend.lastname}</strong>
+                                                                </div>
+                                                                { latestMessages.map((message) => (
+                                                                    <>
+                                                                    {message.fromUser == friend.id && <p>{friend.firstname}: {message.message}</p> }
+                                                                    {message.toUser == friend.id && <p>you: {message.message}</p> }
+                                                                    </>
+                                                                )) }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -235,7 +291,7 @@ function FriendsPage() {
                             <button onClick={() => setShowFriends(!showFriends)}>
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path></svg>
                             </button>
-                            <h1 className="font-bold">{selectedFriend.firstname} {selectedFriend.lastname}</h1>
+                            <h1 className="font-bold">{ selectedFriend !== null && (`${selectedFriend.firstname} ${selectedFriend.lastname}`) }</h1>
                         </div>
                         <div>
                             <button>
@@ -246,8 +302,8 @@ function FriendsPage() {
                             </button> */}
                         </div>
                     </div>
-                    <div className="flex-auto h-4/5 p-4">
-                       <ChatPage />
+                    <div className="flex-auto h-4/5">
+                       { selectedFriend !== null ? (<ChatPage chatId={chatId} friendId={selectedFriend.id} />):null}
                     </div>
                     </>
                     )}

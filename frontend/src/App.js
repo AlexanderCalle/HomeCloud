@@ -9,9 +9,15 @@ import Login from './pages/login';
 import Register from './pages/register';
 import MyProfile from './pages/myProfile';
 import FriendsPage from './pages/friendsPage';
+import socketIOClient from "socket.io-client";
 
+export const socket = socketIOClient(`http://${process.env.REACT_APP_HOST_IP}:3030`, {transports: ['websocket']});
 
 function App() {
+
+  socket.on('connection', function() {
+    console.log('connection');
+  })
 
   const existingTokens = JSON.parse(localStorage.getItem('tokens'));
   const [ authTokens, setAuthTokens ] = useState(existingTokens);
