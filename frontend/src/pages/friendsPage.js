@@ -193,7 +193,7 @@ function FriendsPage() {
                                             <div className="relative w-8 h-8">
                                                 <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                                 {usersRequestingTotal !== 0 ? (
-                                                    <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-white rounded-full bg-red-400 items-center justify-center z-2">
+                                                    <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-gray-100 rounded-full bg-red-400 items-center justify-center z-2">
                                                         <p className="text-white font-medium text-xs">{usersRequestingTotal}</p>
                                                     </div>
                                                 ) : null}
@@ -216,21 +216,21 @@ function FriendsPage() {
                                                 }}>
                                                     <div className={ selectedFriend !== null ? ( selectedFriend.id == friend.id ? styles.selected : styles.default ) : styles.default}>
                                                         <div className="flex flex-row items-center justify-between">
-                                                            <div className="flex flex-col space-x-2">
-                                                                <div className="flex flex-row space-x-2">
+                                                            <div className="flex flex-row space-x-2">
                                                                     {friend.profile_pic !== null ? (
-                                                                        <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-7 h-7 rounded-full" />
+                                                                        <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-12 h-12 rounded-full" />
                                                                     ) : ( 
-                                                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                                     )}
-                                                                    <strong className="flex-grow font-normal">{friend.firstname} {friend.lastname}</strong>
+                                                                <div className="flex flex-col space-x-2">
+                                                                    <strong className="font-semibold">{friend.firstname} {friend.lastname}</strong>
+                                                                    {latestMessages.map((message) => (
+                                                                        <>
+                                                                        {message.fromUser == friend.id && <p className="ml-0">{message.message}</p>}
+                                                                        {message.toUser == friend.id && <p className="ml-0">you: {message.message}</p>}
+                                                                        </>
+                                                                    ))}
                                                                 </div>
-                                                                { latestMessages.map((message) => (
-                                                                    <>
-                                                                    {message.fromUser == friend.id && <p>{friend.firstname}: {message.message}</p> }
-                                                                    {message.toUser == friend.id && <p>you: {message.message}</p> }
-                                                                    </>
-                                                                )) }
                                                             </div>
                                                         </div>
                                                     </div>
