@@ -655,6 +655,13 @@ app.get('/chat/getlatestmessages/:userId', (req, res)=> {
 	})
 });
 
+app.post('/chats/seenmessages/:chatId/:userId', (req, res) => {
+	con.query('UPDATE messages SET Status = 1 WHERE chatId = ? AND toUser = ?', [req.params.chatId, req.params.userId], (err, result)=> {
+        if(err) console.log(err);
+		res.status(200).send(result);
+	})
+})
+
 http.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })

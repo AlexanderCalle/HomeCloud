@@ -23,10 +23,18 @@ export const ChatPage = ({friendId, chatId}) => {
         }
         
     }, [chatId]);
+
+    useEffect(()=> {
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chats/seenmessages/${chatId}/${token.id}`)
+            .then(response => {
+                if(response.status === 200) {
+
+                }
+            })
+    }, [chatId]);
     
     useEffect(() => { 
         socket.on('message', message => {
-            console.log(message);
             setMessages(messages => [ ...messages, message ]);
           });
 

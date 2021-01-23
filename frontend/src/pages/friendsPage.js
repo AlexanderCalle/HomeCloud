@@ -226,8 +226,8 @@ function FriendsPage() {
                                                                     <strong className="font-semibold">{friend.firstname} {friend.lastname}</strong>
                                                                     {latestMessages.map((message) => (
                                                                         <>
-                                                                        {message.fromUser == friend.id && <p className="ml-0">{message.message}</p>}
-                                                                        {message.toUser == friend.id && <p className="ml-0">you: {message.message}</p>}
+                                                                        {message.fromUser == friend.id && <p className={message.Status == 0 ? "font-bold" : "font-normal"}>{message.message}</p>}
+                                                                        {message.toUser == friend.id && <p>you: {message.message}</p>}
                                                                         </>
                                                                     ))}
                                                                 </div>
