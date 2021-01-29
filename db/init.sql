@@ -55,3 +55,13 @@ CREATE TABLE IF NOT EXISTS `chats` (
 	userTwo VARCHAR(255) NOT NULL,
 	PRIMARY KEY (chatId)
 );
+
+CREATE TABLE `shared` (
+	shared_id INT(11) NOT NULL AUTO_INCREMENT,
+	shared_file INT(11) NOT NULL,
+	user_file VARCHAR(255) NOT NULL,
+	shared_user VARCHAR(255) NOT NULL,
+	shared_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (shared_id),
+	FOREIGN KEY (shared_file) REFERENCES `files`(file_id)
+);

@@ -106,7 +106,7 @@ app.post('/login', (req, res) => {
                 return res.sendStatus(500);
             }
             if(result[0] === undefined) {
-                return res.status(201).send('Email does not exist');
+                return res.status(403).send('email');
             }
             if(bcrypt.compareSync(req.body.password, result[0].password_hash)) {
                 res.status(200).send({
@@ -116,11 +116,11 @@ app.post('/login', (req, res) => {
                 });
             } else {
                 console.log('password');
-                return res.sendStatus(403);
+                return res.status(403).send("password");
             }
         });
     } else {
-        return res.status(403).send("Not everything is filled in!")
+        return res.status(403).send("fields")
     }
 })
 

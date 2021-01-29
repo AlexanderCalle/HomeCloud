@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 function Login() {
 
   const [ isLoggedIn, setLoggedIn ] = useState(false); 
-  const [ isError, setIsError ] = useState(false); 
+  const [ isError, setIsError ] = useState(null); 
   const [ emailUser, setEmail ] = useState(""); 
   const [ password, setPassword ] = useState("");
   const { setAuthTokens } = useAuth();
@@ -26,11 +26,25 @@ function Login() {
           profile_pic: result.data.profile_pic,
         });
         setLoggedIn(true)
-      } else {
-        setIsError(true)
       }
     }).catch(e => {
-      setIsError(true);
+      console.log(e.response);
+      if(e.response.status === 403) {
+        switch(e.response.data) {
+          case "email": 
+            setIsError("Email does not exist!");
+            break;
+          case "password": 
+            setIsError("Password is incorrect!");
+            break;
+          case "fields": 
+            setIsError("Everything has to be filled in!");
+            break;
+          default:
+            setIsError(e.response.data);
+            break;
+        }
+      }
     });
   }
 
@@ -49,7 +63,7 @@ function Login() {
                       <h3 class="text-2xl leading-1 font-medium text-blue-500" id="modal-headline">
                         Login
                       </h3>
-                      { isError &&<p>The username or password provided were incorrect!</p> }
+                      { isError !== null && <p className="text-red-500">{isError}</p>}
                       <form class="w-full mt-4 flex flex-col space-y-4" onSubmit={(e)=> { e.preventDefault(); postLogin()}}>
                           <input type="text" value={emailUser} onChange={ (e) => setEmail(e.target.value) } placeholder="Email..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
                           <input type="password" value={password} onChange={ (e) => setPassword(e.target.value) } placeholder="Password..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
