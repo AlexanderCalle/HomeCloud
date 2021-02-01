@@ -9,7 +9,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import MyProfile from './pages/myProfile';
 import FriendsPage from './pages/friendsPage';
-import sharedPage from './pages/shared';
+import SharedPage from './pages/shared';
 import socketIOClient from "socket.io-client";
 
 export const socket = socketIOClient(`http://${process.env.REACT_APP_HOST_IP}:3030`, {transports: ['websocket']});
@@ -38,7 +38,7 @@ function App() {
             <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
             <PrivateRoute exact path='/myprofile' component={MyProfile} />
             <PrivateRoute exact path='/friendspage' component={FriendsPage} />
-            <PrivateRoute exact path='/shared' component={sharedPage} />
+            <PrivateRoute exact path='/shared' component={SharedPage} />
             <Route exact path='/register' component={Register} />
           </Switch>
         </div>

@@ -660,6 +660,41 @@ app.post('/chats/seenmessages/:chatId/:userId', (req, res) => {
         if(err) console.log(err);
 		res.status(200).send(result);
 	})
+});
+
+app.get('/friends/search/:userId/:query', (req, res) => {
+    const query = `SELECT u.id, u.firstname, u.lastname, u.email, u.profile_pic FROM users u LEFT JOIN friends b ON u.id IN (b.UserOne, b.UserTwo) AND ? IN (b.UserOne, b.UserTwo) WHERE CONCAT ( u.firstname, ' ', u.lastname ) LIKE ? AND u.id <> ? AND b.Status = "1"`
+
+    con.query(query, [req.params.userId, req.params.query + '%', req.params.userId], (err, result)=> {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result)
+    })
+});
+
+app.post('/files/sharefile', (req, res)=> {
+    const data = {
+        shared_file: req.body.shared_file,
+        user_file: req.body.user_file,
+        shared_user: req.body.shared_user
+    }
+
+    con.query('SELECT * FROM `shared` WHERE user_file = ? AND shared_user = ? AND shared_file = ?', [data.user_file, data.shared_user, data.shared_file], (err, result)=> {
+        if (err) return res.status(500).send(err);
+        if(result.length === 0) {
+            con.query('INSERT INTO `shared` SET ?', data, (err, result)=> {
+                if(err) return res.status(500).send(err);
+                res.status(200).send(result);
+                console.log('shared file in db!');
+            })
+        }
+    })
+});
+
+app.get('/files/getshared/:userId', (req, res)=> {
+    con.query('SELECT f.*, u.firstname, u.lastname FROM `files` f LEFT JOIN `shared` s ON ? IN (shared_user) LEFT JOIN `users` u ON s.user_file = u.id  WHERE f.file_id = s.shared_file', req.params.userId, (err, data)=> {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(data)
+    })
 })
 
 http.listen(port, () => {

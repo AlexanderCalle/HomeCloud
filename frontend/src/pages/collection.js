@@ -33,6 +33,8 @@ function Collection() {
   const [progress, setProgress] = React.useState(0);
   const [usedSpace, setUsedSpace] = React.useState(0);
   const [showSharedModal, setShowSharedModal] = React.useState(false);
+  const [searchInput, setSearchInput] = React.useState("");
+  const [friends, setFriends] = React.useState(null);
 
   const [file, setFile] = React.useState({
     name: null,
@@ -172,6 +174,38 @@ function Collection() {
       })
 
   }
+
+  function onChange(event) {
+    setSearchInput(event.target.value)
+
+    if(event.target.value != "") {
+      Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/friends/search/${token.id}/${event.target.value}`)
+      .then(response => {
+        if(response.status === 200) {
+          setFriends(response.data)
+        }
+      })
+    } else {
+      setFriends(null)
+    }
+  }
+
+  function shareFile(fileShared, friendId) {
+    const data = {
+      shared_file: fileShared.fileId,
+      user_file: token.id,
+      shared_user: friendId,
+    }
+
+    Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/sharefile`, data)
+      .then(response => {
+        if(response.status === 200) {
+          setSearchInput("");
+          setShowSharedModal(false);
+        }
+      })
+  }
+
   return (
     <div className='flex flex-row h-screen bg-gray-100'>
       
@@ -417,7 +451,7 @@ function Collection() {
                                 {/* { isError && <p>Please fill foldername in!</p> } */}
                                 <div class="pt-2 relative text-gray-800">
                                   <input class="border w-full border-gray-500 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
-                                      type="search" name="search" placeholder="Search for friend..." />
+                                      type="search" name="search" value={searchInput} onChange={(e) => onChange(e)} placeholder="Search for friend..." />
                                   <button type="button" class="absolute right-0 top-0 mt-5 mr-4">
                                       <svg class="text-gray-800 h-4 w-4 fill-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                   </button>
@@ -425,75 +459,29 @@ function Collection() {
                               </div>
                               <div className="mt-2">
                                 <div className="max-h-36 overflow-y-auto">
-                                  {/* <a className="block border-b cursor-pointer" onClick={()=> {
-                                      setSelectedFriend(friend);
-                                      handleChat(friend);
-                                  }}>
-                                      <div className={ selectedFriend !== null ? ( selectedFriend.id == friend.id ? styles.selected : styles.default ) : styles.default}>
-                                          <div className="flex flex-row items-center justify-between">
-                                              <div className="flex flex-row space-x-2">
-                                                      {friend.profile_pic !== null ? (
-                                                          <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-12 h-12 rounded-full" />
-                                                      ) : ( 
-                                                          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                      )}
-                                                  <div className="flex flex-col space-x-2">
-                                                      <strong className="font-semibold">{friend.firstname} {friend.lastname}</strong>
-                                                      {latestMessages.map((message) => (
-                                                          <>
-                                                          {message.fromUser == friend.id && <p className={message.Status == 0 ? "font-bold" : "font-normal"}>{message.message}</p>}
-                                                          {message.toUser == friend.id && <p>you: {message.message}</p>}
-                                                          </>
-                                                      ))}
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </a> */}
-                                    <a className="block border-b cursor-pointer">
+                                  <>
+                                  {friends !== null ? (
+                                    <>
+                                    {friends.map(friend => (
+                                      <a className="block border-b cursor-pointer" onClick={()=> shareFile(file, friend.id)}>
                                       <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-2 space-y-4">
                                           <div className="flex flex-row items-center justify-between">
                                               <div className="flex flex-row space-x-2 items-center justify-center">
-                                                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                  <strong className="font-semibold text-sm">Friend 1</strong>
+                                                  {friend.profile_pic !== null ? (
+                                                      <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-8 h-8 rounded-full" />
+                                                  ) : ( 
+                                                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                  )}
+                                                  <strong className="font-semibold text-sm">{friend.firstname} {friend.lastname}</strong>
                                               </div>
                                               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                                           </div>
                                       </div>
                                     </a>
-                                    <a className="block border-b cursor-pointer">
-                                      <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-2 space-y-4">
-                                          <div className="flex flex-row items-center justify-between">
-                                              <div className="flex flex-row space-x-2 items-center justify-center">
-                                                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                  <strong className="font-semibold text-sm">Friend 1</strong>
-                                              </div>
-                                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                          </div>
-                                      </div>
-                                    </a>
-                                    <a className="block border-b cursor-pointer">
-                                      <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-2 space-y-4">
-                                          <div className="flex flex-row items-center justify-between">
-                                              <div className="flex flex-row space-x-2 items-center justify-center">
-                                                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                  <strong className="font-semibold text-sm">Friend 1</strong>
-                                              </div>
-                                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                          </div>
-                                      </div>
-                                    </a>
-                                    <a className="block border-b cursor-pointer">
-                                      <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-2 space-y-4">
-                                          <div className="flex flex-row items-center justify-between">
-                                              <div className="flex flex-row space-x-2 items-center justify-center">
-                                                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                  <strong className="font-semibold text-sm">Friend 1</strong>
-                                              </div>
-                                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                          </div>
-                                      </div>
-                                    </a>
+                                    ))}
+                                    </>
+                                   ) : null}  
+                                    </>
                                 </div>
                               </div>
                             </div>
