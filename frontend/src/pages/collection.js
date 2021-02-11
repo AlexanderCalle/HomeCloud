@@ -9,8 +9,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
 import FileShow from '../components/FileShow';
 import SelecingFiles from '../components/SelectingFiles';
-import ProgressBar from '../components/ProgressBar';
-//import {selectAll} from '../components/SelectingFiles';
+
 
 function Collection() {
   let history = useHistory();
@@ -35,6 +34,8 @@ function Collection() {
   const [showSharedModal, setShowSharedModal] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
   const [friends, setFriends] = React.useState(null);
+
+  const [showSuccess, setShowSuccess] = React.useState(false)
 
   const [file, setFile] = React.useState({
     name: null,
@@ -208,6 +209,24 @@ function Collection() {
 
   return (
     <div className='flex flex-row h-screen bg-gray-100'>
+
+      <>
+        {/* {showSuccess ? (
+          <div className='fixed flex justify-center z-40 w-screen'>
+            <div class="flex justify-center items-center m-1 font-medium py-2 px-4 rounded-md text-green-700 bg-green-100 border border-green-700 ">
+              <div slot="avatar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle w-5 h-5 mx-2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+              </div>
+              <div class="text-xl font-normal ml-4 max-w-full flex-initial">
+                  Folder has been created!
+              </div>
+            </div>
+          </div>
+        ) : null} */}
+      </>
       
       <Navbar />
 

@@ -1,11 +1,36 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/NavBar';
+import FileShow from '../components/FileShow';
+import useFileDownloader from '../hooks/useFileDownloader';
 
 function SharedPage() {
 
     const token = JSON.parse(localStorage.getItem('tokens'));
     const [files, setFiles] = useState([]);
+    const [selected, setSelected] = useState({
+        name: null,
+        file: null,
+        filename: null,
+        is_image: false,
+      });
+    const [fileshow, setFileshow] = useState(false);
+
+    const [downloadFile, donwloadfolder,downloaderComponent] = useFileDownloader();
+
+    const download = (file) => downloadFile(file);
+
+
+    function  downloadFunction(name, path, filename, is_image) {
+        const fileDown = {
+        name: name,
+        file: path,
+        filename: filename,
+        is_image: is_image
+        };
+
+        download(fileDown)
+    }
 
     useEffect(() => {
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/getshared/${token.id}`)
@@ -14,7 +39,17 @@ function SharedPage() {
                     setFiles(response.data);
                 }
             })
-    }, [])
+    }, []);
+
+    function fileShowing(filePath, fileName, is_image, fileId) {
+        setFileshow(!fileshow);
+        setSelected({
+          name: fileName,
+          file: filePath,
+          is_image: is_image,
+          fileId: fileId
+        })
+      }
 
     return (
         <div className='flex flex-row h-screen bg-gray-100'>
@@ -28,9 +63,9 @@ function SharedPage() {
                         {files.length > 0 && (
                          <>
                          {files.map(file => (
-                             <div className="border-b">
+                            <div className="border-b" >
                                 <div className="flex flex-row items-center border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100">
-                                    <a className="flex-auto cursor-pointer ">
+                                    <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
                                         <div className="p-3 space-y-4">
                                             <div className="flex flex-row items-center space-x-2">
                                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
@@ -40,7 +75,7 @@ function SharedPage() {
                                         </div>
                                     </a>
                                     <div className="flex-none flex flex-row space-x-2 mr-2">
-                                        <button>
+                                        <button onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}>
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                         </button>
                                     </div>
@@ -51,6 +86,10 @@ function SharedPage() {
                         )}
                     </div>
                 </div>
+                {fileshow ? (     
+                    <FileShow setFileshow={setFileshow} file={selected}/>
+                ) : null}
+                {downloaderComponent}
             </div>
         </div>
     )

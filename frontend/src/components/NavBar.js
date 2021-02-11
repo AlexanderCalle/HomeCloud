@@ -57,6 +57,7 @@ function Navbar() {
         }}).then(result => {
             if(result.status === 200) {
                 setShowModal(false);
+                this.props.setShowSuccess(true);
             } else {
                 setIsError(true)
             }
