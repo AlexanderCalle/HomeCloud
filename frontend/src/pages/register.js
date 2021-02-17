@@ -28,6 +28,7 @@ function Register() {
           email: result.data.email,
           id: result.data.id,
           profile_pic: result.data.profile_pic,
+          name: result.data.name,
         });
         setLoggedIn(true)
       } else {

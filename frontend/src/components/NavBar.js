@@ -269,71 +269,91 @@ function Navbar() {
     return (
 
       <>
-        <div className='flex flex-col flex-none relative w-16 justify-between items-center p-4 bg-gray-100'>
-            <div className='flex flex-col items-center space-y-6'>
-                <a href="/">
-                    <svg className="w-12 h-12" fill="#4299e1" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.504 1.132a1 1 0 01.992 0l1.75 1a1 1 0 11-.992 1.736L10 3.152l-1.254.716a1 1 0 11-.992-1.736l1.75-1zM5.618 4.504a1 1 0 01-.372 1.364L5.016 6l.23.132a1 1 0 11-.992 1.736L4 7.723V8a1 1 0 01-2 0V6a.996.996 0 01.52-.878l1.734-.99a1 1 0 011.364.372zm8.764 0a1 1 0 011.364-.372l1.733.99A1.002 1.002 0 0118 6v2a1 1 0 11-2 0v-.277l-.254.145a1 1 0 11-.992-1.736l.23-.132-.23-.132a1 1 0 01-.372-1.364zm-7 4a1 1 0 011.364-.372L10 8.848l1.254-.716a1 1 0 11.992 1.736L11 10.58V12a1 1 0 11-2 0v-1.42l-1.246-.712a1 1 0 01-.372-1.364zM3 11a1 1 0 011 1v1.42l1.246.712a1 1 0 11-.992 1.736l-1.75-1A1 1 0 012 14v-2a1 1 0 011-1zm14 0a1 1 0 011 1v2a1 1 0 01-.504.868l-1.75 1a1 1 0 11-.992-1.736L16 13.42V12a1 1 0 011-1zm-9.618 5.504a1 1 0 011.364-.372l.254.145V16a1 1 0 112 0v.277l.254-.145a1 1 0 11.992 1.736l-1.735.992a.995.995 0 01-1.022 0l-1.735-.992a1 1 0 01-.372-1.364z" clip-rule="evenodd"></path></svg>
+        <div className='flex flex-col flex-none relative xl:w-72 lg:w-16 justify-between bg-cornblue-400'>
+            <div className='flex flex-col p-4 px-6 space-y-12'>
+                <a className='mt-6 flex flex-row items-center space-x-4' href="/">
+                    <svg className="w-12 h-12" fill="#aac5f5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.504 1.132a1 1 0 01.992 0l1.75 1a1 1 0 11-.992 1.736L10 3.152l-1.254.716a1 1 0 11-.992-1.736l1.75-1zM5.618 4.504a1 1 0 01-.372 1.364L5.016 6l.23.132a1 1 0 11-.992 1.736L4 7.723V8a1 1 0 01-2 0V6a.996.996 0 01.52-.878l1.734-.99a1 1 0 011.364.372zm8.764 0a1 1 0 011.364-.372l1.733.99A1.002 1.002 0 0118 6v2a1 1 0 11-2 0v-.277l-.254.145a1 1 0 11-.992-1.736l.23-.132-.23-.132a1 1 0 01-.372-1.364zm-7 4a1 1 0 011.364-.372L10 8.848l1.254-.716a1 1 0 11.992 1.736L11 10.58V12a1 1 0 11-2 0v-1.42l-1.246-.712a1 1 0 01-.372-1.364zM3 11a1 1 0 011 1v1.42l1.246.712a1 1 0 11-.992 1.736l-1.75-1A1 1 0 012 14v-2a1 1 0 011-1zm14 0a1 1 0 011 1v2a1 1 0 01-.504.868l-1.75 1a1 1 0 11-.992-1.736L16 13.42V12a1 1 0 011-1zm-9.618 5.504a1 1 0 011.364-.372l.254.145V16a1 1 0 112 0v.277l.254-.145a1 1 0 11.992 1.736l-1.735.992a.995.995 0 01-1.022 0l-1.735-.992a1 1 0 01-.372-1.364z" clip-rule="evenodd"></path></svg>
+                    <h1 className="text-white font-bold text-2xl">HomeCloud</h1>
                 </a>
-                <a className='tooltip' href='/'>
-                    <span className='tooltiptext shadow-lg font-semibold'>Collection</span>
-                    <svg className="w-8 h-8 " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </a>
-                <a className='tooltip cursor-pointer' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
-                    showModal: true,
-                    name: 'Add Folder',
-                    add_folder: true,
-                    upload_folder: false,
-                    add_files: false
-                })}>
-                    <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
-                </a>
-                <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
-                    showModal: true,
-                    name: 'Add file(s)',
-                    add_folder: false,
-                    upload_folder: false,
-                    add_files: true
-                })}>
-                     <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </botton>
-                <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
-                    showModal: true,
-                    name: 'Upload Folder',
-                    add_folder: false,
-                    upload_folder: true,
-                    add_files: false
-                })}>
-                     <span className='tooltiptext shadow-lg font-semibold'>Upload Folder</span>
-                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                </botton>
-                <a className='tooltip' href="/friendspage">
-                    <span className='tooltiptext shadow-lg font-semibold'>Friends</span>
-                    <div className="relative w-8 h-8">
-                        <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <div className="flex flex-col space-y-1 pb-6 border-b border-cornblue-200">
+                    <a className='flex flex-row items-end space-x-3 p-1 hover:bg-cornblue-600 rounded-md' href='/'>
+                        <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <p className="text-cornblue-200 font-bold text-xl">Home</p>
+                    </a>
+                    {/* <a className='' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
+                        showModal: true,
+                        name: 'Add Folder',
+                        add_folder: true,
+                        upload_folder: false,
+                        add_files: false
+                    })}>
+                        <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                    </a>
+                    <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
+                        showModal: true,
+                        name: 'Add file(s)',
+                        add_folder: false,
+                        upload_folder: false,
+                        add_files: true
+                    })}>
+                        <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </botton>
+                    <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
+                        showModal: true,
+                        name: 'Upload Folder',
+                        add_folder: false,
+                        upload_folder: true,
+                        add_files: false
+                    })}>
+                        <span className='tooltiptext shadow-lg font-semibold'>Upload Folder</span>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </botton> */}
+                    <a className='flex flex-row items-end justify-between p-1 hover:bg-cornblue-600 rounded-md' href="/friendspage">
+                        <div className="flex flex-row items-end space-x-3">
+                            <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <p className="text-cornblue-200 font-bold text-xl">Friends</p>
+                        </div>
                         {usersRequestingTotal != 0 ? (
-                            <div class="absolute flex top-0 right-0 h-4 w-4 my-1 border-2 border-gray-100 rounded-full bg-red-400 items-center justify-center z-2">
-                                <p className="text-white font-medium text-xs">{usersRequestingTotal}</p>
+                            <div class="flex h-4 w-8 my-1 rounded-full bg-cornblue-200 items-center justify-center z-2">
+                                <p className="text-cornblue-400 font-medium text-xs">{usersRequestingTotal}</p>
                             </div>
                         ) : null}
-                    </div>
-                </a >
-                <a className='tooltip' href='/shared'>
-                    <span className='tooltiptext shadow-lg font-semibold'>Shared File(s)</span>
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                </a>
-                <a className='tooltip' href="/myprofile" >
-                    <span className='tooltiptext shadow-lg font-semibold'>My Profile</span>
-                    {token.profile_pic != null && <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + token.profile_pic} className="object-cover w-11 h-11 rounded-full hover:opacity-70" />}
-                    {token.profile_pic == null && <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
-                </a>
+                    </a >
+                    <a className='flex flex-row items-end justify-between p-1 hover:bg-cornblue-600 rounded-md' href="#">
+                        <div className="flex flex-row items-end space-x-3">
+                        <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                            <p className="text-cornblue-200 font-bold text-xl">Chats</p>
+                        </div>
+                        {/* {usersRequestingTotal != 0 ? (
+                            <div class="flex h-4 w-8 my-1 rounded-full bg-cornblue-200 items-center justify-center z-2">
+                                <p className="text-cornblue-400 font-medium text-xs">{usersRequestingTotal}</p>
+                            </div>
+                        ) : null} */}
+                    </a >
+                    <a className='flex flex-row items-end space-x-3 p-1 hover:bg-cornblue-600 rounded-md' href='/shared'>
+                        <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        <p className="text-cornblue-200 font-bold text-xl">Shared</p>
+                    </a>
+                    
+                </div>
             </div>
 
-            <div className='flex flex-col pb-3 space-y-6'>
+            <div className='flex flex-row p-4 py-6 justify-between bg-cornblue-600'>
+                <div className='flex flex-row items-center space-x-3'>
+                    <div>
+                        {token.profile_pic != null && <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + token.profile_pic} className="object-cover w-11 h-11 rounded-full hover:opacity-70" />}
+                        {token.profile_pic == null && <svg className="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
+                    </div>
+                    <div className="flex flex-col space-y-0">
+                        <p className="text-cornblue-200 text-sm font-bold">{token.name}</p>
+                        <a className="text-cornblue-200 text-xs" href="/myprofile">View profile</a>
+                    </div>
+                </div>
                 <button className='tooltip' onClick={logOut}>
                     <span className='tooltiptext shadow-lg font-semibold'>Logout</span>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    <svg className="w-8 h-8 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </div>

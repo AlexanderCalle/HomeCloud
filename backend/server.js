@@ -112,7 +112,8 @@ app.post('/login', (req, res) => {
                 res.status(200).send({
                     email: email,
                     id: result[0].id,
-                    profile_pic: result[0].profile_pic
+                    profile_pic: result[0].profile_pic,
+                    name: result[0].firstname + ' ' + result[0].lastname,
                 });
             } else {
                 console.log('password');
@@ -154,7 +155,8 @@ app.post('/register', (req, res) => {
                     return res.status(200).send({
                         email: data.email,
                         id: data.id,
-                        profile_pic: null
+                        profile_pic: null,
+                        name: req.body.firstname + ' ' + req.body.lastname,
                     })
                 });
             }

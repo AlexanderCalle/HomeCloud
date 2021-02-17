@@ -10,7 +10,16 @@ module.exports = {
             'green': theme('colors.green.500'),
             'blue': theme('colors.blue.500'),
             'black': theme('colors.black')
-          })
+          }),
+          extend: {
+            colors: {
+              cornblue: {
+                '200': '#aac5f5',
+                '400': '#6495ed',
+                '600': '#5b84ce',
+              }
+            }
+          }
         },
         variants: {
           extend: {},
