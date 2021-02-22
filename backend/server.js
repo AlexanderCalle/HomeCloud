@@ -275,7 +275,30 @@ app.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
 app.get('/myprofile/:userid', (req, res)=>{
     con.query('SELECT email, firstname, lastname, id, profile_pic FROM `users` WHERE id = ?', req.params.userid, (err, user)=> {
         if (err) return res.status(500).send(err);
-        res.status(200).send(user[0]);
+
+        let foldersLength = 0;
+        let friendsLength = 0;
+        let filesLength = 0;
+        
+        con.query('SELECT * FROM files WHERE user_id = ?', req.params.userid , (err, files)=> {
+            if (err) return res.status(500).send(err);
+            filesLength = files.length;
+            con.query('SELECT * FROM folders WHERE user_id= ?', req.params.userid, (err, folders)=> {
+                if (err) return res.status(500).send(err);
+                foldersLength = folders.length;
+                con.query('SELECT FriendsId FROM `friends` WHERE UserOne = ? OR UserTwo = ? AND Status = 1', [req.params.userid, req.params.userid], (err, friends)=> {
+                    if (err) return res.status(500).send(err);
+                    friendsLength = friends.length;
+                    res.status(200).send({
+                        user: user[0],
+                        files: filesLength,
+                        folders: foldersLength,
+                        friends: friendsLength
+                    });
+                });
+            });
+        });
+
     });
 });
 

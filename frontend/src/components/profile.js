@@ -10,6 +10,11 @@ class Profile extends Component {
             user: {},
             updatedUser: {},
             avatar: {},
+            totalFiles: 0,
+            totalFolders: 0,
+            totalFriends: 0,
+            progress: 0,
+            space: 0,
         }
     }
 
@@ -20,13 +25,26 @@ class Profile extends Component {
             .then(res => {
                 if(res.status === 200) {
                     this.setState({
-                        user: res.data,
-                        updatedUser: res.data,
+                        user: res.data.user,
+                        updatedUser: res.data.user,
+                        totalFiles: res.data.files,
+                        totalFolders: res.data.folders,
+                        totalFriends: res.data.friends,
                         hovered: false
                     });
-                    console.log(res.data);
                 }
             }).catch(e => console.log(e));
+
+        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/directorySize/${token.id}`)
+            .then(res => {
+              if(res.status === 200) {
+                var percentage = res.data.totalSizeBytes
+                this.setState({
+                    progress: percentage,
+                    space: res.data.totalSize
+                })
+              }
+            })
     }
 
     UpdatingUser = (user) => {
@@ -83,7 +101,96 @@ class Profile extends Component {
     render() {
         return (
             <>
-                <div className='flex flex-col space-y-16 items-center p-6'>
+            <div className="flex flex-col w-2/3 2xl:h-1/2 bg-gray-100 rounded-2xl shadow-xl">
+               <div className="flex flex-row justify-center 2xl:justify-between py-4 px-16">
+                    <div className="absolute 2xl:relative hidden 2xl:flex flex-row justify-between px-6 py-2 w-72 h-16">
+                        <div className="flex flex-col items-center">
+                            <p className="font-medium">{this.state.totalFiles}</p>
+                            <p className="font-light">Files</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <p className="font-medium">{this.state.totalFolders}</p>
+                            <p className="font-light">Folders</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <p className="font-medium">{this.state.totalFriends}</p>
+                            <p className="font-light">Friends</p>
+                        </div>
+                    </div>
+                    <div onClick={this.handleEvent} id="div" onMouseEnter={()=> this.setState({hovered: true})} onMouseLeave={()=> this.setState({hovered: false})} className='-mt-24 flex cursor-pointer rounded-full h-40 w-40 hover:bg-gray-200 justify-center items-center focus:outline-none shadow-2xl'>
+                        {this.state.hovered && (
+                            <svg class="w-10 h-10 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        )}
+                        <input type="file" id="upload" onChange={(e) => this.handleChange(e)} accept="image/*" hidden="true" />
+                        {this.state.user.profile_pic != null && <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + this.state.user.profile_pic} className="absolute object-cover w-40 h-40 rounded-full hover:opacity-30" />}
+                        {this.state.user.profile_pic == null && <svg id="svgProfile" class="w-40 h-40 text-gray-900 stroke-1 hover:opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
+                    </div>
+                    <div className="absolute 2xl:relative hidden 2xl:flex flex-row w-72 h-10 py-2">
+                        <div className="w-full">
+                                <div className="flex mb-2 items-center justify-between">
+                                    <div>
+                                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-cornblue-600 bg-cornblue-200">
+                                            Available Space
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-row items-center space-x-2 text-right">
+                                        <span className="text-xs font-bold inline-block text-cornblue-400">
+                                            { this.state.progress > 0 && this.state.space + '/5.0 GB' }
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="overflow-hidden h-2 text-xs flex rounded bg-cornblue-200">
+                                    <div style={{ width: this.state.progress + '%' }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-cornblue-600"></div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-14 flex flex-col flex-auto items-center space-y-10 pb-8">
+                    <h1 className="font-bold text-2xl">{this.state.user.firstname} {this.state.user.lastname}</h1>
+                    <h2 className="text-lg font-medium"><span className="text-gray-500">@</span> {this.state.user.email}</h2>
+                    <div className="2xl:absolute 2xl:hidden flex flex-col w-3/4 space-y-10">
+                        <div className="flex flex-row flex-auto justify-center space-x-8">
+                            <div className="flex flex-col items-center">
+                                <p className="font-medium">{this.state.totalFiles}</p>
+                                <p className="font-light">Files</p>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <p className="font-medium">{this.state.totalFolders}</p>
+                                <p className="font-light">Folders</p>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <p className="font-medium">{this.state.totalFriends}</p>
+                                <p className="font-light">Friends</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-center">
+                            <div className="w-full">
+                                    <div className="flex mb-2 items-center justify-between">
+                                        <div>
+                                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-cornblue-600 bg-cornblue-200">
+                                                Available Space
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-row items-center space-x-2 text-right">
+                                            <span className="text-xs font-bold inline-block text-cornblue-400">
+                                                { this.state.progress > 0 && this.state.space + '/5.0 GB' }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden h-2 text-xs flex rounded bg-cornblue-200">
+                                        <div style={{ width: this.state.progress + '%' }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-cornblue-600"></div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-6 h-24">
+                    <div className="flex items-center justify-center border-t-2">
+                        <button className="mt-5 font-medium text-cornblue-400">Edit profile</button>
+                    </div>
+                </div>
+            </div>
+                {/* <div className='flex flex-col space-y-16 items-center p-6'>
                     <div onClick={this.handleEvent} id="div" onMouseEnter={()=> this.setState({hovered: true})} onMouseLeave={()=> this.setState({hovered: false})} className='flex cursor-pointer rounded-full h-32 w-32 hover:bg-gray-200 justify-center items-center focus:outline-none'>
                         {this.state.hovered && (
                             <svg class="w-10 h-10 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -126,7 +233,7 @@ class Profile extends Component {
                             </button>
                         )}
                     </div>
-                </div>
+                </div> */}
             </>
         )
     }
