@@ -146,8 +146,20 @@ class Profile extends Component {
                     </div>
                 </div>
                 <div className="mt-14 flex flex-col flex-auto items-center space-y-10 pb-8">
-                    <h1 className="font-bold text-2xl">{this.state.user.firstname} {this.state.user.lastname}</h1>
-                    <h2 className="text-lg font-medium"><span className="text-gray-500">@</span> {this.state.user.email}</h2>
+                    <>
+                        {this.props.isUpdating ? (
+                            <div className="mt-12 flex flex-col 2xl:w-1/2 w-2/3">
+                                <input className="h-10 border-t border-l border-r border-gray-400 rounded-t-lg p-2" value={this.state.updatedUser.firstname} onChange={(e) => this.setState({updatedUser: {...this.state.updatedUser, firstname: e.target.value}})} type="text" placeholder="Firstname..."/>
+                                <input className="h-10 border border-gray-400 p-2" type="text" value={this.state.updatedUser.lastname} onChange={(e) => this.setState({updatedUser: {...this.state.updatedUser, lastname: e.target.value}})} placeholder="Lastname..."/>
+                                <input className="h-10 border-b border-l border-r border-gray-400 rounded-b-lg p-2" value={this.state.updatedUser.email} onChange={(e) => this.setState({updatedUser: {...this.state.updatedUser, email: e.target.value}})} type="text" placeholder="Email..."/>
+                            </div>
+                        ) : (
+                            <>
+                            <h1 className="font-bold text-2xl">{this.state.user.firstname} {this.state.user.lastname}</h1>
+                            <h2 className="text-lg font-medium"><span className="text-gray-500">@</span> {this.state.user.email}</h2>
+                            </>
+                        )}
+                    </>
                     <div className="2xl:absolute 2xl:hidden flex flex-col w-3/4 space-y-10">
                         <div className="flex flex-row flex-auto justify-center space-x-8">
                             <div className="flex flex-col items-center">
@@ -186,7 +198,14 @@ class Profile extends Component {
                 </div>
                 <div className="p-6 h-24">
                     <div className="flex items-center justify-center border-t-2">
-                        <button className="mt-5 font-medium text-cornblue-400">Edit profile</button>
+                        {this.props.isUpdating ? (
+                            <div className="mt-4 flex 2xl:flex-row flex-row space-x-4 ">
+                                <button className="bg-cornblue-200 text-cornblue-400 w-32 h-10 rounded-md outline-none" onClick={() => this.props.setIsUpdating(!this.props.isUpdating)}>Cancel</button>
+                                <button className="bg-cornblue-400 text-cornblue-200 w-32 h-10 rounded-md outline-none" onClick={() => this.UpdatingUser(this.state.updatedUser)}>Update Profile</button>
+                            </div>
+                        ) : (
+                            <button className="mt-5 font-medium text-cornblue-400 outline-none" onClick={() => this.props.setIsUpdating(!this.props.isUpdating)}>Edit profile</button>
+                        )}
                     </div>
                 </div>
             </div>
