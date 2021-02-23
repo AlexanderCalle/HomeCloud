@@ -269,15 +269,6 @@ function Navbar() {
           }
         }
       }
-
-    // function cancelHandler() {
-    //     resetChunkProperties();
-    //     setFiles({});
-    //     setFileOnSelected(0);
-
-    //     source.cancel();
-    //     window.location.reload();
-    // }
     
     return (
 
@@ -293,36 +284,6 @@ function Navbar() {
                         <svg class="xl:relative absolute w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Home</p>
                     </a>
-                    {/* <a className='' style={{ transition: "all .15s ease" }} onClick={() => setShowModal({
-                        showModal: true,
-                        name: 'Add Folder',
-                        add_folder: true,
-                        upload_folder: false,
-                        add_files: false
-                    })}>
-                        <span className='tooltiptext shadow-lg font-semibold'>Add Folder</span>
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
-                    </a>
-                    <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
-                        showModal: true,
-                        name: 'Add file(s)',
-                        add_folder: false,
-                        upload_folder: false,
-                        add_files: true
-                    })}>
-                        <span className='tooltiptext shadow-lg font-semibold'>Add File(s)</span>
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </botton>
-                    <botton className="tooltip cursor-pointer" style={{ transition: "all .15s ease" }} onClick={()=> setShowModal({
-                        showModal: true,
-                        name: 'Upload Folder',
-                        add_folder: false,
-                        upload_folder: true,
-                        add_files: false
-                    })}>
-                        <span className='tooltiptext shadow-lg font-semibold'>Upload Folder</span>
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    </botton> */}
                     <a className='flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' href="/friendspage">
                         <div className="flex flex-row items-end space-x-3">
                             <svg class="xl:relative absolute w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>

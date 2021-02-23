@@ -12,11 +12,12 @@ const path = require('path');
 const app = express();
 const http = require('http').Server(app);
 const io = require("socket.io")(http)
+const morgan = require('morgan');
 
 const port = process.env.PORT || 3030;
-
+app.use(morgan('tiny'))
 app.use(cors({
-    origin:'http://localhost:3000',
+    origin:'*',
     credentials: true
 }));
 app.use(express.static('./upload'))

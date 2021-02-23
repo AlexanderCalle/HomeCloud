@@ -14,10 +14,10 @@ function Login() {
 
   function postLogin() {
     console.log('logging in');
-    axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/login`, data: {
+    axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/login`, {
       email: emailUser,
       password: password
-    }}).then(result => {
+    }).then(result => {
       if(result.status === 200) {
         console.log(result.data);
         setAuthTokens({
