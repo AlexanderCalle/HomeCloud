@@ -86,6 +86,7 @@ function SharedPage() {
                             </button>
                         </div>
                     </div>
+                    <h1 className="mt-4 text-xl font-bold">Shared with me</h1>
                     <>
                     
                         {!selectingFiles ? (

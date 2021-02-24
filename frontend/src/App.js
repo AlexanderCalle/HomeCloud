@@ -8,7 +8,8 @@ import Collection from './pages/collection';
 import Login from './pages/login';
 import Register from './pages/register';
 import MyProfile from './pages/myProfile';
-import FriendsPage from './pages/friendsPage';
+import ChatsPage from './pages/ChatsPage';
+import FriendsPage from './pages/FriendsPage';
 import SharedPage from './pages/shared';
 import socketIOClient from "socket.io-client";
 
@@ -37,7 +38,8 @@ function App() {
             <PrivateRoute exact path='/' component={Home} />
             <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
             <PrivateRoute exact path='/myprofile' component={MyProfile} />
-            <PrivateRoute exact path='/friendspage' component={FriendsPage} />
+            <PrivateRoute exact path='/friends' component={FriendsPage} />
+            <PrivateRoute exact path='/chat' component={ChatsPage} />
             <PrivateRoute exact path='/shared' component={SharedPage} />
             <Route exact path='/register' component={Register} />
           </Switch>

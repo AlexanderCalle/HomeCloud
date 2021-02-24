@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `friends` (
     `UserOne` VARCHAR(255) NOT NULL,
     `UserTwo` VARCHAR(255) NOT NULL,
     `Status` INT(3) NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     PRIMARY KEY (`FriendsId`)
 );
 

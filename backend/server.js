@@ -721,6 +721,13 @@ app.get('/files/getshared/:userId', (req, res)=> {
         if(err) return res.status(500).send(err);
         res.status(200).send(data)
     })
+});
+
+app.get('/users/allfriends/:userId', (req, res)=> {
+    con.query('SELECT u.firstname, u.lastname, u.profile_pic, f.created FROM `friends` f LEFT JOIN `users` u on ? in (f.UserOne, f.UserTwo) AND Status = 1 AND U.id <> ? WHERE u.id = f.UserTwo OR u.id = f.UserOne', [req.params.userId, req.params.userId], (err, result)=> {
+        if(err) return res.status(500).send(err);
+        res.status(200).send(result);
+    })
 })
 
 http.listen(port, () => {
