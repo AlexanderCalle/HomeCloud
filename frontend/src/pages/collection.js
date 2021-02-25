@@ -228,7 +228,7 @@ function Collection() {
         ) : null} */}
       </>
       
-      <Navbar />
+      <Navbar page={"folder"} />
 
       <Transition
         show={showFolders}

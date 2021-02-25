@@ -9,7 +9,7 @@ import ProgressRing from './CircleProgress';
 
 let chunkSize = 1024*1024; // 1MB
 
-function Navbar() {
+function Navbar(props) {
 
     useEffect(() => {
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/directorySize/${token.id}`)
@@ -45,6 +45,8 @@ function Navbar() {
     const token = JSON.parse(localStorage.getItem('tokens'));
     const [progressSpace, setProgressSpace] = React.useState(0);
     const [usedSpace, setUsedSpace] = React.useState(0);
+    const [showModalRequest, setShowModalRequest] = React.useState(false);
+    const [usersRequesting, setUsersRequesting] = React.useState([]);
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -58,10 +60,28 @@ function Navbar() {
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/friendrequests/${token.id}`)
             .then((response) => {
                 if (response.status === 200) {
+                    setUsersRequesting(response.data);
                     setUsersRequestingTotal(response.data.length)
                 }
             })
     }, [])
+
+    function handleUpdateRequest(e, status, FriendsId) {
+        e.preventDefault()
+        let data;
+        if(status === "accept") {
+            data = {Status: 1}
+        } else {
+            data = {Status: 2}
+        }
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/users/updateRequest/${FriendsId}`, data)
+            .then(response => {
+                if(response.status === 200) {
+                    setShowModalRequest(false);
+                    window.location.reload();
+                }
+            })
+    }
 
     function postItem() {
 
@@ -273,7 +293,7 @@ function Navbar() {
     return (
 
       <>
-        <div className='flex flex-col flex-none relative xl:w-72 w-16 justify-between bg-cornblue-400'>
+        <div className='flex flex-col flex-none relative xl:w-72 w-16 z-10 justify-between bg-cornblue-400'>
             <div className='flex flex-col xl:p-4 p-2 space-y-12'>
                 <a className='mt-6 flex xl:flex-row items-center xl:space-x-4' href="/">
                     <svg className="xl:relative absolute w-11 h-11 text-cornblue-200" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.504 1.132a1 1 0 01.992 0l1.75 1a1 1 0 11-.992 1.736L10 3.152l-1.254.716a1 1 0 11-.992-1.736l1.75-1zM5.618 4.504a1 1 0 01-.372 1.364L5.016 6l.23.132a1 1 0 11-.992 1.736L4 7.723V8a1 1 0 01-2 0V6a.996.996 0 01.52-.878l1.734-.99a1 1 0 011.364.372zm8.764 0a1 1 0 011.364-.372l1.733.99A1.002 1.002 0 0118 6v2a1 1 0 11-2 0v-.277l-.254.145a1 1 0 11-.992-1.736l.23-.132-.23-.132a1 1 0 01-.372-1.364zm-7 4a1 1 0 011.364-.372L10 8.848l1.254-.716a1 1 0 11.992 1.736L11 10.58V12a1 1 0 11-2 0v-1.42l-1.246-.712a1 1 0 01-.372-1.364zM3 11a1 1 0 011 1v1.42l1.246.712a1 1 0 11-.992 1.736l-1.75-1A1 1 0 012 14v-2a1 1 0 011-1zm14 0a1 1 0 011 1v2a1 1 0 01-.504.868l-1.75 1a1 1 0 11-.992-1.736L16 13.42V12a1 1 0 011-1zm-9.618 5.504a1 1 0 011.364-.372l.254.145V16a1 1 0 112 0v.277l.254-.145a1 1 0 11.992 1.736l-1.735.992a.995.995 0 01-1.022 0l-1.735-.992a1 1 0 01-.372-1.364z" clip-rule="evenodd"></path></svg>
@@ -310,7 +330,21 @@ function Navbar() {
                         <svg class="xl:relative absolute w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
                         <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Shared</p>
                     </a>
-                    
+                </div>
+                <div>
+                    {props.page === "friends" && (
+                        <a className='-mt-8 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModalRequest(true)}>
+                            <div className="flex flex-row items-end space-x-3">
+                                <svg class="xl:relative absolute w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Friends Requests</p>
+                            </div>
+                            {usersRequestingTotal != 0 ? (
+                                <div class="flex h-4 w-8 my-1 rounded-full bg-cornblue-200 items-center justify-center z-2 xl:visible lg:invisible">
+                                    <p className="text-cornblue-400 font-medium text-xs xl:visible invisible">{usersRequestingTotal}</p>
+                                </div>
+                            ) : null}
+                        </a >
+                    )}
                 </div>
             </div>
             <div className="flex flex-col space-y-4">
@@ -355,8 +389,66 @@ function Navbar() {
             </div>
         </div>
         <>
-        {showModal ? (
+        {showModalRequest ? (
             <div className="fixed z-10 inset-0 overflow-y-auto">
+                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <form>
+                    <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                        <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                    </div>
+                    <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                        <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                        <div className="min-w-0 sm:flex sm:items-start">
+                            <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
+                            <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
+                                Friend Request(s)
+                            </h3>
+                            <div className="mt-2 overflow-y-auto">
+                                {usersRequesting.map(user => (
+                                    <>
+                                    {token.id != user.id ? (
+                                        <div className="block border-b">
+                                        <div className={styles.default}>
+                                            <div className="flex flex-row items-center justify-between">
+                                                <div className="flex flex-row space-x-2">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <strong className="flex-grow font-normal">{user.firstname} {user.lastname}</strong>
+                                                </div>
+                                                <div className="space-x-2">
+                                                    <button onClick={(e) =>  handleUpdateRequest(e, "accept", user.FriendsId)}>
+                                                        <svg class="w-6 h-6 hover:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    </button>
+                                                    <button onClick={(e) =>  handleUpdateRequest(e, "decline", user.FriendsId)}>
+                                                        <svg class="w-6 h-6 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ): null}
+                                    </>
+                                ))}
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button onClick={()=> {
+                            setShowModalRequest(false)
+                        }} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Close
+                        </button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        ) : null}
+        </>
+        <>
+        {showModal ? (
+            <div className="fixed z-20 inset-0 overflow-y-auto">
             <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <form>
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -483,7 +575,7 @@ function Navbar() {
         ): null}
         <>
         {WarningDialog ? (
-            <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="fixed z-20 inset-0 overflow-y-auto">
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <form>
                     <div className="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -520,6 +612,11 @@ function Navbar() {
         </>
       </>
     )
+}
+
+const styles = {
+    default: "border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4",
+    selected: "border-l-2 border-blue-500 bg-blue-100 p-3 space-y-4"
 }
 
 export default Navbar;

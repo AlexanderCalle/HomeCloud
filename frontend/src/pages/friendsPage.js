@@ -17,9 +17,10 @@ function FriendsPage() {
             })
     }, [])
 
-    return( 
+    return ( 
         <div className='flex flex-row h-screen bg-gray-100'>
-            <Navbar />
+            <Navbar page={'friends'}/>
+
             <div className='flex-auto bg-white'>
                 <div className="w-full flex flex-col p-6 space-y-4">
                     <div className="flex-none h-16 flex flex-row justify-between items-center border-b">

@@ -8,7 +8,7 @@ function MyProfile() {
 
     return (
         <div className='flex flex-row h-screen '>
-            <Navbar />
+            <Navbar page={"profile"} />
             <div className='flex flex-row flex-auto  items-center justify-center'>
                     <Profile isUpdating={isUpdating} setIsUpdating={setIsUpdating} />
             </div>

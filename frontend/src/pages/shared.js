@@ -61,7 +61,7 @@ function SharedPage() {
 
     return (
         <div className='flex flex-row h-screen bg-gray-100'>
-            <Navbar />
+            <Navbar page={"shared"} />
             <div className='flex-auto bg-white'>
                 <div className="w-full flex flex-col p-6">
                     <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
