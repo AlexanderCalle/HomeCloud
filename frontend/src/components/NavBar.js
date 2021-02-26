@@ -333,7 +333,7 @@ function Navbar(props) {
                 </div>
                 <div>
                     {props.page === "friends" && (
-                        <a className='-mt-8 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModalRequest(true)}>
+                        <a className='cursor-pointer -mt-8 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModalRequest(true)}>
                             <div className="flex flex-row items-end space-x-3">
                                 <svg class="xl:relative absolute w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                 <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Friends Requests</p>
@@ -344,6 +344,42 @@ function Navbar(props) {
                                 </div>
                             ) : null}
                         </a >
+                    )}
+                    {props.page === "folder" && (
+                        <a className='cursor-pointer -mt-8 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModal({
+                            showModal: true,
+                            name: 'Add folder',
+                            add_folder: true,
+                        })}>
+                            <div className="flex flex-row items-end space-x-3">
+                                <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                                <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Add folder</p>
+                            </div>
+                        </a >
+                    )}
+                    {props.page === "file" && (
+                    <>       
+                        <a className='cursor-pointer -mt-8 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModal({
+                            showModal: true,
+                            name: 'Add file(s)',
+                            add_files: true,
+                        })}>
+                            <div className="flex flex-row items-end space-x-3">
+                                <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Add file(s)</p>
+                            </div>
+                        </a >
+                        <a className='cursor-pointer mt-2 flex flex-row items-end justify-between p-1 h-11 hover:bg-cornblue-600 rounded-md' onClick={() => setShowModal({
+                            showModal: true,
+                            name: 'Upload folder',
+                            upload_folder: true,
+                        })}>
+                            <div className="flex flex-row items-end space-x-3">
+                            <svg class="w-9 h-9 text-cornblue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                                <p className="text-cornblue-200 font-bold text-xl xl:visible invisible">Upload folder</p>
+                            </div>
+                        </a >
+                    </>
                     )}
                 </div>
             </div>

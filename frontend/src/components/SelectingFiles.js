@@ -76,20 +76,20 @@ class SelecingFiles extends Component {
     
     render() {
         return (
-            <div>
+            <>
             {this.state.files.map((file => {
                 return (
-                    <div className="border-b" onClick={() => {
+                    <div className={file.isSelected ? styles.selected : styles.normal} onClick={() => {
                         this.selectItem(file)
                     }}>
-                        <div className={ file.isSelect ? styles.selected : styles.normal }>
+                        <div className="flex flex-row items-center">
                             {file.isSelect ? (
                                 <>
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </>
                             ) : (
                                 <>
-                                <svg width="1.5rem" height="1.5rem">
+                                <svg class="ml-2" width="1.5rem" height="1.5rem">
                                     <circle cx="0.7rem" cy="0.7rem" r="0.50rem" stroke="currentColor" stroke-width="2" fill="none" />
                                 </svg>
                                 </>
@@ -108,14 +108,14 @@ class SelecingFiles extends Component {
             )
             }))}
             
-            </div>
+            </>
         )
     }
 }
 
 const styles = {
-    selected: "flex flex-row items-center border-l-2 border-blue-500 bg-blue-100",
-    normal: "flex flex-row items-center border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100"
+    selected: "border border-cornblue-400 rounded-md shadow-md bg-cornblue-200 text-white",
+    normal: "border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white"
 }
 
 export default SelecingFiles;

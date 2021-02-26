@@ -4,7 +4,7 @@ import PrivateRoute from './PrivateRoute';
 import { AuthContext } from "./context/auth";
 
 import Home from './pages/home';
-import Collection from './pages/collection';
+import Collection from './pages/FilesPage';
 import Login from './pages/login';
 import Register from './pages/register';
 import MyProfile from './pages/myProfile';
