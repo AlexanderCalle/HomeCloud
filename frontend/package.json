@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.0.0",
+    "@tailwindcss/forms": "^0.2.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
@@ -17,6 +18,7 @@
     "react-scripts": "4.0.1",
     "react-transition-group": "^4.4.1",
     "socket.io-client": "^3.1.0",
+    "tailwind-forms": "^1.0.6",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.1",
     "typescript": "^4.1.2",
     "web-vitals": "^0.2.4"
