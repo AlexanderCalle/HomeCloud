@@ -427,24 +427,28 @@ function Navbar(props) {
         <>
         {showModalRequest ? (
             <div className="fixed z-10 inset-0 overflow-y-auto">
-                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <form>
                     <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                         <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                     </div>
-                    <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                        <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
-                        <div className="min-w-0 sm:flex sm:items-start">
-                            <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
-                            <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
-                                Friend Request(s)
-                            </h3>
+                    <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+                    <div className="inline-block rounded-xl text-left overflow-hidden bg-white shadow-xl transform align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                        <div className="pb-2 sm:pb-4">
+                            <div className="w-full min-h-down">
+                            <div className="flex items-center justify-center h-9 bg-cornblue-400">
+                                <h3 className="text-lg leading-6 font-medium text-cornblue-200" id="modal-headline">
+                                    Friend Request(s)
+                                </h3>
+                                <button onClick={() => setShowModalRequest(false)} className="absolute right-2 text-cornblue-200 focus:outline-none">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
                             <div className="mt-2 overflow-y-auto">
                                 {usersRequesting.map(user => (
                                     <>
                                     {token.id != user.id ? (
-                                        <div className="block border-b">
+                                        <div className="block p-2">
                                         <div className={styles.default}>
                                             <div className="flex flex-row items-center justify-between">
                                                 <div className="flex flex-row space-x-2">
@@ -466,15 +470,7 @@ function Navbar(props) {
                                     </>
                                 ))}
                             </div>
-                            </div>
                         </div>
-                        </div>
-                        <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button onClick={()=> {
-                            setShowModalRequest(false)
-                        }} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Close
-                        </button>
                         </div>
                     </div>
                     </form>
@@ -485,24 +481,26 @@ function Navbar(props) {
         <>
         {showModal ? (
             <div className="fixed z-20 inset-0 overflow-y-auto">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <form>
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                    <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
-                    <div className="min-w-0 sm:flex sm:items-start">
-                        <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
-                            <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
-                                {showModal.name}
-                            </h3>
-                            <div className="mt-2">
+                <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+                <div className="inline-block rounded-xl text-left overflow-hidden bg-white shadow-xl transform align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                    <div className="pb-2 sm:pb-4">
+                        <div className="flex flex-col w-full">
+                            <div className="flex flex-row justify-center items-center h-11 bg-cornblue-400 rounded-t-lg shadow-xl">
+                                <h3 className="text-lg leading-6 font-medium text-cornblue-200" id="modal-headline">{showModal.name}</h3>
+                                <button onClick={() => setShowModal(false)} className="absolute right-2 text-cornblue-200 focus:outline-none">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                            <div className="mt-4 px-4">
                                 {showModal.add_folder && (
                                     <>
                                         { isError && <p>Please fill foldername in!</p> }
-                                        <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
+                                        <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
                                     </>
                                 )}
                                 {showModal.add_files && (
@@ -528,7 +526,7 @@ function Navbar(props) {
                                         {folderName == undefined ? (
                                             <p>No Folder Selected</p>
                                         ) : (
-                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-cornblue-200 text-cornblue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-cornblue-400 hover:text-cornblue-200">
                                                 <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                                     <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
                                                 </svg>
@@ -565,7 +563,7 @@ function Navbar(props) {
                                         {folderName == undefined ? (
                                             <p>No Folder Selected</p>
                                         ) : (
-                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                                            <label className="w-full h-10 flex flex-row items-center space-x-4 px-4 py-6 bg-cornblue-200 text-cornblue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-cornblue-400 hover:text-cornblue-200">
                                                 <svg className="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                                     <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
                                                 </svg>
@@ -582,24 +580,23 @@ function Navbar(props) {
                             </div>
                         </div>
                     </div>
-                    </div>
                     <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <>
 
                     {showModal.add_folder ? (
-                        <button type="submit" onClick={postItem} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        <button type="submit" onClick={postItem} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                             Add
                         </button>
                     ) : (
                         <>
                         {folderName == undefined ? null : (
-                            <button type="button" onClick={() => firstGetFileContext()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            <button type="button" onClick={() => firstGetFileContext()} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                                 Add
                             </button>
                         )}
                         </>
                     )}
-                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 sm:mt-0 sm:w-28 w-full inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-cornblue-200 font-medium text-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                         Cancel
                     </button>
                     </>
@@ -651,7 +648,7 @@ function Navbar(props) {
 }
 
 const styles = {
-    default: "border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4",
+    default: "border border-gray-500 p-3 space-y-4 rounded-lg shadow-md",
     selected: "border-l-2 border-blue-500 bg-blue-100 p-3 space-y-4"
 }
 

@@ -342,6 +342,10 @@ function Collection() {
                             <p>Created on: {file.created}</p>
                             <p>Type file: {file.is_image ? 'Image' : 'Document'}</p>
                           </div>
+                          <button type="button" onClick={() => setShowSharedModal(true)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                              <p className="ml-2">Share with friend</p>
+                          </button>
                       </div>
                   </div>
               </div>
@@ -453,38 +457,37 @@ function Collection() {
       <>
       {showSharedModal ? (
           <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <form>
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                  <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
-                  <div className="min-w-0 sm:flex sm:items-start">
-                      <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
-                          <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
-                            Share With Friend
-                          </h3>
-                          <div>
+              <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+              <div className="inline-block rounded-xl text-left overflow-hidden bg-white shadow-xl transform align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                  <div className="pb-2 sm:pb-4">
+                    <div className="flex flex-col w-full">
+                        <div className="flex flex-row justify-center items-center h-11 bg-cornblue-400 rounded-t-lg shadow-xl">
+                          <h3 className="text-lg leading-6 font-medium text-cornblue-200" id="modal-headline">Share with friends!</h3>
+                          <button onClick={() => setShowSharedModal(false)} className="absolute right-2 text-cornblue-200 focus:outline-none">
+                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          </button>
+                        </div>
+                          <div className="p-2">
                             <div className="mt-2 pb-2 border-b">
                               {/* { isError && <p>Please fill foldername in!</p> } */}
                               <div class="pt-2 relative text-gray-800">
                                 <input class="border w-full border-gray-500 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
-                                    type="search" name="search" value={searchInput} onChange={(e) => onChange(e)} placeholder="Search for friend..." />
-                                <button type="button" class="absolute right-0 top-0 mt-5 mr-4">
-                                    <svg class="text-gray-800 h-4 w-4 fill-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </button>
+                                    type="text" name="search" value={searchInput} onChange={(e) => onChange(e)} placeholder="Search for friend..." />
                               </div>
                             </div>
                             <div className="mt-2">
-                              <div className="max-h-36 overflow-y-auto">
+                              <div className="max-h-36 overflow-y-auto space-y-2">
                                 <>
                                 {friends !== null ? (
                                   <>
                                   {friends.map(friend => (
-                                    <a className="block border-b cursor-pointer" onClick={()=> shareFile(file, friend.id)}>
-                                    <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-2 space-y-4">
+                                    <a className="block cursor-pointer" onClick={()=> shareFile(file, friend.id)}>
+                                    <div className="border border-gray-500 hover:border-cornblue-600 hover:bg-cornblue-200 hover:text-white p-2 space-y-4 rounded-lg shadow-md">
                                         <div className="flex flex-row items-center justify-between">
                                             <div className="flex flex-row space-x-2 items-center justify-center">
                                                 {friend.profile_pic !== null ? (
@@ -516,9 +519,8 @@ function Collection() {
                         Cancel
                     </button>
                   </div>
-              </div>
               </form>
-          </div>
+              </div>
           </div>
       ): null}
       </>
