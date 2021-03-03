@@ -325,27 +325,41 @@ function Collection() {
                   <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                       <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                   </div>
-                  <div className="absolute right-0 top-0 h-screen 2xl:w-1/4 w-96  text-cornblue-200 bg-white border-l border-r border-gray-400 overflow-y-auto">
-                      <div className="h-16 bg-cornblue-400 flex flex-row justify-center items-center border-b">
-                          <button className="absolute right-0 pr-2" onClick={() => setFileshow(false)}>
-                              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                          </button>
-                          <div className="flex-none">
-                              <h1 className="font-semibold">{file.name}</h1>
-                          </div>
+                  <div className="flex flex-col justify-between absolute right-0 top-0 h-screen 2xl:w-1/4 pb-4 w-96 text-cornblue-200 bg-white border-l border-r border-gray-400 overflow-y-auto">
+                      <div>
+                        <div className="h-16 bg-cornblue-400 flex flex-row justify-center items-center border-b">
+                            <button className="absolute right-0 pr-2" onClick={() => setFileshow(false)}>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                            <div className="flex-none">
+                                <h1 className="font-semibold">{file.name}</h1>
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-col p-2 space-y-4 justify-center text-black items-center">
+                            <div className="border-b pb-4">
+                            {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>No preview to see</h1>}
+                            </div>
+                            <div className="-mt-4 w-full border-b pb-4 px-4 flex flex-col items-start space-y-4">
+                              <p>Created on: {file.created}</p>
+                              <p>Type file: {file.is_image ? 'Image' : 'Document'}</p>
+                            </div>
+                            <div className="w-full flex xl:flex-row flex-col justify-center items-center xl:space-x-4 space-x-4 xl:space-y-0 space-y-4 ">
+                              <button type="button" onClick={() => setShowSharedModal(true)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
+                                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                                  <p className="ml-2">Share with friend</p>
+                              </button>
+                              <button type="button" onClick={() => renameFile(file)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                  <p className="ml-2">Rename file</p>
+                              </button>
+                            </div>
+                        </div>
                       </div>
-                      <div className="w-full flex flex-col p-2 space-y-4 justify-center text-black items-center">
-                          <div className="border-b pb-4">
-                          {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>No preview to see</h1>}
-                          </div>
-                          <div className="-mt-4 w-full border-b pb-4 px-4 flex flex-col items-start space-y-4">
-                            <p>Created on: {file.created}</p>
-                            <p>Type file: {file.is_image ? 'Image' : 'Document'}</p>
-                          </div>
-                          <button type="button" onClick={() => setShowSharedModal(true)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                              <p className="ml-2">Share with friend</p>
-                          </button>
+                      <div className="w-full flex flex-row justify-center items-center">
+                        <button onClick={() => deletefile(file.fileId)} className="flex flex-col space-y-1 items-center text-red-400 font-medium">
+                          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                          <p>Delete</p>
+                        </button>
                       </div>
                   </div>
               </div>
@@ -388,7 +402,7 @@ function Collection() {
               </div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                  <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
                   <div className="min-w-0 sm:flex sm:items-start">
                       <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
                         <h3 className="text-lg leading-6 font-medium text-red-500" id="modal-headline">
@@ -399,17 +413,17 @@ function Collection() {
                         </div>
                       </div>
                   </div>
-                  </div>
-                  <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                </div>
+                <div className="flex flew-row bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                   <button type="submit" onClick={(e)=> deleteFolder(e)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                       Delete
                   </button>
                   <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                       Cancel
                   </button>
-                  </div>
+                </div>
               </div>
-              </form>
+            </form>
           </div>
           </div>
         ) : null}
@@ -419,13 +433,13 @@ function Collection() {
       {showModal ? (
           <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <form>
+            <form>
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                  <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
+                <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
                   <div className="min-w-0 sm:flex sm:items-start">
                       <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
                           <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
@@ -449,7 +463,7 @@ function Collection() {
                     </button>
                   </div>
               </div>
-              </form>
+            </form>
           </div>
           </div>
       ): null}
