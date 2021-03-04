@@ -3,9 +3,9 @@ import Axios from 'axios';
 
 const Downloader = ({ files = [], remove }) => {
     return (
-        <div className="fixed bg-white w-96 min-h-down right-2 bottom-2 max-h-60 overflow-y-auto border rounded-md shadow-xl">
+        <div className="fixed bg-white w-96 min-h-down right-2 bottom-2 max-h-60 overflow-y-auto border rounded-xl shadow-xl">
             <div>
-                <div className="bg-gray-100 p-2">File Downloader</div>
+                <div className="bg-cornblue-400 text-center font-bold text-cornblue-200 p-2 shadow-md">File Downloader</div>
                 <ul className="max-h-48 p-4 overflow-hidden overflow-y-auto">
                     {files.map((file, idx) => {
                         if(file.is_folder) {

@@ -2,6 +2,16 @@ import React, { useState, useEffect }from 'react';
 import Navbar from '../components/NavBar';
 import '../index.css';
 import axios from 'axios';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import '../styles/react-contextmenu.css'
+import '../styles/custom.css'
+
+const attributes = {
+    className: 'custom-root',
+    disabledClassName: 'custom-disabled',
+    dividerClassName: 'custom-divider',
+    selectedClassName: 'custom-selected'
+}
 
 function FriendsPage() {
 
@@ -11,8 +21,6 @@ function FriendsPage() {
     const [searchValue, setSearchValue] = useState("");
     const [searchedUsers, setSearchedUsers] = useState(null);
     const [searhed, setSearched] = useState(false);
-    const [usersRequesting, setUsersRequesting] = useState(null);
-    const [usersRequestingTotal, setUsersRequestingTotal] = useState(0);
     const [showModalRequest, setShowModalRequest] = useState(false);
 
 
@@ -55,6 +63,17 @@ function FriendsPage() {
                 setSearchValue('')
             }
         })
+    }
+
+    function handleRemoveFriend(FriendsId) {
+        console.log(FriendsId);
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/users/deleteFriend/${FriendsId}/${token.id}`)
+            .then((response) => {
+                console.log(response);
+                if(response.status === 200) {
+                    window.location.reload();
+                }
+            })
     }
 
     function handleUpdateRequest(e, status, FriendsId) {
@@ -135,19 +154,32 @@ function FriendsPage() {
                     <h1 className=" text-xl font-bold z-0">My Friends</h1>
                     <div className=" z-0 flex-auto overflow-y-auto grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-4">
                         {friends.map(friend => (
-                            <div className="border border-gray-400 rounded-md shadow-md p-4">
-                                <div className="flex flex-row items-center space-x-2">
-                                    {friend.profile_pic !== null ? (
-                                        <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-16 h-16 rounded-full" />
-                                    ) : ( 
-                                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    )}
-                                    <div className="flex flex-col space-y-0">
-                                        <strong className="text-lg font-medium">{friend.firstname} {friend.lastname}</strong>
-                                        <p className="text-sm font-normal text-gray-500">{friend.created}</p>
+                            <>
+                                <ContextMenuTrigger id={friend.id}>
+                                    <div className="border border-gray-400 rounded-md shadow-md p-4">
+                                        <div className="flex flex-row items-center space-x-2">
+                                            {friend.profile_pic !== null ? (
+                                                <img src={"http://" + process.env.REACT_APP_HOST_IP + ":3030" + friend.profile_pic} className="object-cover w-16 h-16 rounded-full" />
+                                            ) : ( 
+                                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            )}
+                                            <div className="flex flex-col space-y-0">
+                                                <strong className="text-lg font-medium">{friend.firstname} {friend.lastname}</strong>
+                                                <p className="text-sm font-normal text-gray-500">{friend.created.split('T')[0]}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </ContextMenuTrigger>
+                                <ContextMenu id={friend.id}>
+                                    <MenuItem
+                                        data={{ action: 'paste' }}
+                                        onClick={() => handleRemoveFriend(friend.id)}
+                                        attributes={attributes}
+                                    >
+                                    Delete Friend
+                                    </MenuItem>
+                                </ContextMenu>
+                            </>
                         ))}
                     </div>
                 </div>

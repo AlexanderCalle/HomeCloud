@@ -1,14 +1,12 @@
 import '../index.css';
 import React, {useEffect} from 'react';
-import Transition from '../components/transition';
 import Navbar from '../components/NavBar'
-import FolderList from '../components/folders';
 import File from '../components/files';
 import Axios from 'axios';
 import { useParams, useHistory } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
-import FileShow from '../components/FileShow';
 import SelecingFiles from '../components/SelectingFiles';
+import { useMediaQuery } from 'react-responsive'
 
 
 function Collection() {
@@ -16,7 +14,6 @@ function Collection() {
 
   const token = JSON.parse(localStorage.getItem('tokens'));
 
-  const [showFolders, setShowFolders] = React.useState(true);
   const [foldername, setFoldername] = React.useState(useParams().foldername);
   const folderId = useParams().folderId;
   const [fileshow, setFileshow] = React.useState(false);
@@ -59,7 +56,7 @@ function Collection() {
           setUsedSpace(res.data.totalSize)
         }
       })
-  })
+  }, []);
 
   const [downloadFile, donwloadfolder, downloaderComponent] = useFileDownloader();
 
@@ -144,18 +141,26 @@ function Collection() {
     })
   }
 
+  const isStatic = useBreakpoint('1024px');
+
+  function useBreakpoint(breakpoint) {
+    return useMediaQuery({
+      query: `(min-width: ${breakpoint})`,
+    });
+  }
+
   function renameFile(file) {
     console.log(file);
-    setNewName(file.name)
+    const ext = file.name.split('.')[1];
+    setNewName(file.name.split('.')[0])
     setShowModal({
       showModal: true,
-      fileId: file.fileId,
-      ext: file.ext,
+      fileId: file.fileId || file.file_id,
+      ext: ext,
     });
   }
 
   function submitRename(fileId) {
-
     const token = JSON.parse(localStorage.getItem('tokens'));
     
     const data = {
@@ -178,6 +183,14 @@ function Collection() {
       })
 
   }
+
+  document.addEventListener('keydown', function(event){
+    if(event.key === "Escape"){
+      setShowModal(false);
+      setShowSharedModal(false);
+      setFileshow(false)
+    }
+  });
 
   function onChange(event) {
     setSearchInput(event.target.value)
@@ -236,7 +249,7 @@ function Collection() {
       <div className='flex flex-row flex-auto bg-white'>
         <div className="w-full flex flex-col p-4">
           <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
-            <div className="flex flex-row space-x-4">
+            <div className="flex flex-row space-x-2s">
               <>
               {rename ? (
                 <form className="flex flex-row">
@@ -249,7 +262,7 @@ function Collection() {
                 <>
                 <a className="focus:outline-none text-cornblue-400 flex flex-row space-x-2" href="/">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                  Back
+                  {isStatic ? "Back": null}
                 </a>
                 <div className="flex flex-row items-end space-x-4">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -312,7 +325,8 @@ function Collection() {
                     fileshow={fileshow} 
                     folderId={folderId}
                     IsSelecting={isSelecting}
-                    renameFile={renameFile} 
+                    renameFile={renameFile}
+                    setShowSharedModal={setShowSharedModal}
                   />
                 </div>
               )}
@@ -346,10 +360,10 @@ function Collection() {
                             <div className="w-full flex xl:flex-row flex-col justify-center items-center xl:space-x-4 space-x-4 xl:space-y-0 space-y-4 ">
                               <button type="button" onClick={() => setShowSharedModal(true)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                                  <p className="ml-2">Share with friend</p>
+                                  <p className="ml-2">Share file</p>
                               </button>
                               <button type="button" onClick={() => renameFile(file)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                   <p className="ml-2">Rename file</p>
                               </button>
                             </div>
@@ -432,33 +446,34 @@ function Collection() {
       <>
       {showModal ? (
           <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <form>
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                <div className="bg-white px-4 pt-5 pb-2 sm:p-1 sm:pt-6 sm:pb-4">
-                  <div className="min-w-0 sm:flex sm:items-start">
-                      <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left">
-                          <h3 className="text-lg leading-6 font-medium text-blue-500" id="modal-headline">
-                            Rename file
-                          </h3>
-                          <div className="mt-2">
-
-                            { isError && <p>Please fill foldername in!</p> }
-                            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name..." name="name" className=" h-8 p-2 focus:ring-blue-500 focus:border-blue-500 border border-blue-500 block w-full sm:text-sm rounded-md shadow-xl"/>
-                          
-                          </div>
+              <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+              <div className="inline-block rounded-xl text-left overflow-hidden bg-white shadow-xl transform align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                <div className="pb-2 sm:pb-4">
+                  <div className="flex flex-col w-full">
+                      <div className="flex flex-row justify-center items-center h-11 bg-cornblue-400 rounded-t-lg shadow-xl">
+                        <h3 className="text-lg leading-6 font-medium text-cornblue-200" id="modal-headline">Rename file</h3>
+                        <button onClick={() => setShowModal(false)} className="absolute right-2 text-cornblue-200 focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                       </div>
-                  </div>
+                      <div className="mt-4 px-4">
+
+                        { isError && <p>Please fill foldername in!</p> }
+                        <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name..." name="name" className="h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
+                      
+                      </div>
+                    </div>
                   </div>
                   <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onClick={() => submitRename(showModal.fileId)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Add
+                    <button type="button" onClick={() => submitRename(showModal.fileId)} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
+                        Rename
                     </button>
-                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onClick={() => setShowModal(false)} className="mt-3 sm:mt-0 sm:w-28 w-full inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-cornblue-200 font-medium text-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                         Cancel
                     </button>
                   </div>

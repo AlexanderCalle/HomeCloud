@@ -550,10 +550,18 @@ app.post('/users/updateRequest/:FriendsId', (req, res)=> {
     });
 });
 
-app.get('/users/deleteFriend/:FriendsId', (req, res)=> {
-    con.query('DELETE FROM `friends` WHERE `FriendsId` = ?', req.params.FriendsId, (err, result)=> {
+app.get('/users/deleteFriend/:FriendsId/:userId', (req, res)=> {
+    con.query('DELETE FROM `friends` WHERE  ? in (UserOne, UserTwo) AND ? in (UserOne, UserTwo)', [req.params.FriendsId, req.params.userId], (err, result)=> {
         if(err) return res.status(500).send(err);
-        res.status(200).send('Deleted')
+        con.query('DELETE FROM messages WHERE ? in (fromUser, toUser) AND ? in (fromUser, toUser)', [req.params.FriendsId, req.params.userId], (err, result) => {
+            if(err) return res.status(500).send(err);
+        
+            con.query('DELETE FROM `chats` WHERE ? in (UserOne, UserTwo) AND ? in (UserOne, UserTwo)', [req.params.FriendsId, req.params.userId], (err, chat) => {
+                if (err) return res.status(500).send(err);
+                res.status(200).send('Deleted')
+            })
+
+        })
     })
 });
 
@@ -724,7 +732,7 @@ app.get('/files/getshared/:userId', (req, res)=> {
 });
 
 app.get('/users/allfriends/:userId', (req, res)=> {
-    con.query('SELECT u.firstname, u.lastname, u.profile_pic, f.created FROM `friends` f LEFT JOIN `users` u on ? in (f.UserOne, f.UserTwo) AND Status = 1 AND U.id <> ? WHERE u.id = f.UserTwo OR u.id = f.UserOne', [req.params.userId, req.params.userId], (err, result)=> {
+    con.query('SELECT u.firstname, u.lastname, u.profile_pic, f.created, u.id FROM `friends` f LEFT JOIN `users` u on ? in (f.UserOne, f.UserTwo) AND Status = 1 AND U.id <> ? WHERE u.id = f.UserTwo OR u.id = f.UserOne', [req.params.userId, req.params.userId], (err, result)=> {
         if(err) return res.status(500).send(err);
         res.status(200).send(result);
     })

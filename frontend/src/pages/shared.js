@@ -4,6 +4,16 @@ import Navbar from '../components/NavBar';
 import FileShow from '../components/FileShow';
 import useFileDownloader from '../hooks/useFileDownloader';
 import SelecingFiles from '../components/sharedFileSlecting';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import '../styles/react-contextmenu.css'
+import '../styles/custom.css'
+
+const attributes = {
+    className: 'custom-root',
+    disabledClassName: 'custom-disabled',
+    dividerClassName: 'custom-divider',
+    selectedClassName: 'custom-selected'
+}
 
 function SharedPage() {
 
@@ -33,6 +43,12 @@ function SharedPage() {
 
         download(fileDown)
     }
+
+    document.addEventListener('keydown', function(event){
+        if(event.key === "Escape"){
+           setFileshow(false)
+        }
+      });
 
     useEffect(() => {
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/getshared/${token.id}`)
@@ -94,23 +110,31 @@ function SharedPage() {
                             {files.length > 0 && (
                                 <>
                                 {files.map(file => (
-                                    <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
-                                        <div className="flex flex-row items-center">
-                                            <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
-                                                <div className="p-3 space-y-4">
-                                                    <div className="flex flex-row items-center space-x-2">
-                                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                                        <strong className="text-sm font-normal">{file.name}</strong>
+                                    <>
+                                    <ContextMenuTrigger id={file.file_id}>
+                                        <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
+                                            <div className="flex flex-row items-center">
+                                                <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
+                                                    <div className="p-3 space-y-4">
+                                                        <div className="flex flex-row items-center space-x-2">
+                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                            <strong className="text-sm font-normal">{file.name}</strong>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                            <div className="flex-none flex flex-row space-x-2 mr-2">
-                                                <button className="focus:outline-none" onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}>
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
-                                    </div>
+                                    </ContextMenuTrigger>
+                                    <ContextMenu id={file.file_id}>
+                                        <MenuItem
+                                            data={{ action: 'paste' }}
+                                            onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
+                                            attributes={attributes}
+                                        >
+                                        Download
+                                        </MenuItem>
+                                    </ContextMenu>
+                                    </>
                                 ))}
                                 </>   
                                 )}

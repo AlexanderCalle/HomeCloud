@@ -12,6 +12,7 @@
     "axios": "^0.21.0",
     "postcss": "^7.0.35",
     "react": "^17.0.1",
+    "react-contextmenu": "^2.14.0",
     "react-dom": "^17.0.1",
     "react-responsive": "^8.2.0",
     "react-router-dom": "^5.2.0",
