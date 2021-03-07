@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/NavBar';
-import FileShow from '../components/FileShow';
 import useFileDownloader from '../hooks/useFileDownloader';
 import SelecingFiles from '../components/sharedFileSlecting';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'

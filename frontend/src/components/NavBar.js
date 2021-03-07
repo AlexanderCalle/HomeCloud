@@ -25,7 +25,8 @@ function Navbar(props) {
     const { setAuthTokens } = useAuth();
     const [showModal, setShowModal] = useState(false);
     const [foldername, setFoldername] = useState("");
-    const [isError, setIsError ] = useState(false); 
+    const [isError, setIsError ] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("")
     const [files, setFiles] = React.useState(null);
     const [fileUploading, setFileUploading] = React.useState(null);
     const [folderName, setFolderName] = useState(useParams().foldername);
@@ -83,19 +84,28 @@ function Navbar(props) {
             })
     }
 
-    function postItem() {
-
+    function postItem(e) {
+        setIsError(false);
+        setErrorMsg("")
+        e.preventDefault();
         axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/addfolder/${token.id}`, data: {
             name: foldername,
         }}).then(result => {
             if(result.status === 200) {
                 setShowModal(false);
-                this.props.setShowSuccess(true);
+                //this.props.setShowSuccess(true);
+                window.location.reload();
             } else {
                 setIsError(true)
             }
         }).catch(e => {
-            setIsError(true);
+            if(e.response.status === 400) {
+                setErrorMsg("Foldername already exists");
+                setIsError(true);
+            } else {
+                setErrorMsg("Please give a name!");
+                setIsError(true);
+            }
         });
     }
 
@@ -202,7 +212,7 @@ function Navbar(props) {
                 setTotalSize(res.data.total)
             }
       } )
-    })
+    }, [])
 
     const fileUpload = () => {
         setCounter(counter + 1);
@@ -482,7 +492,6 @@ function Navbar(props) {
         {showModal ? (
             <div className="fixed z-20 inset-0 overflow-y-auto">
             <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <form>
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
@@ -499,8 +508,15 @@ function Navbar(props) {
                             <div className="mt-4 px-4">
                                 {showModal.add_folder && (
                                     <>
-                                        { isError && <p>Please fill foldername in!</p> }
-                                        <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
+                                        { isError ? (
+                                            <>
+                                                {errorMsg}
+                                            </>
+                                        ) : null}
+                                        <form onSubmit={(e)=> { e.preventDefault(); postItem(e)}}>
+                                            <input type="text" value={foldername} onChange={ (e) => setFoldername(e.target.value) } placeholder="Name..." name="name" className=" h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
+                                            <input type="submit" hidden/>
+                                        </form>
                                     </>
                                 )}
                                 {showModal.add_files && (
@@ -584,7 +600,7 @@ function Navbar(props) {
                     <>
 
                     {showModal.add_folder ? (
-                        <button type="submit" onClick={postItem} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
+                        <button type="submit" onClick={(e)=> postItem(e)} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                             Add
                         </button>
                     ) : (
@@ -602,7 +618,6 @@ function Navbar(props) {
                     </>
                     </div>
                 </div>
-                </form>
             </div>
             </div>
         ): null}

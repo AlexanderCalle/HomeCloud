@@ -176,7 +176,8 @@ app.get('/folders/:id', (req, res)=> {
 });
 
 app.post('/addfolder/:id', (req, res)=>{
-    if(req.body.name != ""){
+    const path = './upload/' + req.params.id + '/' + req.body.name + '/'
+    if(req.body.name != "" && !fs.existsSync(path)){
         const data = {
             name: req.body.name,
             main_path: '/' + req.params.id + '/',
@@ -187,13 +188,17 @@ app.post('/addfolder/:id', (req, res)=>{
                 res.status(500).send(err);
                 console.log(err)
             } 
-            fs.mkdirSync('./upload/' + req.params.id + '/' + req.body.name + '/')
+            fs.mkdirSync('./upload/' + req.params.id + '/' + req.body.name.toLowerCase() + '/')
             res.status(200).send({
                 name: req.body.name,
             });
         })
     } else {
-        res.sendStatus(400);
+        if(req.body.name != ""){
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(402);
+        }
     }
 });
 
@@ -735,6 +740,20 @@ app.get('/users/allfriends/:userId', (req, res)=> {
     con.query('SELECT u.firstname, u.lastname, u.profile_pic, f.created, u.id FROM `friends` f LEFT JOIN `users` u on ? in (f.UserOne, f.UserTwo) AND Status = 1 AND U.id <> ? WHERE u.id = f.UserTwo OR u.id = f.UserOne', [req.params.userId, req.params.userId], (err, result)=> {
         if(err) return res.status(500).send(err);
         res.status(200).send(result);
+    })
+});
+
+app.get('/search/find/file/folders/:userId/:query', (req, res)=> {
+    console.log(req.params.query + "%", req.params.userId);
+    con.query('SELECT * FROM files WHERE name LIKE ? AND user_id = ?', [req.params.query + "%", req.params.userId], (err, files) => {
+        if (err) return res.status(500).send(err);
+        con.query('SELECT * FROM folders WHERE name LIKE ? AND user_id = ?', [req.params.query + "%", req.params.userId], (err, folders) => {
+            if (err) return res.status(500).send(err);
+            res.status(200).send({
+                files: files,
+                folders: folders
+            })
+        })
     })
 })
 

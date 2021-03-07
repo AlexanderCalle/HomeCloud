@@ -31,6 +31,9 @@ function Collection() {
   const [showSharedModal, setShowSharedModal] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
   const [friends, setFriends] = React.useState(null);
+  const [searchValue, setSearchValue] = React.useState("");
+    const [foldersFound, setFoldersFound] = React.useState([]);
+    const [filesFound, setFilesFound] = React.useState([]);
 
   const [showSuccess, setShowSuccess] = React.useState(false)
 
@@ -207,6 +210,23 @@ function Collection() {
     }
   }
 
+  function onChangeSearch(e) {
+    console.log(e.target.value);
+    setSearchValue(e.target.value);
+    if(e.target.value !== '') {
+        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/search/find/file/folders/${token.id}/${e.target.value}`)
+        .then(response => {
+            if(response.status === 200) {
+                setFoldersFound(response.data.folders);
+                setFilesFound(response.data.files);
+            }
+        })
+    } else {
+        setFoldersFound([]);
+        setFilesFound([])
+    }
+}
+
   function shareFile(fileShared, friendId) {
     const data = {
       shared_file: fileShared.fileId,
@@ -249,7 +269,7 @@ function Collection() {
       <div className='flex flex-row flex-auto bg-white'>
         <div className="w-full flex flex-col p-4">
           <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
-            <div className="flex flex-row space-x-2s">
+            <div className="flex flex-row space-x-2">
               <>
               {rename ? (
                 <form className="flex flex-row">
@@ -266,7 +286,7 @@ function Collection() {
                 </a>
                 <div className="flex flex-row items-end space-x-4">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                  <input className="outline-none sm:w-96 w-5/6 p-0 text-md" type="text" placeholder="Search..." />
+                  <input className="outline-none sm:w-96 w-5/6 p-0 text-md" value={searchValue} onChange={(e) => onChangeSearch(e)} type="text" placeholder="Search..." />
                 </div>
                 </>
               )}
@@ -285,29 +305,31 @@ function Collection() {
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
               </button>
               {isSelecting && (
-                <button onClick={downloadSelected}>
+                <button className="focus:outline-none" onClick={downloadSelected}>
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
               )}
               {isSelecting && (
-                <button onClick={deleteSelected}>
+                <button className="focus:outline-none" onClick={deleteSelected}>
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               )}
               {!isSelecting && (
-                <button onClick={() => donwloadfolder(folder)}>
+                <button className="focus:outline-none" onClick={() => donwloadfolder(folder)}>
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
               )}
               {!isSelecting && (
-                <button onClick={() => setShowSettings(!showSettings)}>
+                <button className="focus:outline-none" onClick={() => setShowSettings(!showSettings)}>
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                 </button>
               )}
               
             </div>
           </div>
-          <h1 className="mt-4 text-xl font-bold">{foldername}</h1>    
+          {filesFound.length === 0 && foldersFound.length === 0 ? (
+            <>
+            <h1 className="mt-4 text-xl font-bold">{foldername}</h1>    
             <div>
               {isSelecting ? (
                 <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
@@ -331,6 +353,42 @@ function Collection() {
                 </div>
               )}
             </div>
+            </>
+          ) : ( 
+          <>
+            <h1 className="mt-4 text-xl font-bold">Items Found</h1>
+            <div>
+            <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                {foldersFound.map(folder => (
+                    <a className="block cursor-pointer border p-3 border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" href={`/collection/folder/${folder.name}/${folder.folder_id}`}>
+                         <div className="space-y-4">
+                            <div className="flex flex-row items-center space-x-2 overflow-hidden">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                <strong className="flex-grow font-normal">{folder.name}</strong>
+                            </div>
+                        </div>
+                    </a> 
+                ))}
+                {filesFound.map((file => {
+                    return (
+                        <div className="block cursor-pointer border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white overflow-hidden">
+                            <div className="flex flex-row items-center">
+                                <a className="flex-auto cursor-pointer" onClick={() => fileShowing(file.path, file.name, file.is_image, file.file_id, file.created_at)}>
+                                    <div className="p-3 space-y-4">
+                                        <div className="flex flex-row items-center space-x-2 overflow-hidden">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                            <strong className="flex-grow text-sm font-normal">{file.name}</strong>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    )
+                }))}
+            </div>
+            </div>
+        </>
+        )}
         </div>
         <>
         {fileshow ? (     
@@ -357,16 +415,6 @@ function Collection() {
                               <p>Created on: {file.created}</p>
                               <p>Type file: {file.is_image ? 'Image' : 'Document'}</p>
                             </div>
-                            <div className="w-full flex xl:flex-row flex-col justify-center items-center xl:space-x-4 space-x-4 xl:space-y-0 space-y-4 ">
-                              <button type="button" onClick={() => setShowSharedModal(true)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
-                                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                                  <p className="ml-2">Share file</p>
-                              </button>
-                              <button type="button" onClick={() => renameFile(file)} className="xl:w-full w-72 inline-flex justify-center rounded-md px-4 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 sm:ml-3 text-sm">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                  <p className="ml-2">Rename file</p>
-                              </button>
-                            </div>
                         </div>
                       </div>
                       <div className="w-full flex flex-row justify-center items-center">
@@ -387,18 +435,20 @@ function Collection() {
 
       <>
         {showSettings ? (
-          <div className="absolute flex flex-col justify-center w-52 h-32 bg-gray-100 rounded-md right-2 top-20">
-          <button className="block border-b border-t cursor-pointer" onClick={()=> { setRename(true); setShowSettings(false) }}>
-            <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4">
+          <div className="absolute flex flex-col justify-center w-52 bg-gray-100 rounded-md right-2 top-20 p-2">
+          <button className="block cursor-pointer rounded-md" onClick={()=> { setRename(true); setShowSettings(false) }}>
+            <div className="rounded-md hover:bg-cornblue-400 hover:text-white p-1 space-y-4">
               <div className="flex flex-row items-center space-x-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                   <strong className="flex-grow font-normal">Rename</strong>
               </div>
             </div>
           </button>
-          <button className="block border-b cursor-pointer" onClick={()=> { setFoldernameWarning(true)}}>
-            <div className="border-l-2 border-transparent hover:border-blue-500 hover:bg-blue-100 p-3 space-y-4">
+          <button className="block cursor-pointer" onClick={()=> { setFoldernameWarning(true)}}>
+            <div className="rounded-md hover:bg-cornblue-400 hover:text-white p-1 space-y-4">
                 <div className="flex flex-row items-center space-x-2">
-                    <strong className="flex-grow font-normal text-red-500">Delete</strong>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  <strong className="flex-grow font-normal">Delete</strong>
                 </div>
             </div>
           </button>
@@ -447,7 +497,6 @@ function Collection() {
       {showModal ? (
           <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <form>
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
@@ -462,15 +511,15 @@ function Collection() {
                         </button>
                       </div>
                       <div className="mt-4 px-4">
-
-                        { isError && <p>Please fill foldername in!</p> }
-                        <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name..." name="name" className="h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
-                      
+                        <form onSubmit={() => submitRename(showModal.fileId)}>
+                          { isError && <p>Please fill name in!</p> }
+                          <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name..." name="name" className="h-8 p-2 focus:outline-none border border-gray-500 block w-full text-md rounded-md"/>
+                        </form>
                       </div>
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onClick={() => submitRename(showModal.fileId)} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
+                    <button type="submit" onClick={() => submitRename(showModal.fileId)} className="sm:w-28 w-full inline-flex justify-center rounded-lg shadow-sm px-6 py-2 bg-cornblue-400 font-medium text-cornblue-200 hover:bg-cornblue-600 focus:outline-none sm:ml-3 text-sm">
                         Rename
                     </button>
                     <button type="button" onClick={() => setShowModal(false)} className="mt-3 sm:mt-0 sm:w-28 w-full inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-cornblue-200 font-medium text-cornblue-600 focus:outline-none sm:ml-3 text-sm">
@@ -478,7 +527,6 @@ function Collection() {
                     </button>
                   </div>
               </div>
-            </form>
           </div>
           </div>
       ): null}
@@ -555,11 +603,6 @@ function Collection() {
       </>
     </div>
   );
-}
-
-const styles = {
-  selecting: "px-2 py-1 rounded-md border-2 border-blue-500 bg-blue-500 text-white hover:bg-white hover:text-blue-500 font-semibold transition duration-300 outline-none focus:outline-none",
-  default: "px-2 py-1 rounded-md border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold transition duration-300 outline-none focus:outline-none",
 }
 
 export default Collection;
