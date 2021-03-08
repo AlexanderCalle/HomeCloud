@@ -103,7 +103,7 @@ function Login() {
                     <label class="inline-flex items-center">
                         <input type="checkbox" className="form-checkbox border border-gray-200 h-5 w-5 text-cornblue-400 rounded-sm" /><span class="ml-2 text-gray-700">Remember me</span>
                     </label>
-                    <a href="#" className="text-cornblue-400 font-medium xl:mt-0 mt-2">Forgot password?</a>
+                    <a href="/forgot" className="text-cornblue-400 font-medium xl:mt-0 mt-2">Forgot password?</a>
                   </div>
                   <div className="w-full flex flex-col space-y-2">
                     <button type="button" onClick={postLogin} className="w-full inline-flex justify-center rounded-lg shadow-sm py-2 bg-cornblue-400 text-cornblue-200 font-medium hover:bg-cornblue-600 focus:outline-none sm:w-auto text-md">

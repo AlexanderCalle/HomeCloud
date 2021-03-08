@@ -12,6 +12,9 @@ import ChatsPage from './pages/ChatsPage';
 import FriendsPage from './pages/FriendsPage';
 import SharedPage from './pages/shared';
 import socketIOClient from "socket.io-client";
+import EmailForm from "./pages/emailForm";
+import DigitForm from "./pages/digitForm";
+import NewPassword from './pages/newPassword';
 
 export const socket = socketIOClient(`http://${process.env.REACT_APP_HOST_IP}:3030`, {transports: ['websocket']});
 
@@ -35,6 +38,9 @@ function App() {
         <div>
           <Switch>
             <Route exact path='/login' component={Login} />
+            <Route exact path='/forgot' component={EmailForm} />
+            <Route exact path='/digitCode/:email' component={DigitForm} />
+            <Route exact path='/newPassword/:email/:digit' component={NewPassword} />
             <PrivateRoute exact path='/' component={Home} />
             <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
             <PrivateRoute exact path='/myprofile' component={MyProfile} />

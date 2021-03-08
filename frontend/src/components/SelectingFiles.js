@@ -56,23 +56,23 @@ class SelecingFiles extends Component {
         this.props.setSelected(selected)
     };
 
-    // selectAll = () => {
-    //     this.state.files.forEach(item => {
-    //         item.isSelect = !item.isSelect;
-    //         if(item.isSelect){
-    //             const obj = {
-    //                 name: item.name,
-    //                 file: item.path,
-    //                 filename: item.name,
-    //                 is_image: item.is_image,
-    //                 fileId: item.file_id
-    //             };
-    //             selected.push(obj);
-    //         }
-    //     })
-    //     this.setState({selected: selected});
-    //     this.props.setSelected(selected)
-    // }
+    selectAll = () => {
+        this.state.files.forEach(item => {
+            item.isSelect = true;
+            if(item.isSelect){
+                const obj = {
+                    name: item.name,
+                    file: item.path,
+                    filename: item.name,
+                    is_image: item.is_image,
+                    fileId: item.file_id
+                };
+                selected.push(obj);
+            }
+        })
+        this.setState({selected: selected});
+        this.props.setSelected(selected)
+    }
     
     render() {
         return (
