@@ -24,7 +24,7 @@ function Home() {
 
     function deleteFolder(e) {
         e.preventDefault();
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/deletefolder/${folderId}`)
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/folders/deletefolder/${folderId}`)
           .then(async res => {
             if(res.status === 200) {
               window.location.reload();

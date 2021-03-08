@@ -54,7 +54,7 @@ class Profile extends Component {
             email: user.email
         }
 
-        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/updateuser/${user.id}`, data)
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/myprofile/updateuser/${user.id}`, data)
             .then(res => {
                 if(res.status === 200) {
                     this.props.setIsUpdating(false);
@@ -79,7 +79,7 @@ class Profile extends Component {
 
         const token = JSON.parse(localStorage.getItem('tokens'));
 
-        Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/uploadPic/${token.id}`, data, {
+        Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/myprofile/uploadPic/${token.id}`, data, {
             onUploadProgress: (ProgressEvent) => {
                 console.log(ProgressEvent.loaded);
             }

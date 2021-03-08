@@ -144,7 +144,7 @@ const DonwloadFolder = ({name, folder, removeFile}) => {
             }
         }
 
-        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/getfolder/` + folder, {
+        Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/folders/getfolder/` + folder, {
                 responseType: "blob",
                 ...options,
                 headers: {

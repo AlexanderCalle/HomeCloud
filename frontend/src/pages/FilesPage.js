@@ -92,7 +92,7 @@ function Collection() {
 
   function renameFolder(e) {
     e.preventDefault();
-    Axios({method: 'POST', url: `http://${process.env.REACT_APP_HOST_IP}:3030/renamefolder/${folderId}`, data: {
+    Axios({method: 'POST', url: `http://${process.env.REACT_APP_HOST_IP}:3030/folders/renamefolder/${folderId}`, data: {
       name: newFoldername,
     }}).then(async result => {
       if (result.status === 200) {
@@ -107,7 +107,7 @@ function Collection() {
   }
 
   function deletefile(fileId) {
-    Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/deletefile/${fileId}`)
+    Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/deletefile/${fileId}`)
       .then(res => {
         if (res.status === 200) {
           console.log(res.data);
@@ -120,7 +120,7 @@ function Collection() {
 
   function deleteFolder(e) {
     e.preventDefault();
-    Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/deletefolder/${folderId}`)
+    Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/folders/deletefolder/${folderId}`)
       .then(async res => {
         if(res.status === 200) {
           await history.push('/');
@@ -173,7 +173,7 @@ function Collection() {
       fileId: showModal.fileId
     }
 
-    Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/renamefile/${folderId}/${fileId}`, data)
+    Axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/renamefile/${folderId}/${fileId}`, data)
       .then(response => {
         if(response.status === 200) {
           setShowModal(false);
@@ -199,7 +199,7 @@ function Collection() {
     setSearchInput(event.target.value)
 
     if(event.target.value != "") {
-      Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/friends/search/${token.id}/${event.target.value}`)
+      Axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/search/${token.id}/${event.target.value}`)
       .then(response => {
         if(response.status === 200) {
           setFriends(response.data)

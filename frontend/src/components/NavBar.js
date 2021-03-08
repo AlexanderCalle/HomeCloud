@@ -88,7 +88,7 @@ function Navbar(props) {
         setIsError(false);
         setErrorMsg("")
         e.preventDefault();
-        axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/addfolder/${token.id}`, data: {
+        axios({method: "POST", url:`http://${process.env.REACT_APP_HOST_IP}:3030/folders/addfolder/${token.id}`, data: {
             name: foldername,
         }}).then(result => {
             if(result.status === 200) {
@@ -136,7 +136,7 @@ function Navbar(props) {
             setMsg('You have not enough space for this file: ' + files[numb].name);
             setWarningDialog(true)
         } else {
-            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${token.id}/${folderName}/${files[numb].name}`, {
                 cancelToken: source.token
             })
                 .then(async response => {
@@ -170,7 +170,7 @@ function Navbar(props) {
             setMsg('You have not enough space for this file');
             setWarningDialog(true)
         } else {
-            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${token.id}/${folderName}/${files[numb].name}`, {
                 cancelToken: source.token
             })
                 .then(async response => {
@@ -225,7 +225,7 @@ function Navbar(props) {
       const uploadChunk = async (chunk) => {
           
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/UploadChunks`, chunk, {
+            const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/UploadChunks`, chunk, {
                 headers: {
                     'Content-Type': 'application/octet-stream',
                 },
@@ -271,7 +271,7 @@ function Navbar(props) {
             numb = fileOnSelected;
         }
 
-        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/addfiles/${token.id}/${folderName}/${files[numb].name}`, {
+        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/addfiles/${token.id}/${folderName}/${files[numb].name}`, {
             cancelToken: source.token
         });
         if (response.status === 200) {

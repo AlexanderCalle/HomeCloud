@@ -25,7 +25,7 @@ export const ChatPage = ({friendId, chatId}) => {
     }, [chatId]);
 
     useEffect(()=> {
-        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chats/seenmessages/${chatId}/${token.id}`)
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/seenmessages/${chatId}/${token.id}`)
             .then(response => {
                 if(response.status === 200) {
 
