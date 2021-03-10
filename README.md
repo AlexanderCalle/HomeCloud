@@ -29,7 +29,7 @@ A step by step guide that tells you how to get HomeCloud on your machine
 Pulling the code to a folder named HomeCloud:
 
 ```
-git pull https://github.com/AlI230/HomeCloud.git
+git clone https://github.com/AlI230/HomeCloud.git
 ```
 
 Initialize mysql for the site:
