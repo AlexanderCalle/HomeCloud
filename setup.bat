@@ -2,21 +2,22 @@
 cls
 
 if "%ProgramFiles(x86)%" == "" (
-    set MySQLServerPath=%ProgramFiles%\MySQL Installer for Windows
+    set "MySQLServerPath=%ProgramFiles%\MySQL Installer for Windows\"
 ) else (
-    set MySQLServerPath=%ProgramFiles(x86)%\MySQL Installer for Windows
+    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL Installer for Windows\"
 )
 
 echo Starting MySQL install ...
-%SystemRoot%\System32\msiexec.exe /a https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /quiet
-%MySQLServerPath%\MySQLInstallerConsole.exe community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
+%SystemRoot%\System32\msiexec.exe /i https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /qn
+cd %MySQLServerPath%
+MySQLInstallerConsole.exe community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
 echo MySQL installed successfully.
 
 rem if not "%PATH:~-1%" == ";" set "PATH=%PATH%;"
 rem set "PATH=%PATH%%MySQLServerPath%"
 
 echo Starting Nodejs install ...
-%SystemRoot%\System32\msiexec.exe /a https://nodejs.org/dist/v14.16.0/node-v14.16.0-x86.msi /quiet
+%SystemRoot%\System32\msiexec.exe /i https://nodejs.org/dist/v14.16.0/node-v14.16.0-x86.msi /qn
 echo NodeJs installed successfully.
 
 echo Configurating HomeCloud ...
