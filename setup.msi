@@ -2,13 +2,13 @@
 cls
 
 if "%ProgramFiles(x86)%" == "" (
-    set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Server 5.5\bin"
+    set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Server 8.0\bin"
 ) else (
-    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Server 5.5\bin"
+    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Server 8.0\bin"
 )
 
 echo Starting MySQL install ...
-%SystemRoot%\System32\msiexec.exe /i "mysql-installer-web-community-8.0.23.0.msi" /qn
+%SystemRoot%\System32\msiexec.exe /a https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /quiet
 echo MySQL installed successfully.
 
 echo Configurating MySQL Server ...
