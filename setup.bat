@@ -2,9 +2,11 @@
 cls
 
 if "%ProgramFiles(x86)%" == "" (
-    set "MySQLServerPath=%ProgramFiles%\MySQL Installer for Windows\"
+    set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
+    set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
 ) else (
-    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL Installer for Windows\"
+    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
+    set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
 )
 
 echo Starting MySQL install ...
@@ -21,15 +23,11 @@ echo Starting Nodejs install ...
 echo NodeJs installed successfully.
 
 echo Configurating HomeCloud ...
-if [ -f /root/.my.cnf ]; then
-    mysql -e "CREATE DATABASE HomeCloud;"
-    mysql -e "source .\db\init.sql;"
+cd %MySQLCommand%
+mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
+mysql.exe -uroot -pmysql -e "source .\db\init.sql;"
 
-# If /root/.my.cnf doesn't exist then it'll ask for root password   
-else
-    mysql -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
-    mysql -uroot -pmysql -e "source .\db\init.sql;"
-fi
+rem todo fix source init file and below (Copie folder inside Program Files)
 
 for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ipAddress=%ip:~1%
