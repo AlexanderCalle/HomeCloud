@@ -2,18 +2,15 @@
 cls
 
 if "%ProgramFiles(x86)%" == "" (
-    set MySQLServerPath="C:\Program Files\MySQL\MySQL Server 8.0\bin"
+    set MySQLServerPath=%ProgramFiles%\MySQL Installer for Windows
 ) else (
-    set MySQLServerPath="C:\Program Files (x86)\MySQL\MySQL Server 8.0\bin"
+    set MySQLServerPath=%ProgramFiles(x86)%\MySQL Installer for Windows
 )
 
 echo Starting MySQL install ...
 %SystemRoot%\System32\msiexec.exe /a https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /quiet
+%MySQLServerPath%\MySQLInstallerConsole.exe community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
 echo MySQL installed successfully.
-
-echo Configurating MySQL Server ...
-"%MySQLServerPath%\mysqlinstanceconfig.exe" -i -q ServiceName=MySQL RootPassword=mysql ServerType=DEVELOPER DatabaseType=MIXED Port=3306 Charset=utf8
-echo MySQL has been configured successfully.
 
 rem if not "%PATH:~-1%" == ";" set "PATH=%PATH%;"
 rem set "PATH=%PATH%%MySQLServerPath%"
