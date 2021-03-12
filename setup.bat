@@ -4,9 +4,13 @@ cls
 if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
+    set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    xcopy /s %cd% %ProgramFiles%
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
+    set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    xcopy /s %cd% %ProgramFiles(x86)%
 )
 
 echo Starting MySQL install ...
@@ -25,7 +29,7 @@ echo NodeJs installed successfully.
 echo Configurating HomeCloud ...
 cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
-mysql.exe -uroot -pmysql -e "source .\db\init.sql;"
+mysql.exe -uroot -pmysql -e "source %HomeCloudPath%db\init.sql;"
 
 rem todo fix source init file and below (Copie folder inside Program Files)
 
@@ -33,15 +37,21 @@ for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ipAddress=%ip:~1%
 
 echo MYSQL_PASS=mysl >> ./backend/.env
-echo SENDGRID_API_KEY='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' >> ./backend/.env
-echo UPLOAD_FOLDER = / >> ./backend/.env
+echo SENDGRID_API_KEY='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' >> %HomeCloudPath%/backend/.env
+echo UPLOAD_FOLDER = / >> %HomeCloudPath%/backend/.env
 
-echo REACT_APP_HOST_IP=%ipAddress% >> ./frontend/.env
+echo REACT_APP_HOST_IP=%ipAddress% >> %HomeCloudPath%/frontend/.env
 
-cd ./backend
+cd %HomeCloudPath%/backend
 npm install
 
-cd ../frontend
+cd %HomeCloudPath%/frontend
 npm install
 
-cd ../ && (cd ./backend && nodemon) && (cd ./frontend && npm run start)
+cd (cd %HomeCloudPath%/backend && nodemon) && (cd %HomeCloudPath%/frontend && npm run start)
+
+echo Do not close this windows!
+
+pause >null
+
+rem Detele downloaded folder
