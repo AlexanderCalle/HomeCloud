@@ -5,11 +5,13 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    set "npm=%ProgramFiles%\nodejs\npm"
     mkdir %ProgramFiles%\HomeCloud
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    set "npm=%ProgramFiles(x86)%\nodejs\npm"
     mkdir %ProgramFiles(x86)%\HomeCloud
 )
 
@@ -46,13 +48,18 @@ mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.
 
 rem todo fix source init file and below (Copie folder inside Program Files)
 
-cd %HomeCloudPath%/backend && CMD /C "%ProgramFiles%\nodejs\npm" i --loglevel error
+cd %HomeCloudPath%/backend && CMD /C %npm% i --loglevel error
 
-cd %HomeCloudPath%/frontend && CMD /C "%ProgramFiles%\nodejs\npm" i --loglevel error
+pause
 
-cd (cd %HomeCloudPath%/backend && nodemon) && (cd %HomeCloudPath%/frontend && CMD /C "%ProgramFiles%\nodejs\npm" run start)
+cd %HomeCloudPath%/frontend && CMD /C %npm% i --loglevel error
+
+pause
+
+cd (cd %HomeCloudPath%/backend && nodemon) && (cd %HomeCloudPath%/frontend && CMD /C %npm% run start)
 
 echo Do not close this windows!
+echo Your site will be available on: http://%ipAddress%:3000/
 
 pause >null
 
