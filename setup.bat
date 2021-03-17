@@ -7,14 +7,12 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
-    set "npm=%ProgramFiles%\nodejs\"
     mkdir %ProgramFiles%\HomeCloud
     
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles(x86)%\HomeCloud\"
-    set "npm=%ProgramFiles(x86)%\nodejs\"
     mkdir %ProgramFiles%\HomeCloud
 )
 
@@ -59,7 +57,7 @@ start /min cmd /k "node server.js"
 cd %HomeCloudPath%/frontend
 start /min CMD /k "npm run start"
 
-echo Do not close this windows!
+echo Do not close the other windows!
 echo Your site will be available on: http://%ipAddress%:3000/
 
 rem Detele downloaded folder
