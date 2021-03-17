@@ -62,7 +62,7 @@ const con = mysql.createConnection({
     host: 'localhost',
     port: '3306',
     user: 'root',
-    password: 'yourpasswordhere', <--
+    password: 'yourpasswordhere',
     database: 'HomeCloud'
 });
 ```
@@ -82,7 +82,6 @@ In the backend folder create a file called .env and add the following variables
 
 ```
 UPLOAD_FOLDER = /
-SENDGRID_API_KEY='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'
 ```
 
 In the frontend folder also create a file calles .env
