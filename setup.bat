@@ -1,3 +1,5 @@
+if not "%minimized%"=="" goto :minimized
+set minimized=true
 @echo off
 cls
 
@@ -5,14 +7,15 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
-    set "npm=%ProgramFiles%\nodejs\npm"
+    set "npm=%ProgramFiles%\nodejs\"
     mkdir %ProgramFiles%\HomeCloud
+    
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
-    set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
-    set "npm=%ProgramFiles(x86)%\nodejs\npm"
-    mkdir %ProgramFiles(x86)%\HomeCloud
+    set "HomeCloudPath=%ProgramFiles(x86)%\HomeCloud\"
+    set "npm=%ProgramFiles(x86)%\nodejs\"
+    mkdir %ProgramFiles%\HomeCloud
 )
 
 for %%i in ("%~dp0.") do set "mypath=%%~fi"
@@ -20,7 +23,7 @@ for %%i in ("%~dp0.") do set "mypath=%%~fi"
 for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ipAddress=%ip:~1%
 
-echo MYSQL_PASS=mysl >> %mypath%\backend\.env
+echo MYSQL_PASS=mysql >> %mypath%\backend\.env
 echo SENDGRID_API_KEY='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' >> %mypath%\backend\.env
 echo UPLOAD_FOLDER = / >> %mypath%\backend\.env
 
@@ -31,7 +34,7 @@ xcopy /e /v "%mypath%" "%HomeCloudPath%"
 echo Starting MySQL install ...
 %SystemRoot%\System32\msiexec.exe /i https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /qn
 cd %MySQLServerPath%
-MySQLInstallerConsole.exe community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
+MySQLInstallerConsole community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
 echo MySQL installed successfully.
 
 rem if not "%PATH:~-1%" == ";" set "PATH=%PATH%;"
@@ -44,28 +47,19 @@ echo NodeJs installed successfully.
 echo Configurating HomeCloud ...
 cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
-mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql;"
+mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql"
 
-rem todo fix source init file and below (Copie folder inside Program Files)
+cd %HomeCloudPath%/backend && CMD /C "npm install"
 
-cd %HomeCloudPath%/backend && CMD /C %npm% i --loglevel error
+cd %HomeCloudPath%/frontend && CMD /C "npm install"
 
-pause
+cd %HomeCloudPath%/backend
+start /min cmd /k "node server.js"
 
-cd %HomeCloudPath%/frontend && CMD /C %npm% i --loglevel error
-
-pause
-
-cd (cd %HomeCloudPath%/backend && nodemon) && (cd %HomeCloudPath%/frontend && CMD /C %npm% run start)
+cd %HomeCloudPath%/frontend
+start /min CMD /k "npm run start"
 
 echo Do not close this windows!
 echo Your site will be available on: http://%ipAddress%:3000/
 
-pause >null
-
 rem Detele downloaded folder
-rem example for deleting folders
-@REM REM Clean up
-@REM IF EXIST %SourceFiles% DEL %SourceFiles%
-@REM IF EXIST %Config% DEL %Config%
-@REM IF EXIST %Source7ZFile% DEL %Source7ZFile%
