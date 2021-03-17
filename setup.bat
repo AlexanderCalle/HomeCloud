@@ -64,3 +64,8 @@ echo Your site will be available on: http://%ipAddress%:3000/
 pause >null
 
 rem Detele downloaded folder
+rem example for deleting folders
+@REM REM Clean up
+@REM IF EXIST %SourceFiles% DEL %SourceFiles%
+@REM IF EXIST %Config% DEL %Config%
+@REM IF EXIST %Source7ZFile% DEL %Source7ZFile%
