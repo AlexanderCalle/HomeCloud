@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 const http = require('http').Server(app);
+const io = require("socket.io")(http)
 const morgan = require('morgan');
 
 // Port
@@ -158,6 +159,46 @@ app.post('/register', (req, res) => {
     } else {
         return res.status(403).send('')
     }
+});
+
+//socket middelware
+// array of all users
+let usersChats = [];
+// If user joins a room
+function userJoin(id, userId){
+    const user = {id , userId}
+    usersChats.push(user);
+    return usersChats;
+}
+// get all users in socket
+function getUser(userId) {
+    return usersChats.find(user => user.userId == userId);
+  }
+// Create socket
+io.on("connection", socket => {  
+    socket.emit('connection', null);
+
+	socket.on('joinchat', ({chatId, userId}) => {
+        socket.join(chatId);
+        userJoin(socket.id, userId);
+    });
+    
+    socket.on('sendMessage', ({data, chatId}) => {    
+        io.sockets.to(chatId).emit('message', data);
+        io.sockets.to(chatId).emit('latest', data);
+    });
+
+    socket.on('sendMelding', ({userId, friendId}) => {           
+        const user = getUser(friendId);
+        const currentUser = getUser(userId);
+        if(user != undefined) {
+            io.to(user.id).emit('latest');
+
+            if(currentUser != undefined) {
+                io.to(currentUser.id).emit('latest');
+            }
+        }
+    })
 });
 
 //Router folders

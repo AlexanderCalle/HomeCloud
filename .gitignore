@@ -9,6 +9,7 @@ backend/upload/*
 # dependencies
 frontend/.pnp
 frontend.pnp.js
+frontend/.env
 
 # testing
 frontend/coverage

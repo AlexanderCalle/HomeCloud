@@ -22,7 +22,6 @@ for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ipAddress=%ip:~1%
 
 echo MYSQL_PASS=mysql >> %mypath%\backend\.env
-echo SENDGRID_API_KEY='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' >> %mypath%\backend\.env
 echo UPLOAD_FOLDER = / >> %mypath%\backend\.env
 
 echo REACT_APP_HOST_IP=%ipAddress% >> %mypath%\frontend\.env

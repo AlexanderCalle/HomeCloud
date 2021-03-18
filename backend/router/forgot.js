@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs')
 const sgMail = require('@sendgrid/mail');
 
 // Send email with code
-router.post('/sendemail/:email', (req, res) => {
+router.post('/sendcode/:email', (req, res) => {
 
     con.query('SELECT id FROM users WHERE email = ?', req.params.email, (err, users) => {
         if(err) return res.status(500).send(err);
@@ -27,23 +27,11 @@ router.post('/sendemail/:email', (req, res) => {
         con.query('UPDATE users SET ? WHERE email = ?', [data, req.params.email], (err, result) => {
             if (err) return res.status(500).send(err);
 
-            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-            const msg = {
-                to: req.params.email, // Change to your recipient
-                from: 'callebauta@hotmail.com', // Change to your verified sender
-                subject: 'Reset password HomeCloud',
-                text: 'Your code to reset your email is \n\ Code: ' + code,
-            }
-
-            sgMail.send(msg)
-                .then(() => {
-                    console.log('Email sent');
-                    res.status(200).send("Ok");
-                })
-                .catch((error) => {
-                    console.error(error)
-                })
+            // send code to the client
+            res.status(200).send({
+                code: code
+            })
+            
         })
 
     })
