@@ -7,7 +7,7 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
-    mkdir %ProgramFiles%\HomeCloud
+    if not exist mkdir %ProgramFiles%\HomeCloud
     
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
