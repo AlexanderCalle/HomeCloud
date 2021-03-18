@@ -46,17 +46,19 @@ cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
 mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql"
 
-cd %HomeCloudPath%/backend && CMD /C "npm install"
+cd %HomeCloudPath%/backend && CMD /C "npm install"s
 
 cd %HomeCloudPath%/frontend && CMD /C "npm install"
 
 cd %HomeCloudPath%/backend
-runas /noprofile /user:mymachine\administrator start /min cmd /k "node server.js"
+runas /noprofile /user\administrator %mypath%\startBackend.bat
 
 cd %HomeCloudPath%/frontend
 start /min CMD /k "npm run start"
 
 echo Do not close the other windows!
 echo Your site will be available on: http://%ipAddress%:3000/
+
+pause <null
 
 rem Detele downloaded folder
