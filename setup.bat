@@ -13,7 +13,7 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
     set "HomeCloudPath=%ProgramFiles(x86)%\HomeCloud\"
-    mkdir %ProgramFiles%\HomeCloud
+    If not exist mkdir %ProgramFiles%\HomeCloud
 )
 
 for %%i in ("%~dp0.") do set "mypath=%%~fi"
@@ -52,7 +52,7 @@ cd %HomeCloudPath%/backend && CMD /C "npm install"
 cd %HomeCloudPath%/frontend && CMD /C "npm install"
 
 cd %HomeCloudPath%/backend
-start /min cmd /k "node server.js"
+runas /noprofile /user:mymachine\administrator start /min cmd /k "node server.js"
 
 cd %HomeCloudPath%/frontend
 start /min CMD /k "npm run start"
