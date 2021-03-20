@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const con = require('../connect');
-const app = express();
 
 // Get a chat
 router.get('/getChat/:userId/:friendId', (req, res)=> {

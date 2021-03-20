@@ -77,13 +77,13 @@ const getTotalSizeBytes = function(directoryPath) {
 // array of chunks to be uploaded
 
 //5368709120 == 5 GB
-//52428800 == 50 MB
+//26843545600 == 25 GB
 
 // Get the total size of users folder
 app.get('/directorySize/:userId', (req, res) => {
     res.status(200).send({
         totalSize: getTotalSize('./upload/' + req.params.userId),
-        totalSizeBytes: Math.ceil((getTotalSizeBytes('./upload/' + req.params.userId) / 5368709120) * 100),
+        totalSizeBytes: Math.ceil((getTotalSizeBytes('./upload/' + req.params.userId) / 26843545600) * 100),
         total: getTotalSizeBytes('./upload/' + req.params.userId)
     });
 })

@@ -51,7 +51,7 @@ cd %HomeCloudPath%/backend && CMD /C "npm install"s
 cd %HomeCloudPath%/frontend && CMD /C "npm install"
 
 cd %HomeCloudPath%/backend
-runas /noprofile /user\administrator %mypath%\startBackend.bat
+start /min cmd /k "node server.js"
 
 cd %HomeCloudPath%/frontend
 start /min CMD /k "npm run start"

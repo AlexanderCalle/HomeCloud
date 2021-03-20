@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const con = require('../connect');
 const bcrypt = require('bcryptjs')
-const sgMail = require('@sendgrid/mail');
 
 // Send email with code
 router.post('/sendcode/:email', (req, res) => {
