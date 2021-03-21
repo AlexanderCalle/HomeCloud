@@ -46,7 +46,7 @@ cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
 mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql"
 
-cd %HomeCloudPath%/backend && CMD /C "npm install"s
+cd %HomeCloudPath%/backend && CMD /C "npm install"
 
 cd %HomeCloudPath%/frontend && CMD /C "npm install"
 
