@@ -47,13 +47,17 @@ To run the service do the following
 First run the backend server
 
 ```
-path/to/folder/backend> nodemon
+commandLine> cd Program Files (X86)\HomeCloud\backend\
+
+Program Files (X86)\HomeCloud\backend> nodemon
 ```
 
 For the frontend server run:
 
 ```
-path/to/folder/frontend> npm run start
+commandLine> cd Program Files (X86)\HomeCloud\frontend\
+
+Program Files (x86)\HomeCloud\frontend> npm run start
 ```
 
 You can view the cloud / site on the andress:
@@ -68,6 +72,7 @@ http://(IPv4 you found):3000/
 * [Express.js](https://expressjs.com/) - The web framework for Node.js
 * [Node.js](https://nodejs.org/en/) - Javascript runtime built
 * [Mysql](https://www.mysql.com/) - Database service
+* [Tailwindcss](https://tailwindcss.com) - Css framework
 
 ## Contributing
 
