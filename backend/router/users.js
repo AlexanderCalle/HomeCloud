@@ -3,9 +3,6 @@ const express = require('express');
 const router = express.Router();
 const con = require('../connect');
 
-const morgan = require('morgan');
-const sgMail = require('@sendgrid/mail');
-
 // Get all searched users
 router.get('/search/:userId/:query', async (req, res) => {  
     const userId  = req.params.userId;

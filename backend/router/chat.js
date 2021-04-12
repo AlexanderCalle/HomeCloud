@@ -2,9 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const con = require('../connect');
-const app = express();
-const http = require('http').Server(app);
-const io = require("socket.io")(http)
 
 // Get a chat
 router.get('/getChat/:userId/:friendId', (req, res)=> {
@@ -42,44 +39,6 @@ router.post('/makechat', (req, res)=> {
 // 	});
 // }
 
-// array of all users
-let users = [];
-// If user joins a room
-function userJoin(id, userId){
-    const user = {id , userId}
-    users.push(user);
-    return users;
-}
-// get all users in socket
-function getUser(userId) {
-    return users.find(user => user.userId == userId);
-  }
-// Create socket
-io.on("connection", socket => {  
-    socket.emit('connection', null);
-
-	socket.on('joinchat', ({chatId, userId}) => {
-        socket.join(chatId);
-        userJoin(socket.id, userId);
-    });
-    
-    socket.on('sendMessage', ({data, chatId}) => {    
-        io.sockets.to(chatId).emit('message', data);
-        io.sockets.to(chatId).emit('latest', data);
-    });
-
-    socket.on('sendMelding', ({userId, friendId}) => {           
-        const user = getUser(friendId);
-        const currentUser = getUser(userId);
-        if(user != undefined) {
-            io.to(user.id).emit('latest');
-
-            if(currentUser != undefined) {
-                io.to(currentUser.id).emit('latest');
-            }
-        }
-    })
-});
 // Send message to chat
 router.post('/sendmessage', (req, res)=> {
 	const data = {

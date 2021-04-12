@@ -409,7 +409,7 @@ function Collection() {
                         </div>
                         <div className="w-full flex flex-col p-2 space-y-4 justify-center text-black items-center">
                             <div className="border-b pb-4">
-                            {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>No preview to see</h1>}
+                            {file.is_image ? <img src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + file.file} /> : <h1>No preview to see</h1>}
                             </div>
                             <div className="-mt-4 w-full border-b pb-4 px-4 flex flex-col items-start space-y-4">
                               <p>Created on: {file.created}</p>

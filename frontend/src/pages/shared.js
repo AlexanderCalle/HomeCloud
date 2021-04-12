@@ -160,7 +160,7 @@ function SharedPage() {
                                 </div>
                                 <div className="flex flex-col p-2 space-y-8 justify-center items-center">
                                     <>
-                                    {selected.is_image ? <img src={'http://localhost:3030' + selected.file} /> : <h1>No preview to see</h1>}
+                                    {selected.is_image ? <img src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + selected.file} /> : <h1>No preview to see</h1>}
                                     </>
                                 </div>
                             </div>
