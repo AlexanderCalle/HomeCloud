@@ -6,22 +6,6 @@ HomeCloud is a open source local cloud for a safer way to store all your files. 
 
 These instructions will get you a copie if this poject so you can use it on your local machine.
 
-### Prerequisites
-
-What you need to install the software and how to install them
-
-Mysql
-
-To install mysql go to the site and install recommended version/ latest version and follow the instruction, make sure you have a secure password. To check if it is installed, in the console type: mysql -V
-
-NodeJs
-
-Go to the node.js site and install the recommended version and follow along with the installer, make sure you install npm as well. To check bouth software type this in the console: node -v and npm -v
-
-Git
-
-For git go as well to the site and install  the recommended version and follow along with the installer. Check with: git —version
-
 ### Installing
 
 To download HomeCloud you have to do the following steps:
