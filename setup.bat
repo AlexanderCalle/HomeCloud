@@ -62,3 +62,5 @@ echo Your site will be available on: http://%ipAddress%:3000/
 pause <null
 
 rem Detele downloaded folder
+rem not sure maybe it will not work because of the setup file in dir
+CMD /k "rmdir /s %mypath%"
