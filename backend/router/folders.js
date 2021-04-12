@@ -84,10 +84,10 @@ router.get('/deletefolder/:folderId', (req, res)=> {
     con.query('SELECT * FROM `folders` WHERE folder_id = ?', req.params.folderId, (err, folder)=> {
         if (err) return res.status(500).send(err);
 
-        con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, (err, files)=> {
+        con.query('SELECT * FROM `files` WHERE folder_id = ?', req.params.folderId, async (err, files)=> {
             if (err) return res.status(500).send(err);
 
-            files.forEach(file => {
+            await files.forEach(file => {
                 fs.unlinkSync('./upload' + file.path);
 
                 con.query('DELETE FROM `files` WHERE file_id = ?', file.file_id, (err, result)=> {
