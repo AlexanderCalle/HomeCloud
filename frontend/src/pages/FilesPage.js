@@ -332,12 +332,12 @@ function Collection() {
             <h1 className="mt-4 text-xl font-bold">{foldername}</h1>    
             <div>
               {isSelecting ? (
-                <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                <>
                 <SelecingFiles 
                   folderId={folderId}
                   setSelected={setSelected}
                 />
-                </div>
+                </>
               ) : (
                 <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                   <File 

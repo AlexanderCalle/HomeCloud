@@ -185,7 +185,7 @@ class Profile extends Component {
                                         </div>
                                         <div className="flex flex-row items-center space-x-2 text-right">
                                             <span className="text-xs font-bold inline-block text-cornblue-400">
-                                                { this.state.progress > 0 && this.state.space + '/5.0 GB' }
+                                                { this.state.progress > 0 && this.state.space + '/25.0 GB' }
                                             </span>
                                         </div>
                                     </div>
