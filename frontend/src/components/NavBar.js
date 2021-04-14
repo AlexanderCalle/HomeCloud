@@ -4,7 +4,7 @@ import { useAuth } from '../context/auth';
 import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
-import WarningDialog from './warningDialog';
+import Message from '../components/Message';
 import ProgressRing from './CircleProgress';
 
 let chunkSize = 1024*1024; // 1MB
@@ -48,6 +48,8 @@ function Navbar(props) {
     const [usedSpace, setUsedSpace] = React.useState(0);
     const [showModalRequest, setShowModalRequest] = React.useState(false);
     const [usersRequesting, setUsersRequesting] = React.useState([]);
+    const [isSuccess, setIsSuccess] = React.useState(null);
+    const [succesMessage, setSuccesMessage] = React.useState(null);
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -66,6 +68,7 @@ function Navbar(props) {
                     setUsersRequestingTotal(response.data.length)
                 }
             })
+        
     }, [])
 
     function handleUpdateRequest(e, status, FriendsId) {
@@ -85,6 +88,28 @@ function Navbar(props) {
             })
     }
 
+    // useEffect(() => {
+    //     if(isSucces != null){
+        
+    //     }
+    // }, [])
+
+    // function showMessage(message, isSuccesMessage) {
+    //     if(isSuccesMessage) {
+    //         setTimeout(() => {
+    //             setIsSuccess(true);
+    //             setSuccesMessage(message);
+    //         }, 2000);
+    //     }
+
+    //     if(!isSuccesMessage) {
+    //         setTimeout(() => {
+    //             setIsSuccess(false);
+    //             setSuccesMessage(message);
+    //         }, 2000);
+    //     }
+    // }
+
     function postItem(e) {
         setIsError(false);
         setErrorMsg("")
@@ -95,7 +120,8 @@ function Navbar(props) {
             if(result.status === 200) {
                 setShowModal(false);
                 //this.props.setShowSuccess(true);
-                window.location.reload();
+                window.location.reload()
+                // showMessage("Folder added successfully", true);
             } else {
                 setIsError(true)
             }
@@ -132,7 +158,7 @@ function Navbar(props) {
 
         const token = JSON.parse(localStorage.getItem('tokens'));
         //5368709120 == 5 GB
-        //52428800 == 50 MB
+        //52428800 == 50 MBs
         if(totalSize + files[numb].size >= totalCapacity) {
             setMsg('You have not enough space for this file: ' + files[numb].name);
             setWarningDialog(true)
@@ -276,28 +302,29 @@ function Navbar(props) {
             cancelToken: source.token
         });
         if (response.status === 200) {
-          setProgress(100);
-          if(files.length == 1) {
-              setTimeout(() => {
-                  resetChunkProperties();
-                  setShowModal(false);
-                  setFileUploading(null);
-                  window.location.reload();
-              }, 1000);
-          } else {
-            if(files.length - 1 === fileOnSelected) {
+            setProgress(100);
+            if(files.length == 1) {
                 setTimeout(() => {
                     resetChunkProperties();
                     setShowModal(false);
                     setFileUploading(null);
-                    window.location.reload();
+                    window.location.reload()
+                    // showMessage("File added successfully", true);
                 }, 1000);
             } else {
-                setTimeout(() => {
-                    getFileContext();
-                }, 1000);
+                if(files.length - 1 === fileOnSelected) {
+                    setTimeout(() => {
+                        resetChunkProperties();
+                        setShowModal(false);
+                        setFileUploading(null);
+                        // showMessage("Files added successfully", true);
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        getFileContext();
+                    }, 1000);
+                }
             }
-          }
         }
       }
     
@@ -305,6 +332,7 @@ function Navbar(props) {
 
       <>
         <div className='flex flex-col flex-none relative xl:w-72 w-16 z-10 justify-between bg-cornblue-400'>
+            {/* { isSuccess != null && <Message succesMessage={succesMessage} isError={isSuccess} />} */}
             <div className='flex flex-col xl:p-4 p-2 space-y-12'>
                 <a className='mt-6 flex xl:flex-row items-center xl:space-x-4' href="/">
                     <svg className="xl:relative absolute w-11 h-11 text-cornblue-200" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.504 1.132a1 1 0 01.992 0l1.75 1a1 1 0 11-.992 1.736L10 3.152l-1.254.716a1 1 0 11-.992-1.736l1.75-1zM5.618 4.504a1 1 0 01-.372 1.364L5.016 6l.23.132a1 1 0 11-.992 1.736L4 7.723V8a1 1 0 01-2 0V6a.996.996 0 01.52-.878l1.734-.99a1 1 0 011.364.372zm8.764 0a1 1 0 011.364-.372l1.733.99A1.002 1.002 0 0118 6v2a1 1 0 11-2 0v-.277l-.254.145a1 1 0 11-.992-1.736l.23-.132-.23-.132a1 1 0 01-.372-1.364zm-7 4a1 1 0 011.364-.372L10 8.848l1.254-.716a1 1 0 11.992 1.736L11 10.58V12a1 1 0 11-2 0v-1.42l-1.246-.712a1 1 0 01-.372-1.364zM3 11a1 1 0 011 1v1.42l1.246.712a1 1 0 11-.992 1.736l-1.75-1A1 1 0 012 14v-2a1 1 0 011-1zm14 0a1 1 0 011 1v2a1 1 0 01-.504.868l-1.75 1a1 1 0 11-.992-1.736L16 13.42V12a1 1 0 011-1zm-9.618 5.504a1 1 0 011.364-.372l.254.145V16a1 1 0 112 0v.277l.254-.145a1 1 0 11.992 1.736l-1.735.992a.995.995 0 01-1.022 0l-1.735-.992a1 1 0 01-.372-1.364z" clip-rule="evenodd"></path></svg>
