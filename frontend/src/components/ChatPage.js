@@ -87,9 +87,12 @@ export const ChatPage = ({friendId, chatId}) => {
                     <div class="relative flex flex-row items-center justify-between border p-1 border-black rounded-2xl">
                         <input type="text" value={inputMessage} onChange={(e)=> setInputMessage(e.target.value)} placeholder="Write Something" class="w-full focus:outline-none h-8 focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-6 py-2" />
                         <div class="items-center inset-y-0 flex">
-                            <button>
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            </button>
+                            <div className="cursor-pointer">
+                                <label for="file-input" className="cursor-pointer">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </label>
+                                <input type="file" id="file-input" hidden="true" />
+                            </div>
                             <button type="submit" onClick={(e)=> sendMessage(e)} class="inline-flex items-center justify-center rounded-full h-9 w-9 text-black focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                             </button>

@@ -25,7 +25,8 @@ function ChatsPage() {
             .then(response => {
                 if(response.status === 200) {
                     setFriends(response.data);
-                    setSelectedFriend(null)
+                    setSelectedFriend(response.data[0]);
+                    handleChat(response.data[0]);
                 }
             })
     }, [token.id]);
