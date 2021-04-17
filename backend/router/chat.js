@@ -55,6 +55,23 @@ router.post('/sendmessage', (req, res)=> {
         //io.sockets.in(data.chatId).emit("message", data);
 	});
 });
+
+router.post('/sendimage', (req, res) => {
+    const data = {
+        chatId: req.body.chatId,
+        fromUser: req.body.fromUser,
+        toUser: req.body.toUser,
+        message: req.body.message,
+        isImage: 1,
+        Status: 0
+    }
+
+    con.query('INSERT INTO messages SET ?', data, (err, result) => {
+        if(err) console.log(err);
+        res.status(200).send('sended!')
+    })
+})
+
 // Get all messages from chat
 router.get('/getMessages/:chatId', async (req, res) => {
     const chatId = req.params.chatId

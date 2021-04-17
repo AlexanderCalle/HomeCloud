@@ -1,9 +1,11 @@
 import React, {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import {socket} from '../App';
+import useFileUpload from '../hooks/useFileUpload'
 
 
 export const ChatPage = ({friendId, chatId}) => {
+
 
 
     const [inputMessage, setInputMessage] = useState("");
@@ -69,6 +71,13 @@ export const ChatPage = ({friendId, chatId}) => {
         };
     };
 
+    const [ firstGetFileContext ] = useFileUpload();
+
+    function sendImage(e) {
+
+        firstGetFileContext('chat', e.target.files, chatId, friendId);
+    }
+
     return (
         <div className="justify-between flex flex-col h-full">
             <div className="flex flex-col p-4 space-y-4 items-start overflow-y-auto" ref={messageEl}>
@@ -76,7 +85,9 @@ export const ChatPage = ({friendId, chatId}) => {
                      <>
                      {message.chatId == chatId && (
                          <div className={message.fromUser === token.id ? style.sender : style.friend}>
-                            {message.message}
+                            {message.isImage == 0 ? message.message : (
+                                <img src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + message.message} />
+                            )}
                         </div>
                      )}
                     </>
@@ -91,7 +102,7 @@ export const ChatPage = ({friendId, chatId}) => {
                                 <label for="file-input" className="cursor-pointer">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </label>
-                                <input type="file" id="file-input" hidden="true" />
+                                <input type="file" id="file-input" hidden="true" onChange={(e) => sendImage(e)} multiple />
                             </div>
                             <button type="submit" onClick={(e)=> sendMessage(e)} class="inline-flex items-center justify-center rounded-full h-9 w-9 text-black focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
