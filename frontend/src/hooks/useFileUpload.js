@@ -22,6 +22,7 @@ const useFileUpload = () => {
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
+    const dateNow = new Date().getTime();
     // const totalCapacity = 26843545600;
 
     const firstGetFileContext = (foldername, files, chatId, toUser) => {
@@ -43,9 +44,11 @@ const useFileUpload = () => {
         }
 
         const token = JSON.parse(localStorage.getItem('tokens'));
+
+        const fileName = dateNow + '-' + files[numb].name;
         //5368709120 == 5 GB
         //52428800 == 50 MB
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${token.id}/${foldername}/${files[numb].name}`, {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${chatId}/${foldername}/${fileName}`, {
             cancelToken: source.token
         })
             .then(async response => {
@@ -71,9 +74,10 @@ const useFileUpload = () => {
         }
     
         const token = JSON.parse(localStorage.getItem('tokens'));
-        
-        
-        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${token.id}/${folderName}/${files[numb].name}`, {
+
+        const fileName = dateNow + '-' + files[numb].name;
+         
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/files/openStream/${chatId}/${folderName}/${fileName}`, {
             cancelToken: source.token
         })
             .then(async response => {
@@ -162,9 +166,9 @@ const useFileUpload = () => {
             numb = fileOnSelected;
         }
 
-        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/addfiles/${token.id}/${folderName}/${files[numb].name}`, {
-            cancelToken: source.token
-        });
+        const fileName = dateNow + '-' + files[numb].name;
+
+        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/addfiles/${token.id}/${folderName}/${fileName}`, {chatId: chatId});
 
         if (response.status === 200) {
 
@@ -175,7 +179,8 @@ const useFileUpload = () => {
                 chatId: chatId,
                 fromUser: token.id,
                 toUser: friendId,
-                message: `/${token.id}/${folderName}/${files[numb].name}`
+                message: `/${folderName}/${chatId}/${fileName}`,
+                isImage: true
             };
 
             socket.emit('sendMessage', {data, chatId, friendId});
@@ -186,7 +191,7 @@ const useFileUpload = () => {
                 chatId: chatId,
                 fromUser: token.id,
                 toUser: toUser,
-                message: `/${token.id}/${folderName}/${files[numb].name}`
+                message: `/${folderName}/${chatId}/${fileName}`
             }).then(resp => {
                 if(resp.status === 200) {
                     setProgress(100);

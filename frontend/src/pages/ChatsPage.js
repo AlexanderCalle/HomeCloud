@@ -144,8 +144,8 @@ function ChatsPage() {
                                                             <strong className="font-semibold">{friend.firstname} {friend.lastname}</strong>
                                                             {latestMessages.map((message) => (
                                                                 <>
-                                                                {message.fromUser == friend.id && <p className={message.Status == 0 ? "font-bold text-gray-500" : "font-normal text-gray-500"}>{message.message}</p>}
-                                                                {message.toUser == friend.id && <p className="text-gray-500">you: {message.message}</p>}
+                                                                {message.fromUser == friend.id && <p className={message.Status == 0 ? "font-bold text-gray-500" : "font-normal text-gray-500"}>{message.isImage ? friend.firstname + " sended a picture" :  message.message}</p>}
+                                                                {message.toUser == friend.id && <p className="text-gray-500"> {message.isImage ? "you sended a picture" : "you: " + message.message}</p>}
                                                                 </>
                                                             ))}
                                                         </div>

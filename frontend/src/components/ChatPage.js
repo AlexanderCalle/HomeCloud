@@ -55,7 +55,8 @@ export const ChatPage = ({friendId, chatId}) => {
                 chatId: chatId,
                 fromUser: token.id,
                 toUser: friendId,
-                message: inputMessage
+                message: inputMessage,
+                isImage: 0
             };
 
             const userId = token.id;
@@ -74,8 +75,9 @@ export const ChatPage = ({friendId, chatId}) => {
     const [ firstGetFileContext ] = useFileUpload();
 
     function sendImage(e) {
-
-        firstGetFileContext('chat', e.target.files, chatId, friendId);
+        if(e.target.files.length != 0){
+            firstGetFileContext('chat', e.target.files, chatId, friendId);
+        }
     }
 
     return (

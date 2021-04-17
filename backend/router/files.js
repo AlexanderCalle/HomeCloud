@@ -26,12 +26,17 @@ router.post('/UploadChunks', (req, res) => {
     }); 
 });
 // Opens the stream to upload file(s)
-router.get('/openStream/:userId/:foldername/:filename', async (req, res) => {
-    let path = `./upload/${req.params.userId}/${req.params.foldername}/${req.params.filename}`;
+router.get('/openStream/:id/:foldername/:filename', async (req, res) => {
+    let path = `./upload/${req.params.id}/${req.params.foldername}/${req.params.filename}`;
 
     if(req.params.foldername == 'chat') {
-        if(!fs.existsSync(`./upload/${req.params.userId}/${req.params.foldername}/`)) {
-            fs.mkdirSync(`./upload/${req.params.userId}/${req.params.foldername}/`)
+        path = `./upload/${req.params.foldername}/${req.params.id}/${req.params.filename}`
+        if(!fs.existsSync(`./upload/${req.params.foldername}/`)) {
+            fs.mkdirSync(`./upload/${req.params.foldername}/`);
+        }
+
+        if(!fs.existsSync(`./upload/${req.params.foldername}/${req.params.id}/`)) {
+            fs.mkdirSync(`./upload/${req.params.foldername}/${req.params.id}/`)
         }
     }
 
@@ -55,7 +60,7 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
         
                 const data = {
                     name: req.params.filename,
-                    path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                    path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
                     user_id: req.params.user_id,
                     folder_id: 0,
                     is_image: is_image
@@ -64,7 +69,7 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
                     if(err.code == 'ER_NO_REFERENCED_ROW_2') {
                         const data = {
                             name: 'chat',
-                            main_path: '/' + req.params.user_id + '/',
+                            main_path: '/',
                             user_id: req.params.user_id
                         }
                         con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
@@ -86,7 +91,7 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
         
                 const data = {
                     name: req.params.filename,
-                    path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                    path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
                     user_id: req.params.user_id,
                     folder_id: 0,
                     is_image: is_image
@@ -95,7 +100,7 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
                     if(err.code == 'ER_NO_REFERENCED_ROW_2') {
                         const data = {
                             name: 'chat',
-                            main_path: '/' + req.params.user_id + '/',
+                            main_path: '/',
                             user_id: req.params.user_id
                         }
                         con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {

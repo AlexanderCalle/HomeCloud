@@ -46,7 +46,8 @@ router.post('/sendmessage', (req, res)=> {
 		fromUser: req.body.fromUser,
 		toUser: req.body.toUser,
 		message: req.body.message,
-		Status: 0
+		Status: 0,
+        isImage: req.body.isImage
 	}
 
 	con.query('INSERT INTO messages SET ?', data, (err, result) => {
