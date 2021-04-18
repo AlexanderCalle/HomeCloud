@@ -224,10 +224,10 @@ router.post('/sharefile', (req, res)=> {
     }
 
     con.query('SELECT * FROM `shared` WHERE user_file = ? AND shared_user = ? AND shared_file = ?', [data.user_file, data.shared_user, data.shared_file], (err, result)=> {
-        if (err) return res.status(500).send(err);
+        if (err) return console.log(err);
         if(result.length === 0) {
             con.query('INSERT INTO `shared` SET ?', data, (err, result)=> {
-                if(err) return res.status(500).send(err);
+                if(err) return console.log(err);
                 res.status(200).send(result);
                 console.log('shared file in db!');
             })
