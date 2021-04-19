@@ -18,11 +18,12 @@ const useFileUpload = () => {
     const [fileOnSelected, setFileOnSelected] = useState(0);
     const [chatId, setChatId] = useState(null);
     const [toUser, setToUser] = useState(null);
+    const [newFilename, setNewFilename] = useState(null);
     // const token = JSON.parse(localStorage.getItem('tokens'));
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    const dateNow = new Date().getTime();
+    let dateNow = Date.now();
     // const totalCapacity = 26843545600;
 
     const firstGetFileContext = (foldername, files, chatId, toUser) => {
@@ -32,7 +33,7 @@ const useFileUpload = () => {
         setChatId( chatId );
         setToUser( toUser );
 
-        console.log(foldername);
+        // console.log(foldername);
 
         resetChunkProperties();
         setCounter(1);
@@ -54,6 +55,7 @@ const useFileUpload = () => {
             .then(async response => {
                 if(response.status === 200) {
                     setFileSize(files[numb].size);
+                    setNewFilename(response.data.fileName);
 
                     const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
                     setChunkCount(_totalCount);
@@ -83,6 +85,7 @@ const useFileUpload = () => {
             .then(async response => {
                 if(response.status === 200) {
                     setFileSize(files[numb].size);
+                    setNewFilename(response.data.fileName);
 
                     const _totalCount = files[numb].size % chunkSize == 0 ? files[numb].size / chunkSize : Math.floor(files[numb].size / chunkSize) + 1;
                     setChunkCount(_totalCount);
@@ -154,6 +157,7 @@ const useFileUpload = () => {
     }
 
     const uploadCompleted = async () => {
+
         if(files.length > 1) {
             setFileOnSelected(fileOnSelected + 1);
         }
@@ -166,9 +170,7 @@ const useFileUpload = () => {
             numb = fileOnSelected;
         }
 
-        const fileName = dateNow + '-' + files[numb].name;
-
-        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/addfiles/${token.id}/${folderName}/${fileName}`, {chatId: chatId});
+        const response = await axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/files/addfiles/${token.id}/${folderName}/${newFilename}`, {chatId: chatId});
 
         if (response.status === 200) {
 
@@ -179,7 +181,7 @@ const useFileUpload = () => {
                 chatId: chatId,
                 fromUser: token.id,
                 toUser: friendId,
-                message: `/${folderName}/${chatId}/${fileName}`,
+                message: `/${folderName}/${chatId}/${newFilename}`,
                 isImage: true
             };
 
@@ -191,7 +193,7 @@ const useFileUpload = () => {
                 chatId: chatId,
                 fromUser: token.id,
                 toUser: toUser,
-                message: `/${folderName}/${chatId}/${fileName}`
+                message: `/${folderName}/${chatId}/${newFilename}`
             }).then(resp => {
                 if(resp.status === 200) {
                     setProgress(100);

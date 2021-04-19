@@ -9,7 +9,7 @@ let chunks = [];
 // Create files out of chunks (stream)
 let ws = null;
 function writeStream(path) {
-    console.log(path);
+    // console.log(path);
     ws = fs.createWriteStream(path)
 }
 // Put chunck inside the stream and write file
@@ -41,7 +41,9 @@ router.get('/openStream/:id/:foldername/:filename', async (req, res) => {
     }
 
     await writeStream(path);
-    res.status(200).send('ok');
+    res.status(200).send({
+        fileName: req.params.filename
+    });
 });
 // Add file(s) method:Post
 router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
