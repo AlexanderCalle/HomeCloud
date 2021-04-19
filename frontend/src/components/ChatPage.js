@@ -136,8 +136,8 @@ export const ChatPage = ({friendId, chatId}) => {
                         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                             <div className="absolute inset-0 bg-gray-500 opacity-80"></div>
                         </div>
-                        <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
-                        <span className="absolute flex flex-row justify-center items-center top-2 right-2 h-9 w-9 text-white rounded-full bg-black opacity-50">&#10005;</span>
+                        <span  className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+                        <span onClick={() => setShowImage(false)} className="cursor-pointer focus:outline-none absolute flex flex-row justify-center items-center top-2 right-2 h-9 w-9 text-white rounded-full bg-black opacity-50">&#10005;</span>
                         <div className="inline-block overflow-hidden shadow-xl transform align-middle lg:max-w-2xl md:max-w-lg sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                             <img className="w-full h-full" src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + image} />
                         </div>
