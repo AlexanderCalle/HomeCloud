@@ -6,10 +6,11 @@ import useFileUpload from '../hooks/useFileUpload'
 
 export const ChatPage = ({friendId, chatId}) => {
 
-
-
     const [inputMessage, setInputMessage] = useState("");
     const [messages, setMessages] = useState([]);
+    const [showImage, setShowImage] = useState(false);
+    const [image, setImage] = useState(null);
+
     const token = JSON.parse(localStorage.getItem('tokens'));
     const messageEl = useRef(null);
 
@@ -25,6 +26,12 @@ export const ChatPage = ({friendId, chatId}) => {
         }
         
     }, [chatId]);
+
+    document.addEventListener('keydown', function(event){
+        if(event.key === "Escape"){
+          setShowImage(false);
+        }
+      });
 
     useEffect(()=> {
         axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/seenmessages/${chatId}/${token.id}`)
@@ -80,6 +87,11 @@ export const ChatPage = ({friendId, chatId}) => {
         }
     }
 
+    function scaleImage(path) {
+        setShowImage(true);
+        setImage(path);
+    }
+
     return (
         <div className="justify-between flex flex-col h-full">
             <div className="flex flex-col p-4 space-y-4 items-start overflow-y-auto" ref={messageEl}>
@@ -92,7 +104,7 @@ export const ChatPage = ({friendId, chatId}) => {
                                 {message.message}
                             </div>
                          ) : (
-                            <img className={message.fromUser === token.id ? style.senderImage : style.friendImage} src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + message.message} />
+                            <img onClick={() => scaleImage(message.message)} className={message.fromUser === token.id ? style.senderImage : style.friendImage} src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + message.message} />
                         )}
                         </>
                      )}
@@ -117,6 +129,22 @@ export const ChatPage = ({friendId, chatId}) => {
                     </div>
                 </form>
             </div>
+
+            {showImage && (
+                <div className="fixed z-10 inset-0 overflow-y-auto">
+                    <div className="block items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div className="absolute inset-0 bg-gray-500 opacity-80"></div>
+                        </div>
+                        <span className="inline-block align-middle h-screen" aria-hidden="true">&#8203;</span>
+                        <span className="absolute flex flex-row justify-center items-center top-2 right-2 h-9 w-9 text-white rounded-full bg-black opacity-50">&#10005;</span>
+                        <div className="inline-block overflow-hidden shadow-xl transform align-middle lg:max-w-2xl md:max-w-lg sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                            <img className="w-full h-full" src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + image} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }
@@ -124,6 +152,6 @@ export const ChatPage = ({friendId, chatId}) => {
 const style = {
 	sender: "max-w-lg inline-block px-4 self-end py-2 bg-blue-500 rounded-t-xl rounded-bl-xl text-white",
 	friend: "max-w-lg inline-block px-4 py-2 bg-gray-200 rounded-t-xl rounded-br-xl",
-    senderImage: "max-w-lg inline-block self-end rounded-t-xl rounded-bl-xl cursor-pointer",
-    friendImage: "max-w-lg inline-block rounded-t-xl rounded-br-xl cursor-pointer",
+    senderImage: "lg:max-w-lg md:max-w-md sm:max-w-sm max-w-xs inline-block self-end rounded-t-xl rounded-bl-xl cursor-pointer",
+    friendImage: "lg:max-w-lg md:max-w-md sm:max-w-sm max-w-xs inline-block rounded-t-xl rounded-br-xl cursor-pointer",
 }
