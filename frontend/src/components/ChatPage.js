@@ -86,11 +86,15 @@ export const ChatPage = ({friendId, chatId}) => {
                  {messages.map(message => (
                      <>
                      {message.chatId == chatId && (
-                         <div className={message.fromUser === token.id ? style.sender : style.friend}>
-                            {message.isImage == 0 ? message.message : (
-                                <img src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + message.message} />
-                            )}
-                        </div>
+                         <>
+                         {message.isImage == 0 ? (
+                            <div className={message.fromUser === token.id ? style.sender : style.friend}>
+                                {message.message}
+                            </div>
+                         ) : (
+                            <img className={message.fromUser === token.id ? style.senderImage : style.friendImage} src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + message.message} />
+                        )}
+                        </>
                      )}
                     </>
                 ))}
@@ -119,5 +123,7 @@ export const ChatPage = ({friendId, chatId}) => {
 
 const style = {
 	sender: "max-w-lg inline-block px-4 self-end py-2 bg-blue-500 rounded-t-xl rounded-bl-xl text-white",
-	friend: "max-w-lg inline-block px-4 py-2 bg-gray-200 rounded-t-xl rounded-br-xl"
+	friend: "max-w-lg inline-block px-4 py-2 bg-gray-200 rounded-t-xl rounded-br-xl",
+    senderImage: "max-w-lg inline-block self-end rounded-t-xl rounded-bl-xl cursor-pointer",
+    friendImage: "max-w-lg inline-block rounded-t-xl rounded-br-xl cursor-pointer",
 }

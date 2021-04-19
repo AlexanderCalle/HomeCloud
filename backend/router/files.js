@@ -50,73 +50,74 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
     ws.end();
 
     if(req.params.foldername == 'chat') {
-        res.status(200).send('ok');
-        // con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, 0], (err, file) => {
-        //     if(file[0] != undefined || file[0] != null) {
-        //         let is_image = 0;
+        // res.status(200).send('ok');
+        con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, 0], (err, file) => {
+            if(file[0] != undefined || file[0] != null) {
+                let is_image = 0;
 
-        //         let dataType = req.params.filename.split('.')[1].toLowerCase();
+                let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-        //         if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
-        //             is_image = 1;
-        //         }
+                if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                    is_image = 1;
+                }
         
-        //         const data = {
-        //             name: req.params.filename,
-        //             path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
-        //             user_id: req.params.user_id,
-        //             folder_id: 0,
-        //             is_image: is_image
-        //         }
-        //         con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result)=>{
-        //             if(err.code == 'ER_NO_REFERENCED_ROW_2') {
-        //                 const data = {
-        //                     name: 'chat',
-        //                     main_path: '/',
-        //                     user_id: req.params.user_id
-        //                 }
-        //                 con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
-        //                     if(err) return res.status(500).send(err);
-        //                     res.status(200).send('ok');
-        //                 });
-        //             }
-        //             if (err) return console.log(err.code);
-        //             if(!err) return res.status(200).send('ok');
-        //         }); 
-        //     } else {
-        //         res.status(200).send('ok');
-        //         // let is_image = 0;
+                const data = {
+                    name: req.params.filename,
+                    path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
+                    user_id: req.params.user_id,
+                    folder_id: 0,
+                    is_image: is_image
+                }
+                con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result)=>{
+                    if(err.code == 'ER_NO_REFERENCED_ROW_2') {
+                        const data = {
+                            folder_id: 0,
+                            name: 'chat',
+                            main_path: '/',
+                            user_id: req.params.user_id
+                        }
+                        con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
+                            if(err) return res.status(500).send(err);
+                            res.status(200).send('ok');
+                        });
+                    }
+                    if (err) return console.log(err.code);
+                    if(!err) return res.status(200).send('ok');
+                }); 
+            } else {
+                // res.status(200).send('ok');
+                let is_image = 0;
 
-        //         // let dataType = req.params.filename.split('.')[1].toLowerCase();
+                let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-        //         // if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
-        //         //     is_image = 1;
-        //         // }
+                if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                    is_image = 1;
+                }
         
-        //         // const data = {
-        //         //     name: req.params.filename,
-        //         //     path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
-        //         //     user_id: req.params.user_id,
-        //         //     folder_id: 0,
-        //         //     is_image: is_image
-        //         // }
-        //         // con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-        //         //     if(err.code == 'ER_NO_REFERENCED_ROW_2') {
-        //         //         const data = {
-        //         //             name: 'chat',
-        //         //             main_path: '/',
-        //         //             user_id: req.params.user_id
-        //         //         }
-        //         //         con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
-        //         //             if(err) return res.status(500).send(err);
-        //         //             res.status(200).send('ok');
-        //         //         });
-        //         //     }
-        //         //     if (err) return console.log(err.code);
-        //         //     if(!err) return res.status(200).send('ok');
-        //         // }); 
-        //     }
-        //})
+                const data = {
+                    name: req.params.filename,
+                    path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
+                    user_id: req.params.user_id,
+                    folder_id: 0,
+                    is_image: is_image
+                }
+                con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
+                    if(!err) return res.status(200).send('ok');
+                    if(err.code == 'ER_NO_REFERENCED_ROW_2') {
+                        const data = {
+                            name: 'chat',
+                            main_path: '/',
+                            user_id: req.params.user_id
+                        }
+                        con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
+                            if(err) return res.status(500).send(err);
+                            res.status(200).send('ok');
+                        });
+                    }
+                    if (err) return console.log(err.code);
+                }); 
+            }
+        })
     }
 
     if(req.params.foldername != 'chat') {
