@@ -349,6 +349,7 @@ function Collection() {
                     IsSelecting={isSelecting}
                     renameFile={renameFile}
                     setShowSharedModal={setShowSharedModal}
+                    setFile={setFile}
                   />
                 </div>
               )}
