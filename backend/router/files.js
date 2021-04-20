@@ -17,11 +17,11 @@ router.post('/UploadChunks', (req, res) => {
     var size = 0;
     req.on('data', function (data) {
         size += data.length;
-        console.log('Got chunk: ' + data.length + ' total: ' + size);
+        // console.log('Got chunk: ' + data.length + ' total: ' + size);
         ws.write(data);
     });
     req.on('end', function () {
-        console.log("total size = " + size);
+        // console.log("total size = " + size);
         res.status(200).send("response");
     }); 
 });

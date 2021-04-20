@@ -46,13 +46,6 @@ export const ChatPage = ({friendId, chatId}) => {
         socket.on('message', message => {
             setMessages(messages => [ ...messages, message ]);
           });
-
-        if(messageEl) {
-          messageEl.current.addEventListener('DOMNodeInserted', event => {
-            const { currentTarget: target } = event;
-            target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
-          });
-        }
       }, [])
 
     function sendMessage(e) {
@@ -92,6 +85,15 @@ export const ChatPage = ({friendId, chatId}) => {
         setImage(path);
     }
 
+    // scroll to bottom of screen
+    const messagesEndRef = useRef(null)
+
+    const scrollToBottom = () => {
+      messagesEndRef.current.scrollIntoView()
+    }
+    
+    useEffect(scrollToBottom, [messages]);
+
     return (
         <div className="justify-between flex flex-col h-full">
             <div className="flex flex-col p-4 space-y-4 items-start overflow-y-auto" ref={messageEl}>
@@ -110,6 +112,7 @@ export const ChatPage = ({friendId, chatId}) => {
                      )}
                     </>
                 ))}
+                <div ref={messagesEndRef} />
             </div>          
             <div class="mt-2 border-gray-200 pt-4 mb-1 sm:mb-0">
                 <form onSubmit={(e)=> sendMessage(e)}>
