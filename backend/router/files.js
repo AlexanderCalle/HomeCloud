@@ -245,4 +245,32 @@ router.get('/getshared/:userId', (req, res)=> {
     })
 });
 
+router.get('/getMedia/:chatId/page=/:page', (req, res)=> {
+    var numPerPage = 9;
+    var page = parseInt(req.params.page);
+    var skip = (page - 1) * numPerPage;
+    var limit = skip + ',' + numPerPage;
+
+    con.query('SELECT count(*) as numRows FROM files WHERE folder_id = "0" AND path LIKE ?', '/chat/' + req.params.chatId + '/%', (err, rows, fields) => {
+        if(err){
+            console.log("error: " , err);
+            res.status(500).send("Failed loading data");
+        } else {
+            var numRows = rows[0].numRows;
+            var numPages = Math.ceil(numRows / numPerPage);
+
+            con.query('SELECT * FROM files WHERE folder_id = "0" AND path LIKE ? LIMIT '+limit, '/chat/' + req.params.chatId + '/%', (err, rows, fields) => {
+                if(err){
+                    console.log("error: ", err);
+                    res.status(200).send("Failed to laod data");
+                } else {
+                    res.status(200).send(rows);
+                }
+            })
+
+        }
+    })
+
+})
+
 module.exports = router;

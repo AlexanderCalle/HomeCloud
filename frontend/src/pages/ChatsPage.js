@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Navbar from '../components/NavBar';
+import Media from '../components/Media';
 import '../index.css';
 import Transition from '../components/transition';
 import axios from 'axios';
@@ -54,7 +55,6 @@ function ChatsPage() {
     }, [chatId]) // not sure yet
 
     useEffect(() => {
-        console.log(isStatic);
         socket.on('latest', () => {
             axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getlatestmessages/${token.id}`)
             .then(response => {
@@ -214,10 +214,11 @@ function ChatsPage() {
                                         <div className="w-full flex flex-col space-y-2">
                                             <div className="flex flex-row justify-between border-b">
                                                 <p>Media</p>
-                                                <button>
+                                                {/* <button>
                                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                                </button>
+                                                </button> */}
                                             </div>
+                                            <Media chatId={chatId} />
                                         </div>
                                     </div>
                                 </div>
