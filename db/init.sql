@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     email VARCHAR(255) not null,
     password_hash VARCHAR(255) NOT NULL,
     folder_path VARCHAR(255),
-    profile_picture VARCHAR(255) DEFAULT NULL,
+    profile_pic VARCHAR(255) DEFAULT NULL,
     resetPasswordCode INT(7),
     resetPasswordExpired DATETIME,
     PRIMARY KEY(id)

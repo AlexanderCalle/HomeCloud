@@ -5,15 +5,16 @@ cls
 
 if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
-    set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.6\bin\"
+    set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.7\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    set "nodejsPath=%ProgramFiles%\nodejs"
     if not exist mkdir %ProgramFiles%\HomeCloud
-    
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
-    set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.6\bin\"
+    set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.7\bin\"
     set "HomeCloudPath=%ProgramFiles(x86)%\HomeCloud\"
     If not exist mkdir %ProgramFiles%\HomeCloud
+    set "nodejsPath=%ProgramFiles(x86)%\nodejs"
 )
 
 for %%i in ("%~dp0.") do set "mypath=%%~fi"
@@ -29,9 +30,13 @@ echo REACT_APP_HOST_IP=%ipAddress% >> %mypath%\frontend\.env
 xcopy /e /v "%mypath%" "%HomeCloudPath%"
 
 echo Starting MySQL install ...
+
+%mypath%\vcredist_x86.exe /q /norestart
+%mypath%\vcredist_x64.exe /q /norestart
+
 %SystemRoot%\System32\msiexec.exe /i https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /qn
 cd %MySQLServerPath%
-MySQLInstallerConsole community install server;5.6.24;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
+MySQLInstallerConsole community install server;5.7.14;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
 echo MySQL installed successfully.
 
 rem if not "%PATH:~-1%" == ";" set "PATH=%PATH%;"
@@ -46,12 +51,14 @@ cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
 mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql"
 
-cd %HomeCloudPath%/backend && CMD /C "npm install"
+SET PATH=%nodejsPath%;%PATH%
 
-cd %HomeCloudPath%/frontend && CMD /C "npm install"
+cd %HomeCloudPath%/backend && CMD /c "npm install"
+
+cd %HomeCloudPath%/frontend && CMD /c "npm install"
 
 cd %HomeCloudPath%/backend
-start /min cmd /k "node server.js"
+start /min CMD /k "node server.js"
 
 cd %HomeCloudPath%/frontend
 start /min CMD /k "npm run start"
