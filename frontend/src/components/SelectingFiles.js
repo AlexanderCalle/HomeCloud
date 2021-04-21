@@ -57,58 +57,79 @@ class SelecingFiles extends Component {
     };
 
     selectAll = () => {
-        this.state.files.forEach(item => {
-            item.isSelect = true;
-            if(item.isSelect){
-                const obj = {
-                    name: item.name,
-                    file: item.path,
-                    filename: item.name,
-                    is_image: item.is_image,
-                    fileId: item.file_id
-                };
-                selected.push(obj);
-            }
-        })
+        var filteredFiles = []
+
+        for(let file of this.state.files) {
+            if(!this.state.selected.find(selected => selected.fileId == file.file_id))filteredFiles.push(file)
+        }
+        if(this.state.selected.length < this.state.files.length) {
+            filteredFiles.forEach(item => {
+                item.isSelect = true;
+                if(item.isSelect){
+                    const obj = {
+                        name: item.name,
+                        file: item.path,
+                        filename: item.name,
+                        is_image: item.is_image,
+                        fileId: item.file_id
+                    };
+                    selected.push(obj);
+                }
+            });
+        } else {
+            console.log("helll");
+            this.state.files.forEach(item => {
+                item.isSelect = false;
+                for(let i = 0; i < selected.length; i++) {
+                    if(selected[i].fileId === item.file_id) {
+                        selected.splice(i, 1)
+                    }
+                }
+            });
+        }
+
         this.setState({selected: selected});
         this.props.setSelected(selected)
     }
     
     render() {
         return (
-            <>
-            {this.state.files.map((file => {
-                return (
-                    <div className={file.isSelected ? styles.selected : styles.normal} onClick={() => {
-                        this.selectItem(file)
-                    }}>
-                        <div className="flex flex-row items-center">
-                            {file.isSelect ? (
-                                <>
-                                <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </>
-                            ) : (
-                                <>
-                                <svg class="ml-2" width="1.5rem" height="1.5rem">
-                                    <circle cx="0.7rem" cy="0.7rem" r="0.50rem" stroke="currentColor" stroke-width="2" fill="none" />
-                                </svg>
-                                </>
-                            )}
-                            <a className="flex-auto cursor-pointer ">
-                                <div className="p-3 space-y-4">
-                                    <div className="flex flex-row items-center space-x-2">
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                        <strong className="flex-grow text-sm font-normal">{file.name}</strong>
+            <div>
+                <button className="p-1 rounded-md absolute right-2 top-24 focus:outline-none border bg-cornblue-200 border-cornblue-400 hover:bg-cornblue-400 text-cornblue-600 hover:text-cornblue-200" onClick={this.selectAll}>Select all</button>
+                <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                {this.state.files.map((file => {
+                    return (
+                        <div className={file.isSelected ? styles.selected : styles.normal} onClick={() => {
+                            this.selectItem(file)
+                        }}>
+                            <div className="flex flex-row items-center">
+                                {file.isSelect ? (
+                                    <>
+                                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </>
+                                ) : (
+                                    <>
+                                    <svg class="ml-2" width="1.5rem" height="1.5rem">
+                                        <circle cx="0.7rem" cy="0.7rem" r="0.50rem" stroke="currentColor" stroke-width="2" fill="none" />
+                                    </svg>
+                                    </>
+                                )}
+                                <a className="flex-auto cursor-pointer ">
+                                    <div className="p-3 space-y-4">
+                                        <div className="flex flex-row items-center space-x-2">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                            <strong className="flex-grow text-sm font-normal">{file.name}</strong>
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
 
+                            </div>
                         </div>
-                    </div>
-            )
-            }))}
+                        )  
+                    }))}
+                </div>
             
-            </>
+            </div>
         )
     }
 }

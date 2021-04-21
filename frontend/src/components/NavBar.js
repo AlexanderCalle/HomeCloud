@@ -4,8 +4,8 @@ import { useAuth } from '../context/auth';
 import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
-import WarningDialog from './warningDialog';
 import ProgressRing from './CircleProgress';
+import useFileUpload from '../hooks/useFileUpload';
 
 let chunkSize = 1024*1024; // 1MB
 
@@ -405,7 +405,7 @@ function Navbar(props) {
                                 </div>
                                 <div className="flex flex-row items-center space-x-2 text-right">
                                     <span className="text-xs font-bold inline-block text-cornblue-200">
-                                        { progressSpace > 0 && usedSpace + '/5.0 GB' }
+                                        { progressSpace > 0 && usedSpace + '/25 GB' }
                                     </span>
                                 </div>
                             </div>
