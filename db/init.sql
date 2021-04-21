@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     email VARCHAR(255) not null,
     password_hash VARCHAR(255) NOT NULL,
     folder_path VARCHAR(255),
-    profile_picture VARCHAR(255) DEFAULT NULL,
+    profile_pic VARCHAR(255) DEFAULT NULL,
     resetPasswordCode INT(7),
     resetPasswordExpired DATETIME,
     PRIMARY KEY(id)
@@ -38,20 +38,8 @@ CREATE TABLE IF NOT EXISTS `friends` (
     `UserOne` VARCHAR(255) NOT NULL,
     `UserTwo` VARCHAR(255) NOT NULL,
     `Status` INT(3) NOT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`FriendsId`)
-);
-
-CREATE TABLE IF NOT EXISTS `messages` (
-	message_id INT(11) NOT NULL AUTO_INCREMENT,
-    chatId INT(11) NOT NULL,
-	fromUser VARCHAR(255) NOT NULL,
-	toUser VARCHAR(255) NOT NULL,
-	message LONGTEXT NOT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	`Status` TINYINT NOT NULL DEFAULT 0,
-	PRIMARY KEY (message_id),
-    FOREIGN KEY (chatId) REFERENCES `chats`(chatId)
 );
 
 CREATE TABLE IF NOT EXISTS `chats` (
@@ -60,6 +48,19 @@ CREATE TABLE IF NOT EXISTS `chats` (
 	userTwo VARCHAR(255) NOT NULL,
 	PRIMARY KEY (chatId)
 );
+
+CREATE TABLE IF NOT EXISTS `messages` (
+	message_id INT(11) NOT NULL AUTO_INCREMENT,
+    chatId INT(11) NOT NULL,
+	fromUser VARCHAR(255) NOT NULL,
+	toUser VARCHAR(255) NOT NULL,
+	message LONGTEXT NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	`Status` TINYINT NOT NULL DEFAULT 0,
+	PRIMARY KEY (message_id),
+    FOREIGN KEY (chatId) REFERENCES `chats`(chatId)
+);
+
 
 CREATE TABLE `shared` (
 	shared_id INT(11) NOT NULL AUTO_INCREMENT,

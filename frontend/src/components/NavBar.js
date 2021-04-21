@@ -51,6 +51,7 @@ function Navbar(props) {
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
+    const totalCapacity = 26843545600;
 
     function logOut() {
         setAuthTokens(null);
@@ -132,7 +133,7 @@ function Navbar(props) {
         const token = JSON.parse(localStorage.getItem('tokens'));
         //5368709120 == 5 GB
         //52428800 == 50 MB
-        if(totalSize + files[numb].size >= 5368709120 ) {
+        if(totalSize + files[numb].size >= totalCapacity) {
             setMsg('You have not enough space for this file: ' + files[numb].name);
             setWarningDialog(true)
         } else {
@@ -166,7 +167,7 @@ function Navbar(props) {
     
         const token = JSON.parse(localStorage.getItem('tokens'));
         
-        if(totalSize + files[numb].size >= 5368709120) {
+        if(totalSize + files[numb].size >= totalCapacity) {
             setMsg('You have not enough space for this file');
             setWarningDialog(true)
         } else {

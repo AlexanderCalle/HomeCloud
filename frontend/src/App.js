@@ -9,7 +9,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import MyProfile from './pages/myProfile';
 import ChatsPage from './pages/ChatsPage';
-import FriendsPage from './pages/FriendsPage';
+import FriendsPage from './pages/friendsPage';
 import SharedPage from './pages/shared';
 import socketIOClient from "socket.io-client";
 import EmailForm from "./pages/emailForm";

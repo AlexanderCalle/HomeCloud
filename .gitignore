@@ -4,11 +4,12 @@ frontend/node_modules
 
 # Backend
 /backend/.env
-backend/upload
+backend/upload/*
 
 # dependencies
 frontend/.pnp
 frontend.pnp.js
+frontend/.env
 
 # testing
 frontend/coverage
