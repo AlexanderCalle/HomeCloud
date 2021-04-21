@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     email VARCHAR(255) not null,
     password_hash VARCHAR(255) NOT NULL,
     folder_path VARCHAR(255),
-    profile_picture VARCHAR(255) DEFAULT NULL,
+    profile_pic VARCHAR(255) DEFAULT NULL,
     resetPasswordCode INT(7),
     resetPasswordExpired DATETIME,
     PRIMARY KEY(id)
@@ -72,6 +72,7 @@ CREATE TABLE `shared` (
 	PRIMARY KEY (shared_id),
 	FOREIGN KEY (shared_file) REFERENCES `files`(file_id)
 );
+
 
 INSERT INTO users set id = "0", firstname = "admin", lastname = "admin", email = "admin@admin.com", password_hash = "nqmljflmsqjdf";
 INSERT INTO folders set folder_id = 0, name = "chat", main_path = "/", user_id = "0";
