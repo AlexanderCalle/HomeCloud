@@ -7,13 +7,14 @@ if "%ProgramFiles(x86)%" == "" (
     set "MySQLServerPath=%ProgramFiles%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles%\MySQL\MySQL Server 5.7\bin\"
     set "HomeCloudPath=%ProgramFiles%\HomeCloud\"
+    set "nodejsPath=%ProgramFiles%\nodejs"
     if not exist mkdir %ProgramFiles%\HomeCloud
-    
 ) else (
     set "MySQLServerPath=%ProgramFiles(x86)%\MySQL\MySQL Installer for Windows\"
     set "MySQLCommand=%ProgramFiles(x86)%\MySQL\MySQL Server 5.7\bin\"
     set "HomeCloudPath=%ProgramFiles(x86)%\HomeCloud\"
     If not exist mkdir %ProgramFiles%\HomeCloud
+    set "nodejsPath=%ProgramFiles(x86)%\nodejs"
 )
 
 for %%i in ("%~dp0.") do set "mypath=%%~fi"
@@ -29,6 +30,10 @@ echo REACT_APP_HOST_IP=%ipAddress% >> %mypath%\frontend\.env
 xcopy /e /v "%mypath%" "%HomeCloudPath%"
 
 echo Starting MySQL install ...
+
+%mypath%\vcredist_x86.exe /q /norestart
+%mypath%\vcredist_x64.exe /q /norestart
+
 %SystemRoot%\System32\msiexec.exe /i https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.23.0.msi /qn
 cd %MySQLServerPath%
 MySQLInstallerConsole community install server;5.7.14;x86:*:port=3306;rootpasswd=mysql;servicename=MySQL -silent
@@ -46,9 +51,11 @@ cd %MySQLCommand%
 mysql.exe -uroot -pmysql -e "CREATE DATABASE HomeCloud;"
 mysql.exe --database=HomeCloud -uroot -pmysql -e "source %HomeCloudPath%db\init.sql"
 
-cd %HomeCloudPath%/backend && CMD /k "npm install"
+SET PATH=%nodejsPath%;%PATH%
 
-cd %HomeCloudPath%/frontend && CMD /k "npm install"
+cd %HomeCloudPath%/backend && CMD /c "npm install"
+
+cd %HomeCloudPath%/frontend && CMD /c "npm install"
 
 cd %HomeCloudPath%/backend
 start /min CMD /k "node server.js"
