@@ -115,7 +115,7 @@ router.post('/seenmessages/:chatId/:userId', (req, res) => {
 });
 
 router.get('/getMessages/:chatId/page=:page', (req, res) => {
-    var numPerPage = 10;
+    var numPerPage = 20;
     var page = parseInt(req.params.page);
     var skip = (page - 1) * numPerPage;
     var limit = skip + ',' + numPerPage;
@@ -124,9 +124,16 @@ router.get('/getMessages/:chatId/page=:page', (req, res) => {
             res.status(500).send(err);
         } else {
             var numRows = rows[0].numRows;
+            var numPages = Math.ceil(numRows / numPerPage);
             con.query('SELECT * FROM messages WHERE chatId = ? ORDER BY message_id DESC LIMIT ' + limit, req.params.chatId, (err, rows, fields) => {
-                if (err) return res.status(500).send(err) 
-                if (!err) return res.status(200).send(rows.reverse());
+                if (err) {
+                    res.status(500).send(err) 
+                } else {
+                    res.status(200).send({
+                        messages: rows.reverse(), 
+                        total: numPages
+                    });
+                }
             })
         }
     })
