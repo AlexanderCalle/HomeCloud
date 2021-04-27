@@ -174,18 +174,33 @@ function userJoin(id, userId){
 function getUser(userId) {
     return usersChats.find(user => user.userId == userId);
   }
+function getUserSocket(socketId) {
+    return usersChats.find(user => user.id == socketId)
+}
 // Create socket
 io.on("connection", socket => {  
     socket.emit('connection', null);
 
 	socket.on('joinchat', ({chatId, userId}) => {
+        console.log(`User joind room ${chatId}`);
         socket.join(chatId);
         userJoin(socket.id, userId);
     });
     
-    socket.on('sendMessage', ({data, chatId}) => {    
-        io.sockets.to(chatId).emit('message', data);
-        io.sockets.to(chatId).emit('latest', data);
+    socket.on('sendMessage', ({data, chatId}) => {        
+        var rooms = io.sockets.adapter.rooms;
+        for(let room of rooms) {
+            if(room[0] == chatId) {
+                room[1].forEach(user => {
+                    const pers = getUserSocket(user)
+                    io.to(pers.id).emit('message', data);
+                    io.to(pers.id).emit('latest');
+                })
+            }
+        }
+        // io.to(chatId).emit('message', data);
+        // io.in(chatId).emit('latest', data);
+        // console.log(socket.adapter.rooms, user)
     });
 
     socket.on('sendMelding', ({userId, friendId}) => {           
@@ -193,7 +208,6 @@ io.on("connection", socket => {
         const currentUser = getUser(userId);
         if(user != undefined) {
             io.to(user.id).emit('latest');
-
             if(currentUser != undefined) {
                 io.to(currentUser.id).emit('latest');
             }
