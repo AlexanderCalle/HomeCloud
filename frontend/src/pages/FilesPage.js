@@ -32,10 +32,11 @@ function Collection() {
   const [searchInput, setSearchInput] = React.useState("");
   const [friends, setFriends] = React.useState(null);
   const [searchValue, setSearchValue] = React.useState("");
-    const [foldersFound, setFoldersFound] = React.useState([]);
-    const [filesFound, setFilesFound] = React.useState([]);
+  const [foldersFound, setFoldersFound] = React.useState([]);
+  const [filesFound, setFilesFound] = React.useState([]);
+  const [grid, setGrid] = React.useState(true);
 
-  const [showSuccess, setShowSuccess] = React.useState(false)
+  // const [showSuccess, setShowSuccess] = React.useState(false)
 
   const [file, setFile] = React.useState({
     name: null,
@@ -301,8 +302,12 @@ function Collection() {
               <button className="focus:outline-none" onClick={() => setIsSelecting(!isSelecting)}>
                 <svg class={isSelecting ? "w-6 h-6 text-cornblue-400 feather feather-check-circle" : "w-6 h-6 feather feather-check-circle"} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
               </button>
-              <button className="focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+              <button className="focus:outline-none" onClick={()=> setGrid(!grid)}>
+                {!grid ? 
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                :
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                }
               </button>
               {isSelecting && (
                 <button className="focus:outline-none" onClick={downloadSelected}>
@@ -339,19 +344,39 @@ function Collection() {
                 />
                 </>
               ) : (
-                <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                  <File 
-                    downloadFunction={downloadFunction} 
-                    deletefile={deletefile} 
-                    fileShowing={fileShowing} 
-                    fileshow={fileshow} 
-                    folderId={folderId}
-                    IsSelecting={isSelecting}
-                    renameFile={renameFile}
-                    setShowSharedModal={setShowSharedModal}
-                    setFile={setFile}
-                  />
-                </div>
+                <>
+                {
+                  grid ? (
+                    <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                      <File 
+                        downloadFunction={downloadFunction} 
+                        deletefile={deletefile} 
+                        fileShowing={fileShowing} 
+                        fileshow={fileshow} 
+                        folderId={folderId}
+                        IsSelecting={isSelecting}
+                        renameFile={renameFile}
+                        setShowSharedModal={setShowSharedModal}
+                        setFile={setFile}
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex-auto overflow-y-auto flex flex-col w-full space-y-4">
+                      <File 
+                        downloadFunction={downloadFunction} 
+                        deletefile={deletefile} 
+                        fileShowing={fileShowing} 
+                        fileshow={fileshow} 
+                        folderId={folderId}
+                        IsSelecting={isSelecting}
+                        renameFile={renameFile}
+                        setShowSharedModal={setShowSharedModal}
+                        setFile={setFile}
+                      />
+                    </div>
+                  )
+                }
+                </>
               )}
             </div>
             </>

@@ -27,6 +27,7 @@ function SharedPage() {
     const [fileshow, setFileshow] = useState(false);
     const [selectingFiles, setSelectingFiles] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [grid, setGrid] = useState(true);
     const [downloadFile, donwloadfolder,downloaderComponent] = useFileDownloader();
 
     const download = (file) => downloadFile(file);
@@ -86,15 +87,19 @@ function SharedPage() {
                         </div>
                         <div className="flex flex-row items-end space-x-2">
                             {selectingFiles ? (
-                                    <button className="focus:outline-none" onClick={downloadSelected}>
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                    </button>
+                                <button className="focus:outline-none" onClick={downloadSelected}>
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </button>
                             ):null}
                             <button className="focus:outline-none" onClick={()=> setSelectingFiles(!selectingFiles)}>
                                 <svg class={selectingFiles ? "w-6 h-6 text-cornblue-400 feather feather-check-circle" : "w-6 h-6 feather feather-check-circle"} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             </button>
-                            <button className="focus:outline-none">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <button className="focus:outline-none" onClick={()=> setGrid(!grid)}>
+                                {!grid ? 
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                                :
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                }
                             </button>
                             <button className="focus:outline-none">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>   
@@ -105,39 +110,79 @@ function SharedPage() {
                     <>
                     
                         {!selectingFiles ? (
-                            <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                            {files.length > 0 && (
-                                <>
-                                {files.map(file => (
-                                    <>
-                                    <ContextMenuTrigger id={file.file_id}>
-                                        <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
-                                            <div className="flex flex-row items-center">
-                                                <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
-                                                    <div className="p-3 space-y-4">
-                                                        <div className="flex flex-row items-center space-x-2">
-                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                                            <strong className="text-sm font-normal">{file.name}</strong>
+                            <>
+                            {
+                                grid ? (
+                                    <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                                    {files.length > 0 && (
+                                        <>
+                                        {files.map(file => (
+                                            <>
+                                            <ContextMenuTrigger id={file.file_id}>
+                                                <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
+                                                    <div className="flex flex-row items-center">
+                                                        <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
+                                                            <div className="p-3 space-y-4">
+                                                                <div className="flex flex-row items-center space-x-2">
+                                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                                    <strong className="text-sm font-normal">{file.name}</strong>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </ContextMenuTrigger>
+                                            <ContextMenu id={file.file_id}>
+                                                <MenuItem
+                                                    data={{ action: 'paste' }}
+                                                    onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
+                                                    attributes={attributes}
+                                                >
+                                                Download
+                                                </MenuItem>
+                                            </ContextMenu>
+                                            </>
+                                        ))}
+                                        </>   
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="mt-4 flex-auto overflow-y-auto flex flex-col w-full space-y-4">
+                                        {files.length > 0 && (
+                                            <>
+                                            {files.map(file => (
+                                                <>
+                                                <ContextMenuTrigger id={file.file_id}>
+                                                    <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
+                                                        <div className="flex flex-row items-center">
+                                                            <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
+                                                                <div className="p-3 space-y-4">
+                                                                    <div className="flex flex-row items-center space-x-2">
+                                                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                                        <strong className="text-sm font-normal">{file.name}</strong>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
                                                         </div>
                                                     </div>
-                                                </a>
-                                            </div>
+                                                </ContextMenuTrigger>
+                                                <ContextMenu id={file.file_id}>
+                                                    <MenuItem
+                                                        data={{ action: 'paste' }}
+                                                        onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
+                                                        attributes={attributes}
+                                                    >
+                                                    Download
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                                </>
+                                            ))}
+                                            </>   
+                                            )}
                                         </div>
-                                    </ContextMenuTrigger>
-                                    <ContextMenu id={file.file_id}>
-                                        <MenuItem
-                                            data={{ action: 'paste' }}
-                                            onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
-                                            attributes={attributes}
-                                        >
-                                        Download
-                                        </MenuItem>
-                                    </ContextMenu>
-                                    </>
-                                ))}
-                                </>   
-                                )}
-                            </div>
+                                ) 
+                            }
+                            </>
                         ): (
                             <SelecingFiles setSelected={setSelectedFiles} />
                         )}
