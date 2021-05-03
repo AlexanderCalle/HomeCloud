@@ -267,8 +267,8 @@ function Collection() {
       
       <Navbar page={"file"} />
       
-      <div className='flex flex-row flex-auto bg-white'>
-        <div className="w-full flex flex-col p-4">
+      <div className='flex flex-row h-screen flex-auto bg-white'>
+        <div className="w-full h-full flex flex-col p-4 overflow-y-auto">
           <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
             <div className="flex flex-row space-x-2">
               <>
@@ -333,7 +333,7 @@ function Collection() {
             </div>
           </div>
           {filesFound.length === 0 && foldersFound.length === 0 ? (
-            <>
+            <div className="overflow-y-auto">
             <h1 className="mt-4 text-xl font-bold">{foldername}</h1>    
             <div>
               {isSelecting ? (
@@ -347,7 +347,7 @@ function Collection() {
                 <>
                 {
                   grid ? (
-                    <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                    <div className="mt-4 overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                       <File 
                         downloadFunction={downloadFunction} 
                         deletefile={deletefile} 
@@ -361,7 +361,7 @@ function Collection() {
                       />
                     </div>
                   ) : (
-                    <div className="mt-4 flex-auto overflow-y-auto flex flex-col w-full space-y-4">
+                    <div className="mt-4 overflow-y-auto flex flex-col w-full space-y-4">
                       <File 
                         downloadFunction={downloadFunction} 
                         deletefile={deletefile} 
@@ -379,7 +379,7 @@ function Collection() {
                 </>
               )}
             </div>
-            </>
+            </div>
           ) : ( 
           <>
             <h1 className="mt-4 text-xl font-bold">Items Found</h1>

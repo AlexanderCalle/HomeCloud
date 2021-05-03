@@ -79,7 +79,7 @@ function SharedPage() {
         <div className='flex flex-row h-screen bg-gray-100'>
             <Navbar page={"shared"} />
             <div className='flex-auto bg-white'>
-                <div className="w-full flex flex-col p-6">
+                <div className="w-full h-full flex flex-col p-6">
                     <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
                         <div className="flex flex-row items-end space-x-4">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -106,48 +106,16 @@ function SharedPage() {
                             </button>
                         </div>
                     </div>
-                    <h1 className="mt-4 text-xl font-bold">Shared with me</h1>
-                    <>
-                    
-                        {!selectingFiles ? (
-                            <>
-                            {
-                                grid ? (
-                                    <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                                    {files.length > 0 && (
-                                        <>
-                                        {files.map(file => (
-                                            <>
-                                            <ContextMenuTrigger id={file.file_id}>
-                                                <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
-                                                    <div className="flex flex-row items-center">
-                                                        <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
-                                                            <div className="p-3 space-y-4">
-                                                                <div className="flex flex-row items-center space-x-2">
-                                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                                                    <strong className="text-sm font-normal">{file.name}</strong>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </ContextMenuTrigger>
-                                            <ContextMenu id={file.file_id}>
-                                                <MenuItem
-                                                    data={{ action: 'paste' }}
-                                                    onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
-                                                    attributes={attributes}
-                                                >
-                                                Download
-                                                </MenuItem>
-                                            </ContextMenu>
-                                            </>
-                                        ))}
-                                        </>   
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="mt-4 flex-auto overflow-y-auto flex flex-col w-full space-y-4">
+
+                    <div className="overflow-y-auto">
+                        <h1 className="mt-4 text-xl font-bold">Shared with me</h1>
+                        <>
+                        
+                            {!selectingFiles ? (
+                                <>
+                                {
+                                    grid ? (
+                                        <div className="mt-4 flex-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                                         {files.length > 0 && (
                                             <>
                                             {files.map(file => (
@@ -180,13 +148,48 @@ function SharedPage() {
                                             </>   
                                             )}
                                         </div>
-                                ) 
-                            }
-                            </>
-                        ): (
-                            <SelecingFiles setSelected={setSelectedFiles} />
-                        )}
-                    </>
+                                    ) : (
+                                        <div className="mt-4 flex-auto flex flex-col w-full space-y-4">
+                                            {files.length > 0 && (
+                                                <>
+                                                {files.map(file => (
+                                                    <>
+                                                    <ContextMenuTrigger id={file.file_id}>
+                                                        <div className="border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" >
+                                                            <div className="flex flex-row items-center">
+                                                                <a className="flex-auto cursor-pointer" onClick={()=> fileShowing(file.path, file.name, file.is_image, file.file_id)}>
+                                                                    <div className="p-3 space-y-4">
+                                                                        <div className="flex flex-row items-center space-x-2">
+                                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                                            <strong className="text-sm font-normal">{file.name}</strong>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </ContextMenuTrigger>
+                                                    <ContextMenu id={file.file_id}>
+                                                        <MenuItem
+                                                            data={{ action: 'paste' }}
+                                                            onClick={() => downloadFunction(file.name, file.path, file.name, file.is_image)}
+                                                            attributes={attributes}
+                                                        >
+                                                        Download
+                                                        </MenuItem>
+                                                    </ContextMenu>
+                                                    </>
+                                                ))}
+                                                </>   
+                                                )}
+                                            </div>
+                                    ) 
+                                }
+                                </>
+                            ): (
+                                <SelecingFiles setSelected={setSelectedFiles} />
+                            )}
+                        </>
+                    </div>
                 </div>
                 {fileshow ? (     
                     <div className="fixed z-10 inset-0 overflow-y-auto">
