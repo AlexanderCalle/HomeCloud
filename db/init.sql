@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
 	fromUser VARCHAR(255) NOT NULL,
 	toUser VARCHAR(255) NOT NULL,
 	message LONGTEXT NOT NULL,
+    isImage TINYINT NOT NULL DEFAULT 0,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	`Status` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY (message_id),
@@ -71,3 +72,7 @@ CREATE TABLE `shared` (
 	PRIMARY KEY (shared_id),
 	FOREIGN KEY (shared_file) REFERENCES `files`(file_id)
 );
+
+
+INSERT INTO users set id = "0", firstname = "admin", lastname = "admin", email = "admin@admin.com", password_hash = "nqmljflmsqjdf";
+INSERT INTO folders set folder_id = 0, name = "chat", main_path = "/", user_id = "0";

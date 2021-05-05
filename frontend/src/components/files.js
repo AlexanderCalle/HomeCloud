@@ -70,7 +70,8 @@ class File extends Component {
                         </MenuItem>
                         <MenuItem
                             data={{ action: 'paste' }}
-                            onClick={() => this.props.setShowSharedModal(true)}
+                            onClick={() => {this.props.setShowSharedModal(true)
+                                 this.props.setFile({fileId: file.file_id})}}
                             attributes={attributes}
                         >
                         Share file
