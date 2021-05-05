@@ -1,12 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext } from 'react';
 import Navbar from '../components/NavBar';
 import Media from '../components/Media';
 import '../index.css';
 import Transition from '../components/transition';
 import axios from 'axios';
 import { ChatPage } from '../components/ChatPage';
-import {socket} from '../App';
-import { useMediaQuery } from 'react-responsive'
+import { useMediaQuery } from 'react-responsive';
+import { useParams } from 'react-router-dom';
+import { SocketContext } from '../socketContext';
 
 function ChatsPage() {
 
@@ -17,8 +18,11 @@ function ChatsPage() {
     const [latestMessages, setLatestMessages] = useState([]);
     const [showFriendInfo, setShowFriendInfo] = useState(false);
 
-    const token = JSON.parse(localStorage.getItem('tokens'));
+    const [idParams, setIdParams] = useState(useParams().chatId);
+    const [idFriend, setIdFriend] = useState(useParams().friendId);
 
+    const token = JSON.parse(localStorage.getItem('tokens'));
+    const socket = useContext(SocketContext)
     const isStatic = useBreakpoint('1024px');
 
     useEffect(() => {
@@ -26,11 +30,21 @@ function ChatsPage() {
             .then(response => {
                 if(response.status === 200) {
                     setFriends(response.data);
-                    setSelectedFriend(response.data[0]);
-                    handleChat(response.data[0]);
+
+                    if(idParams != null  && idParams != undefined) {
+                        for(let friend of response.data){
+                            if(idFriend == friend.id){
+                                setSelectedFriend(friend);
+                                handleChat(friend)
+                            }
+                        }
+                    }
+
+                    // setSelectedFriend(response.data[0]);
+                    // handleChat(response.data[0]);
                 }
-            })
-    }, [token.id]);
+            });
+    }, [token.id, idParams]);
 
     function useBreakpoint(breakpoint) {
         return useMediaQuery({
@@ -56,6 +70,7 @@ function ChatsPage() {
 
     useEffect(() => {
         socket.on('latest', () => {
+            console.log('melding');
             axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getlatestmessages/${token.id}`)
             .then(response => {
                 if(response.status === 200) {
@@ -69,28 +84,38 @@ function ChatsPage() {
         axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getchat/${token.id}/${friend.id}`)
             .then(response => {
 
-            if(response.status === 200) {
-                setChatId(response.data.chatId)
+                if(response.status === 200) {
+                    if(idParams != undefined) {
+                        if(response.data.chatId != idParams) window.location = '/chat/' + response.data.chatId + '/' + friend.id;
+                        // // window.location = '/chat/' + response.data.chatId;
+                        setChatId(response.data.chatId)
+                        let chatId = response.data.chatId
+                        let userId = token.id
 
-                let chatId = response.data.chatId
-                let userId = token.id
-
-                socket.emit('joinchat', {chatId, userId})
-            } else if(response.status === 201) {
-    
-                const data = {
-                    userOne: token.id,
-                    userTwo: friend.id
+                        socket.emit('joinchat', {chatId, userId})
+                    } else {
+                        window.location = '/chat/' + response.data.chatId + '/' + friend.id;
+                        // setChatId(response.data.chatId)
+                        // let chatId = response.data.chatId
+                        // let userId = token.id
+                        // socket.emit('joinchat', {chatId, userId})
+                    }
+                    
+                } else if(response.status === 201) {
+        
+                    const data = {
+                        userOne: token.id,
+                        userTwo: friend.id
+                    }
+        
+                    axios.post('http://localhost:3030/chat/makechat', data)
+                        .then(response => {
+                            if(response.status === 200) {
+                                setChatId(response.data.insertId)
+                                socket.emit('joinchat', response.data.insertId)
+                            }
+                    })
                 }
-    
-                axios.post('http://localhost:3030/chat/makechat', data)
-                    .then(response => {
-                        if(response.status === 200) {
-                            setChatId(response.data.insertId)
-                            socket.emit('joinchat', response.data.insertId)
-                        }
-                })
-            }
         })
     }
 

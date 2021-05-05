@@ -1,10 +1,12 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import axios from 'axios';
-import {socket} from '../App';
-import useFileUpload from '../hooks/useFileUpload'
+// import {socket} from '../App';
+import useFileUpload from '../hooks/useFileUpload';
+import { useParams } from 'react-router-dom';
+import { SocketContext } from '../socketContext';
 
-
-export const ChatPage = ({friendId, chatId}) => {
+let totalPages;
+export const ChatPage = ({friendId}) => {
 
     const [inputMessage, setInputMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -12,20 +14,33 @@ export const ChatPage = ({friendId, chatId}) => {
     const [image, setImage] = useState(null);
 
     const token = JSON.parse(localStorage.getItem('tokens'));
-    const messageEl = useRef(null);
+    const messageEl = useRef();
+    const socket = useContext(SocketContext)
+
+    const [chatId, setChatId] = useState(useParams().chatId);
+    const [page, setpage] = useState(null)
 
     useEffect(()=> {
 
-        if(chatId != null) {
-            axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getMessages/${chatId}`)
-                .then(response => {
-                    if (response.status === 200) {
-                        setMessages(response.data);
-                    }
-                })
-        }
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getMessages/${chatId}/page=${1}`)
+            .then(response => {
+                if (response.status === 200) {
+                    setpage(1)
+                    setMessages(response.data.messages);
+                    totalPages = response.data.total;
+                    scrollToBottom();
+                }
+            })
         
-    }, [chatId]);
+    }, []);
+
+    useEffect(() => {
+        socket.on('message', message => {
+            console.log(message);
+            setMessages(messages => [ ...messages, message ]);
+            scrollToBottom();
+        });
+    }, [socket])
 
     document.addEventListener('keydown', function(event){
         if(event.key === "Escape"){
@@ -34,19 +49,39 @@ export const ChatPage = ({friendId, chatId}) => {
       });
 
     useEffect(()=> {
-        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/seenmessages/${chatId}/${token.id}`)
+        axios.post(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/seenmessages/${chatId}/${token.id}`)            
+    }, [chatId]);
+
+    useEffect(() => {
+        if(messages.length > 0 && page <= totalPages) {
+            messageEl.current.addEventListener('scroll', (e) => {
+                // console.log(totalPages);
+                if(messageEl.current.scrollTop === 0) {
+                    infinteScroll(messages);
+                }
+            });
+        }
+    }, [messages])
+
+    function infinteScroll(oldMessages) {
+
+        let newPage = page;
+        ++newPage;
+
+        setpage(newPage);
+
+        fetchData(newPage, oldMessages);
+    }
+
+    function fetchData(newPage, oldMessages) {
+        axios.get(`http://${process.env.REACT_APP_HOST_IP}:3030/chat/getMessages/${chatId}/page=${newPage}`)
             .then(response => {
                 if(response.status === 200) {
-
+                    let newMess = [...response.data.messages, ...oldMessages]
+                    setMessages(newMess);
                 }
             })
-    }, [chatId]);
-    
-    useEffect(() => { 
-        socket.on('message', message => {
-            setMessages(messages => [ ...messages, message ]);
-          });
-      }, [])
+    }
 
     function sendMessage(e) {
         e.preventDefault();
@@ -92,7 +127,7 @@ export const ChatPage = ({friendId, chatId}) => {
       messagesEndRef.current.scrollIntoView()
     }
     
-    useEffect(scrollToBottom, [messages]);
+    // useEffect(scrollToBottom, [messages]);
 
     return (
         <div className="justify-between flex flex-col h-full">

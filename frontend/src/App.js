@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from './PrivateRoute';
 import { AuthContext } from "./context/auth";
+import { SocketProvider } from './socketContext'
 
 import Home from './pages/home';
 import Collection from './pages/FilesPage';
@@ -34,23 +35,26 @@ function App() {
 
   return (
     <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
-      <Router>
-        <div>
-          <Switch>
-            <Route exact path='/login' component={Login} />
-            <Route exact path='/forgot' component={EmailForm} />
-            <Route exact path='/digitCode/:email' component={DigitForm} />
-            <Route exact path='/newPassword/:email/:digit' component={NewPassword} />
-            <PrivateRoute exact path='/' component={Home} />
-            <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
-            <PrivateRoute exact path='/myprofile' component={MyProfile} />
-            <PrivateRoute exact path='/friends' component={FriendsPage} />
-            <PrivateRoute exact path='/chat' component={ChatsPage} />
-            <PrivateRoute exact path='/shared' component={SharedPage} />
-            <Route exact path='/register' component={Register} />
-          </Switch>
-        </div>
-      </Router>
+      <SocketProvider>
+        <Router>
+          <div>
+            <Switch>
+              <Route exact path='/login' component={Login} />
+              <Route exact path='/forgot' component={EmailForm} />
+              <Route exact path='/digitCode/:email' component={DigitForm} />
+              <Route exact path='/newPassword/:email/:digit' component={NewPassword} />
+              <PrivateRoute exact path='/' component={Home} />
+              <PrivateRoute exact path='/collection/folder/:foldername/:folderId' component={Collection} />
+              <PrivateRoute exact path='/myprofile' component={MyProfile} />
+              <PrivateRoute exact path='/friends' component={FriendsPage} />
+              <PrivateRoute exact path='/chat' component={ChatsPage} />
+              <PrivateRoute exact path='/chat/:chatId/:friendId' component={ChatsPage} />
+              <PrivateRoute exact path='/shared' component={SharedPage} />
+              <Route exact path='/register' component={Register} />
+            </Switch>
+          </div>
+        </Router>
+      </SocketProvider>
     </AuthContext.Provider>
   )
 }
