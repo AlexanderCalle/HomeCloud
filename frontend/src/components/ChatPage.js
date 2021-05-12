@@ -36,7 +36,6 @@ export const ChatPage = ({friendId}) => {
 
     useEffect(() => {
         socket.on('message', message => {
-            console.log(message);
             setMessages(messages => [ ...messages, message ]);
             scrollToBottom();
         });
