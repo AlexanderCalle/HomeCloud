@@ -111,6 +111,7 @@ function ChatsPage() {
                     axios.post('http://localhost:3030/chat/makechat', data)
                         .then(response => {
                             if(response.status === 200) {
+                                window.location = '/chat/' + response.data.insertId + '/' + friend.id;
                                 setChatId(response.data.insertId)
                                 socket.emit('joinchat', response.data.insertId)
                             }
