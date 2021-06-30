@@ -4,8 +4,8 @@ import { useAuth } from '../context/auth';
 import { Redirect, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
-import Message from '../components/Message';
 import ProgressRing from './CircleProgress';
+import useFileUpload from '../hooks/useFileUpload';
 
 let chunkSize = 1024*1024; // 1MB
 

@@ -13,6 +13,7 @@ function Home() {
     const [foldersFound, setFoldersFound] = React.useState([]);
     const [filesFound, setFilesFound] = React.useState([]);
     const [fileshow, setFileshow] = React.useState(false);
+    const [grid, setGrid] = React.useState(true);
 
     const [file, setFile] = React.useState({
         name: null,
@@ -65,61 +66,75 @@ function Home() {
         <div className='flex flex-row h-screen bg-gray-100'>
             <NavBar page={"folder"} />
             <div className='flex-auto bg-white'>
-                <div className="w-full flex flex-col p-6 space-y-4">
+                <div className="w-full h-full flex flex-col p-6 space-y-4">
                     <div className="flex-none h-16 flex flex-row justify-between items-center border-b">
                         <div className="flex flex-row items-end space-x-4">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             <input className="outline-none sm:w-96 w-5/6 p-0 text-md" value={searchValue} onChange={(e) => onChange(e)} type="text" placeholder="Search..." />
                         </div>
                         <div className="flex flex-row items-end space-x-2">
-                            <button className="focus:outline-none">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <button className="focus:outline-none" onClick={()=> setGrid(!grid)}>
+                                {!grid ? 
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                                :
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                }
                             </button>
                             <button className="focus:outline-none">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>   
                             </button>
                         </div>
                     </div>
-                    {filesFound.length === 0 && foldersFound.length === 0 ? (
-                        <>
-                            <h1 className="mt-4 text-xl font-bold">My folders</h1>
+                    <div className="overflow-y-auto">
+                        {filesFound.length === 0 && foldersFound.length === 0 ? (
+                            <>
+                                <h1 className="mt-4 text-xl font-bold">My folders</h1>
+                                {
+                                    grid ? (
+                                        <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                                            <FolderList setFoldernameWarning={setFoldernameWarning} setFolderId={setFolderId} />
+                                        </div>
+                                    ): (
+                                        <div className="mt-4 flex-auto overflow-y-auto flex flex-col w-full space-y-4">
+                                            <FolderList setFoldernameWarning={setFoldernameWarning} setFolderId={setFolderId} />
+                                        </div>
+                                    )
+                                }
+                            </>
+                        ) : (
+                            <>
+                            <h1 className="mt-4 text-xl font-bold">Items Found</h1>
                             <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                                <FolderList setFoldernameWarning={setFoldernameWarning} setFolderId={setFolderId} />
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                        <h1 className="mt-4 text-xl font-bold">Items Found</h1>
-                        <div className="mt-4 flex-auto overflow-y-auto grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                            {foldersFound.map(folder => (
-                                <a className="block cursor-pointer border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" href={`/collection/folder/${folder.name}/${folder.folder_id}`}>
-                                        <div className="p-3 space-y-4">
-                                        <div className="flex flex-row items-center space-x-2 overflow-hidden">
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                                            <strong className="flex-grow font-normal">{folder.name}</strong>
+                                {foldersFound.map(folder => (
+                                    <a className="block cursor-pointer border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white" href={`/collection/folder/${folder.name}/${folder.folder_id}`}>
+                                            <div className="p-3 space-y-4">
+                                            <div className="flex flex-row items-center space-x-2 overflow-hidden">
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                                <strong className="flex-grow font-normal">{folder.name}</strong>
+                                            </div>
                                         </div>
-                                    </div>
-                                </a> 
-                            ))}
-                            {filesFound.map((file => {
-                                return (
-                                    <div className="block cursor-pointer border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white overflow-hidden">
-                                        <div className="flex flex-row items-center">
-                                            <a className="flex-auto cursor-pointer" onClick={() => fileShowing(file.path, file.name, file.is_image, file.file_id, file.created_at)}>
-                                                <div className="p-3 space-y-4">
-                                                    <div className="flex flex-row items-center space-x-2 overflow-hidden">
-                                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                                        <strong className="flex-grow text-sm font-normal">{file.name}</strong>
+                                    </a> 
+                                ))}
+                                {filesFound.map((file => {
+                                    return (
+                                        <div className="block cursor-pointer border border-gray-400 rounded-md shadow-md hover:border-cornblue-400 hover:bg-cornblue-200 hover:text-white overflow-hidden">
+                                            <div className="flex flex-row items-center">
+                                                <a className="flex-auto cursor-pointer" onClick={() => fileShowing(file.path, file.name, file.is_image, file.file_id, file.created_at)}>
+                                                    <div className="p-3 space-y-4">
+                                                        <div className="flex flex-row items-center space-x-2 overflow-hidden">
+                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                            <strong className="flex-grow text-sm font-normal">{file.name}</strong>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
-                                )
-                            }))}
-                        </div>
-                        </>
-                    )}
+                                    )
+                                }))}
+                            </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
             <>
@@ -177,7 +192,7 @@ function Home() {
                             </div>
                             <div className="w-full flex flex-col p-2 space-y-4 justify-center text-black items-center">
                                 <div className="border-b pb-4">
-                                {file.is_image ? <img src={'http://localhost:3030' + file.file} /> : <h1>No preview to see</h1>}
+                                {file.is_image ? <img src={'http://' + process.env.REACT_APP_HOST_IP + ':3030' + file.file} /> : <h1>No preview to see</h1>}
                                 </div>
                                 <div className="-mt-4 w-full border-b pb-4 px-4 flex flex-col items-start space-y-4">
                                 <p>Created on: {file.created}</p>
