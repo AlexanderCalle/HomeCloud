@@ -64,9 +64,9 @@ class Profile extends Component {
 
     }
 
-    UpdatingUserPic = (user) => {
-        console.log('pok');
-    }
+    // UpdatingUserPic = (user) => {
+    //     console.log('pok');
+    // }
 
     handleEvent = () => {
         var input = document.getElementById('upload');

@@ -45,38 +45,13 @@ function Register() {
 
     return (
         <div class="fixed z-10 inset-0 overflow-y-auto shadow-2xl bg-gray-100">
-          {/* <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <form>
-              <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                <div class="w-full bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div class="min-w-0 sm:flex sm:items-start">
-                    <div class="w-full mt-3 text-center sm:mt-0 sm:ml-1 sm:text-left">
-                      <h3 class="text-2xl leading-1 font-medium text-blue-500" id="modal-headline">
-                        Register
-                      </h3>
-                      <div class="w-full mt-4 flex flex-col space-y-4">
-                      { isError &&<p>The email is already taken or required everything!</p> }
-                        <input type="text" value={firstname} onChange={ (e) => setFirstname(e.target.value) } placeholder="Firstname..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                        <input type="text" value={lastname} onChange={ (e) => setLastname(e.target.value) } placeholder="Lastname..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                        <input type="text" value={emailUser} onChange={ (e) => setEmail(e.target.value) } placeholder="Email..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                        <input type="password" value={password} onChange={ (e) => setPassword(e.target.value) } placeholder="Password..." class="h-8 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-blue-500 rounded-md"/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <a>
-                  <button type="button" onClick={postRegister} class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Register
-                  </button>
-                  </a>
-                </div>
-              </div>
-            </form>
-          </div> */}
-
           <div className="flex items-center justify-center h-screen w-screen min-h-screen pt-4 px-4 pb-20 text-center">
+          { isError !== null && (
+              <div className="text-red-500 absolute top-3 border border-red-500 bg-red-50 px-4 py-2 rounded-md flex flex-row space-x-2">
+                <p>{isError}</p>
+                <span onClick={() => setIsError(null)} className="hover:bg-red-100 px-2 right-1 rounded-sm cursor-pointer">&#10005;</span>
+              </div>
+            )}
               <form className="space-y-5 text-center lg:w-1/4 w-80">
                   <div className="flex flex-col items-center space-y-4">
                     <svg class="w-20 h-20 text-cornblue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>

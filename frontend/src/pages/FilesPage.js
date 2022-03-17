@@ -6,7 +6,8 @@ import Axios from 'axios';
 import { useParams, useHistory } from 'react-router-dom';
 import useFileDownloader from '../hooks/useFileDownloader'
 import SelecingFiles from '../components/SelectingFiles';
-import { useMediaQuery } from 'react-responsive'
+import { useMediaQuery } from 'react-responsive';
+import Message from '../components/Message';
 
 
 function Collection() {
@@ -246,7 +247,6 @@ function Collection() {
 
   return (
     <div className='flex flex-row h-screen bg-gray-100'>
-
       <>
         {/* {showSuccess ? (
           <div className='fixed flex justify-center z-40 w-screen'>
