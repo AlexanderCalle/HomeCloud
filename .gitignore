@@ -10,6 +10,7 @@ backend/upload/*
 frontend/.pnp
 frontend.pnp.js
 frontend/.env
+frontend/.eslintcache
 
 # testing
 frontend/coverage
