@@ -23,19 +23,19 @@ router.post('/UploadChunks', (req, res) => {
     req.on('end', function () {
         // console.log("total size = " + size);
         res.status(200).send("response");
-    }); 
+    });
 });
 // Opens the stream to upload file(s)
 router.get('/openStream/:id/:foldername/:filename', async (req, res) => {
     let path = `./upload/${req.params.id}/${req.params.foldername}/${req.params.filename}`;
 
-    if(req.params.foldername == 'chat') {
+    if (req.params.foldername == 'chat') {
         path = `./upload/${req.params.foldername}/${req.params.id}/${req.params.filename}`
-        if(!fs.existsSync(`./upload/${req.params.foldername}/`)) {
+        if (!fs.existsSync(`./upload/${req.params.foldername}/`)) {
             fs.mkdirSync(`./upload/${req.params.foldername}/`);
         }
 
-        if(!fs.existsSync(`./upload/${req.params.foldername}/${req.params.id}/`)) {
+        if (!fs.existsSync(`./upload/${req.params.foldername}/${req.params.id}/`)) {
             fs.mkdirSync(`./upload/${req.params.foldername}/${req.params.id}/`)
         }
     }
@@ -49,18 +49,18 @@ router.get('/openStream/:id/:foldername/:filename', async (req, res) => {
 router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
     ws.end();
 
-    if(req.params.foldername == 'chat') {
+    if (req.params.foldername == 'chat') {
         // res.status(200).send('ok');
         con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, 0], (err, file) => {
-            if(file[0] != undefined || file[0] != null) {
+            if (file[0] != undefined || file[0] != null) {
                 let is_image = 0;
 
                 let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-                if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                if (dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
                     is_image = 1;
                 }
-        
+
                 const data = {
                     name: req.params.filename,
                     path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
@@ -68,32 +68,32 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
                     folder_id: 0,
                     is_image: is_image
                 }
-                con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result)=>{
-                    if(err.code == 'ER_NO_REFERENCED_ROW_2') {
+                con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result) => {
+                    if (err.code == 'ER_NO_REFERENCED_ROW_2') {
                         const data = {
                             folder_id: 0,
                             name: 'chat',
                             main_path: '/',
                             user_id: req.params.user_id
                         }
-                        con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
-                            if(err) return res.status(500).send(err);
+                        con.query('INSERT INTO `folders` SET ?', data, (err, result) => {
+                            if (err) return res.status(500).send(err);
                             res.status(200).send('ok');
                         });
                     }
                     if (err) return console.log(err.code);
-                    if(!err) return res.status(200).send('ok');
-                }); 
+                    if (!err) return res.status(200).send('ok');
+                });
             } else {
                 // res.status(200).send('ok');
                 let is_image = 0;
 
                 let dataType = req.params.filename.split('.')[1].toLowerCase();
 
-                if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                if (dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
                     is_image = 1;
                 }
-        
+
                 const data = {
                     name: req.params.filename,
                     path: '/' + req.params.foldername + '/' + req.body.chatId + '/' + req.params.filename,
@@ -101,72 +101,72 @@ router.post('/addfiles/:user_id/:foldername/:filename', (req, res) => {
                     folder_id: 0,
                     is_image: is_image
                 }
-                con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-                    if(!err) return res.status(200).send('ok');
-                    if(err.code == 'ER_NO_REFERENCED_ROW_2') {
+                con.query('INSERT INTO `files` SET ?', data, (err, result) => {
+                    if (!err) return res.status(200).send('ok');
+                    if (err.code == 'ER_NO_REFERENCED_ROW_2') {
                         const data = {
                             name: 'chat',
                             main_path: '/',
                             user_id: req.params.user_id
                         }
-                        con.query('INSERT INTO `folders` SET ?', data, (err, result)=> {
-                            if(err) return res.status(500).send(err);
+                        con.query('INSERT INTO `folders` SET ?', data, (err, result) => {
+                            if (err) return res.status(500).send(err);
                             res.status(200).send('ok');
                         });
                     }
                     if (err) return console.log(err.code);
-                }); 
+                });
             }
         })
     }
 
-    if(req.params.foldername != 'chat') {
-        con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?',[req.params.foldername, req.params.user_id], async (err, result)=>{
-            if(err) return res.status(500).send(err);
-    
-                con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, result[0].folder_id], (err, file) => {
-                    if(file[0] != undefined || file[0] != null) {
-                        let is_image = 0;
-    
-                        let dataType = req.params.filename.split('.')[1].toLowerCase();
-    
-                        if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
-                            is_image = 1;
-                        }
-                
-                        const data = {
-                            name: req.params.filename,
-                            path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
-                            user_id: req.params.user_id,
-                            folder_id: result[0].folder_id || 0,
-                            is_image: is_image
-                        }
-                        con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result)=>{
-                            if (err) return res.status(500).send(err);
-                        }); 
-                        res.status(200).send('ok');
-                    } else {
-                        let is_image = 0;
-    
-                        let dataType = req.params.filename.split('.')[1].toLowerCase();
-    
-                        if(dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
-                            is_image = 1;
-                        }
-                
-                        const data = {
-                            name: req.params.filename,
-                            path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
-                            user_id: req.params.user_id,
-                            folder_id: result[0].folder_id || 0,
-                            is_image: is_image
-                        }
-                        con.query('INSERT INTO `files` SET ?', data, (err, result)=>{
-                            if (err) return res.status(500).send(err);
-                        }); 
-                        res.status(200).send('ok');
+    if (req.params.foldername != 'chat') {
+        con.query('SELECT folder_id FROM `folders` WHERE name = ? AND user_id = ?', [req.params.foldername, req.params.user_id], async (err, result) => {
+            if (err) return res.status(500).send(err);
+
+            con.query('SELECT * FROM `files` WHERE name = ? AND folder_id = ?', [req.params.filename, result[0].folder_id], (err, file) => {
+                if (file[0] != undefined || file[0] != null) {
+                    let is_image = 0;
+
+                    let dataType = req.params.filename.split('.')[1].toLowerCase();
+
+                    if (dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                        is_image = 1;
                     }
-                })
+
+                    const data = {
+                        name: req.params.filename,
+                        path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                        user_id: req.params.user_id,
+                        folder_id: result[0].folder_id || 0,
+                        is_image: is_image
+                    }
+                    con.query('UPDATE `files` SET ? WHERE file_id = ?', [data, file[0].file_id], (err, result) => {
+                        if (err) return res.status(500).send(err);
+                    });
+                    res.status(200).send('ok');
+                } else {
+                    let is_image = 0;
+
+                    let dataType = req.params.filename.split('.')[1].toLowerCase();
+
+                    if (dataType === 'jpg' || dataType === 'jpeg' || dataType === 'png' || dataType === 'gif') {
+                        is_image = 1;
+                    }
+
+                    const data = {
+                        name: req.params.filename,
+                        path: '/' + req.params.user_id + '/' + req.params.foldername + '/' + req.params.filename,
+                        user_id: req.params.user_id,
+                        folder_id: result[0].folder_id || 0,
+                        is_image: is_image
+                    }
+                    con.query('INSERT INTO `files` SET ?', data, (err, result) => {
+                        if (err) return res.status(500).send(err);
+                    });
+                    res.status(200).send('ok');
+                }
+            })
         });
     }
 });
@@ -175,14 +175,14 @@ router.post('/renamefile/:folderId/:fileId', (req, res) => {
     const name = req.body.name;
     con.query('SELECT * FROM `files` WHERE folder_id = ? AND name = ?', [req.params.folderId, name], (err, result) => {
         if (err) return res.status(500).send(err);
-        if(result[0] == undefined) {
+        if (result[0] == undefined) {
             con.query('SELECT * FROM `files` WHERE file_id = ?', req.body.fileId, async (err, file) => {
-                if(err) return console.log(err);
+                if (err) return console.log(err);
 
                 const oldPath = './upload' + file[0].path;
                 const newPath = `./upload/${req.body.userId}/${req.body.foldername}/${name}`
                 const newPathDb = `/${req.body.userId}/${req.body.foldername}/${name}`
-    
+
                 await fs.renameSync(oldPath, newPath);
 
                 const data = {
@@ -196,41 +196,40 @@ router.post('/renamefile/:folderId/:fileId', (req, res) => {
                 })
             });
         } else {
-            
+
             res.status(201).send('There is already a file with this name');
-            
+
         }
     })
 
 });
 // Delete a file
 router.get('/deletefile/:fileId', (req, res) => {
-
     con.query('SELECT * FROM `files` WHERE file_id = ?', req.params.fileId, (err, files) => {
         if (err) return res.status(500).send(err);
-
-        fs.unlinkSync('./upload' + files[0].path);
-        con.query('DELETE FROM `files` WHERE file_id = ?', req.params.fileId, (err, result)=> {
+        let file = files[0];
+        con.query('DELETE FROM `files` WHERE file_id = ?', req.params.fileId, (err, result) => {
             if (err) return res.status(500).send(err);
+            fs.unlinkSync('./upload' + file.path);
             res.status(200).send('ok')
         });
-
-    });
+    })
 
 });
+
 // Share a file with friend method:Post
-router.post('/sharefile', (req, res)=> {
+router.post('/sharefile', (req, res) => {
     const data = {
         shared_file: req.body.shared_file,
         user_file: req.body.user_file,
         shared_user: req.body.shared_user
     }
 
-    con.query('SELECT * FROM `shared` WHERE user_file = ? AND shared_user = ? AND shared_file = ?', [data.user_file, data.shared_user, data.shared_file], (err, result)=> {
+    con.query('SELECT * FROM `shared` WHERE user_file = ? AND shared_user = ? AND shared_file = ?', [data.user_file, data.shared_user, data.shared_file], (err, result) => {
         if (err) return console.log(err);
-        if(result.length === 0) {
-            con.query('INSERT INTO `shared` SET ?', data, (err, result)=> {
-                if(err) return console.log(err);
+        if (result.length === 0) {
+            con.query('INSERT INTO `shared` SET ?', data, (err, result) => {
+                if (err) return console.log(err);
                 res.status(200).send(result);
                 console.log('shared file in db!');
             })
@@ -238,29 +237,44 @@ router.post('/sharefile', (req, res)=> {
     })
 });
 // Get all shared files
-router.get('/getshared/:userId', (req, res)=> {
-    con.query('SELECT f.*, u.firstname, u.lastname FROM `files` f LEFT JOIN `shared` s ON ? IN (shared_user) LEFT JOIN `users` u ON s.user_file = u.id  WHERE f.file_id = s.shared_file', req.params.userId, (err, data)=> {
-        if(err) return res.status(500).send(err);
+router.get('/getshared/:userId', (req, res) => {
+    con.query('SELECT f.*, u.firstname, u.lastname FROM `files` f LEFT JOIN `shared` s ON ? IN (shared_user) LEFT JOIN `users` u ON s.user_file = u.id  WHERE f.file_id = s.shared_file', req.params.userId, (err, data) => {
+        if (err) return res.status(500).send(err);
         res.status(200).send(data)
     })
 });
 
-router.get('/getMedia/:chatId/page=/:page', (req, res)=> {
+router.get('/shared/:fileId', (req, res) => {
+    con.query('SELECT * FROM `shared` WHERE shared_file = ?', req.params.fileId, (err, file) => {
+        if (err) return res.status(500).send(err);
+        if (!file[0]) return res.status(200).send({ found: undefined });
+        else return res.status(200).send({ found: file[0] });
+    })
+})
+
+router.get('/shared/delete/:fileId', (req, res) => {
+    con.query('DELETE FROM `shared` WHERE shared_file = ?', req.params.fileId, (err, file) => {
+        if (err) return res.status(500).send(err);
+        res.status(200).send('successfully deleted shared file');
+    })
+})
+
+router.get('/getMedia/:chatId/page=/:page', (req, res) => {
     var numPerPage = 9;
     var page = parseInt(req.params.page);
     var skip = (page - 1) * numPerPage;
     var limit = skip + ',' + numPerPage;
 
     con.query('SELECT count(*) as numRows FROM files WHERE folder_id = "0" AND path LIKE ?', '/chat/' + req.params.chatId + '/%', (err, rows, fields) => {
-        if(err){
-            console.log("error: " , err);
+        if (err) {
+            console.log("error: ", err);
             res.status(500).send("Failed loading data");
         } else {
             var numRows = rows[0].numRows;
             var numPages = Math.ceil(numRows / numPerPage);
 
-            con.query('SELECT * FROM files WHERE folder_id = "0" AND path LIKE ? LIMIT '+limit, '/chat/' + req.params.chatId + '/%', (err, rows, fields) => {
-                if(err){
+            con.query('SELECT * FROM files WHERE folder_id = "0" AND path LIKE ? LIMIT ' + limit, '/chat/' + req.params.chatId + '/%', (err, rows, fields) => {
+                if (err) {
                     console.log("error: ", err);
                     res.status(200).send("Failed to laod data");
                 } else {
